@@ -239,7 +239,7 @@ namespace Bambit.TestUtility.DataGeneration
         /// <param name="postCreate">The <see cref="Action{T}"/> to call on each entity before returning.</param>
         /// <param name="numberItems">The number of items to generate</param>
         /// <returns>A <see cref="IList{T}"/> of <see cref="numberItems"/> object of type <see cref="T"/></returns>
-        List<T> InitializeList<T>(int numberItems, Action<T> postCreate) where T : 
+        IList<T> InitializeList<T>(int numberItems, Action<T> postCreate) where T : 
 #if NET6_0_OR_GREATER
             notnull, 
 #endif
