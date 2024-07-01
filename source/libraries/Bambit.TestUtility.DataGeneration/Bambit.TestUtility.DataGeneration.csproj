@@ -13,7 +13,6 @@
 	  <PackageProjectUrl>https://github.com/bambit/test-utils</PackageProjectUrl>
 	  <RepositoryUrl>https://github.com/bambit/test-utils</RepositoryUrl>
      <PackageReadmeFile>Readme.md</PackageReadmeFile>
-     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
