@@ -304,6 +304,33 @@ namespace Bambit.TestUtility.DataGeneration
         ;
         #endregion Instantiation Methods
 
+        #region Misc Methods
+
+        /// <summary>
+        /// Gets the first day of the supplied month.
+        /// </summary>
+        /// <param name="monthDate">The date to retrieve the first date for</param>
+        /// <returns>A <see cref="DateTime"/> with the <see cref="DateTime.Day"/> value being 1 and other values matching the supplied <see cref="monthDate"/></returns>
+        DateTime GetFirstDayOfMonth(DateTime monthDate);
+        /// <summary>
+        ///  Gets the first day of the current month
+        /// </summary>
+        /// <returns>A <see cref="DateTime"/> with the <see cref="DateTime.Day"/> value being 1 and other values matching <see cref="DateTime.Today"/></returns>
+        DateTime GetFirstDayOfMonth();
+
+        /// <summary>
+        /// Gets the last day of the supplied month.
+        /// </summary>
+        /// <param name="monthDate">The date to retrieve the last date for</param>
+        /// <returns>A <see cref="DateTime"/> with the <see cref="DateTime.Day"/> value being the last day of the supplied <see cref="monthDate"/>, and other value matches</returns>
+        DateTime GetLastDayOfMonth(DateTime monthDate );
+        /// <summary>
+        ///  Gets the last day of the current month
+        /// </summary>
+        /// <returns>A <see cref="DateTime"/> with the <see cref="DateTime.Day"/> value being the last day of the supplied <see cref="DateTime.Today"/></returns>
+        DateTime GetLastDayOfMonth();
+
+        #endregion Misc Methods
         #region Selection methods
 
         /// <summary>
@@ -332,6 +359,7 @@ namespace Bambit.TestUtility.DataGeneration
         T GetListEntry<T>(List<T> list);
 
         #endregion Selection methods
+
 
     }
 }

@@ -104,12 +104,7 @@ namespace Bambit.TestUtility.DataGeneration
         /// </summary>
         private readonly Dictionary<Type, Type> AutoProperties;
 
-        /// <summary>
-        /// Contains a mapping of types to specialized functions to generate them.  Allows for global customaization
-        /// of any given type.
-        /// </summary>
-        private readonly Dictionary<Type, Func<object>> MappedInitializeFunctions;
-
+        
         /// <summary>
         /// Contains a mapping of field names to the generators that will produce the string.
         /// Used if a class has fields like "FirstName" or "State", you can use specific generator methods
@@ -117,10 +112,16 @@ namespace Bambit.TestUtility.DataGeneration
         /// </summary>
         private readonly Dictionary<string, Func<string>> FieldNamesToGenerators;
 
+        /// <summary>
+        /// Contains a mapping of types to specialized functions to generate them.  Allows for global customaization
+        /// of any given type.
+        /// </summary>
+        private readonly Dictionary<Type, Func<object>> MappedInitializeFunctions;
+
+
         public int MaxRecursion { get; set; } = 20;
 
         #endregion Fields
-
 
         #region Ctors
 
@@ -135,6 +136,8 @@ namespace Bambit.TestUtility.DataGeneration
         }
 
         #endregion Fields
+
+        #region IRandomDataGenerator Implementation
 
         #region Generation Methods
 
@@ -192,22 +195,63 @@ namespace Bambit.TestUtility.DataGeneration
             double value = Math.Floor(GenerateDouble(0, high));
             return Convert.ToDecimal(value / divisor);
         }
+        
+        public virtual Guid GenerateGuid()
+        {
+            return Guid.NewGuid();
+        }
+
+        public virtual bool GenerateBoolean()
+        {
+            return GenerateInt() % 2 == 0;
+        }
 
         public virtual decimal GenerateDecimal(decimal low = 0m, decimal high = 10000000000m)
         {
             double value = GenerateDouble((double)low, (double)high);
             return Convert.ToDecimal(value);
         }
+        public virtual DateTime GenerateDate(int daysAgoMinimum = -30, int daysFutureMaximum = 30)
+        {
+            return DateTime.Today.AddDays(GenerateInt(daysAgoMinimum, daysFutureMaximum));
+        }
+
+
+        public virtual DateTime GenerateDateTime(int daysAgoMinimum = -30, int daysFutureMaximum = 30)
+        {
+            return DateTime.Today.AddDays(GenerateInt(daysAgoMinimum, daysFutureMaximum))
+                    .AddSeconds(GenerateDouble(0, 24 * 60 * 60))
+                    .AddMilliseconds(GenerateDouble(0, 1000))
+                    .AddMicroseconds(GenerateDouble(0, 1000))
+                ;
+        }
+
+        
+        public string GenerateFirstName()
+        {
+            return FirstNames[GenerateInt(0, FirstNames.Length)];
+        }
+
+        public string GenerateLastName()
+        {
+            return LastNames[GenerateInt(0, LastNames.Length)];
+        }
+
+        public string GenerateName()
+        {
+            return $"{GenerateFirstName()} {GenerateLastName()}";
+
+        }
 
         #endregion Basic types
-
-        #endregion Generation Methods
-
 
         public virtual decimal GenerateMoney(decimal low = 0m, decimal high = 10000000000m)
         {
             return Math.Floor(GenerateDecimal(low, high) * 100) / 100;
         }
+        #endregion Generation Methods
+
+        #region Configuration 
 
         public void AddStringFieldNameGenerator(string fieldName, Func<string> generator)
         {
@@ -243,7 +287,9 @@ namespace Bambit.TestUtility.DataGeneration
             AddAutoProperties<T, T>();
         }
 
-
+        #endregion Configuration 
+        
+        #region Instantiation Methods
         public virtual Dictionary<string, TValue> InitializeDictionary<TValue>(int numberItems)
             where TValue : notnull, new()
         {
@@ -273,8 +319,6 @@ namespace Bambit.TestUtility.DataGeneration
         {
             return InitializeObject<T>(null);
         }
-
-
 
         public virtual T InitializeObject<T>(Action<T>? modifierFunction) 
             where T :  notnull, new()
@@ -359,6 +403,103 @@ namespace Bambit.TestUtility.DataGeneration
             return newObject;
         }
         
+        public virtual T InitializeObject<T>(T objectToInitialize) 
+            where T : notnull 
+        {
+            return InitializeObject(objectToInitialize, MaxRecursion);
+        }
+
+        public virtual T InitializeObject<T>(T objectToInitialize, int maxRecursion) where T : notnull
+        {
+            if (--maxRecursion < 1)
+                throw new InvalidOperationException("Maximum recursion level hit");
+            Type objectType = objectToInitialize.GetType();
+            PropertyInfo[] propertyInfos =
+                objectType.GetProperties(BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.Public)
+                    .Where(p => p is { CanRead: true, CanWrite: true }).ToArray();
+
+            foreach (PropertyInfo propertyInfo in propertyInfos)
+            {
+                AssignValueToProperty(objectToInitialize, propertyInfo, maxRecursion);
+
+            }
+
+            return objectToInitialize;
+        }
+
+
+
+        public virtual T InitializeObject<T>(T objectToInitialize, Action<T>? modifierFunction)
+            where T : notnull 
+        {
+
+
+            Type objectType = objectToInitialize.GetType();
+            PropertyInfo[] propertyInfos =
+                objectType.GetProperties(BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.Public)
+                    .Where(p => p is { CanRead: true, CanWrite: true }).ToArray();
+
+            foreach (PropertyInfo propertyInfo in propertyInfos)
+            {
+                AssignValueToProperty(objectToInitialize, propertyInfo, MaxRecursion);
+
+            }
+
+            modifierFunction?.Invoke(objectToInitialize);
+            return objectToInitialize;
+        }
+        #endregion Instantiation Methods
+
+        #region Misc Methods
+
+        public virtual DateTime GetFirstDayOfMonth()
+        {
+            return GetFirstDayOfMonth(DateTime.Today);
+        }
+        public virtual DateTime GetFirstDayOfMonth(DateTime monthDate)
+        {
+            return new DateTime(monthDate.Year, monthDate.Month, 1);
+        }
+
+        public virtual DateTime GetLastDayOfMonth()
+        {
+            return GetLastDayOfMonth(DateTime.Today);
+;        }
+        public virtual DateTime GetLastDayOfMonth(DateTime monthDate)
+        {
+            return GetFirstDayOfMonth(monthDate).AddMonths(1).AddDays(-1);
+        }
+        #endregion Misc Methods
+
+        #region Selection methods
+        public T GenerateEnum<T>() where T : struct, Enum, IConvertible
+        {
+            if (!typeof(T).IsEnum)
+                throw new ArgumentException("Type must be an enum");
+            string[] names = Enum.GetNames(typeof(T));
+            Enum.TryParse(GetEntry(names), out T result);
+            return result;
+        }
+
+        public T CoinToss<T>(T heads, T tails)
+        {
+            return GenerateInt(0, 2) == 0 ? heads : tails;
+        }
+
+        public T GetListEntry<T>(List<T> list)
+        {
+            return list[GenerateInt(0, list.Count)];
+        }
+
+        public T GetEntry<T>(T[] list)
+        {
+            return list[GenerateInt(0, list.Length)];
+        }
+        #endregion Selection Methods
+        
+        #endregion IRandomDataGenerator Implementation
+
+        #region Protected Methods
         protected virtual string? GenerateStringForFieldName(string fieldName)
         {
             return
@@ -366,45 +507,7 @@ namespace Bambit.TestUtility.DataGeneration
                     ? generator.Invoke()
                     : null;
         }
-
-        private void SetProperty<T>(T objectToInitialize, PropertyInfo propertyInfo, Type mappedType, int maxRecursion)
-        {
-            
-            object? newObject;
-            if (MappedInitializeFunctions.TryGetValue(mappedType, out Func<object>? function))
-                newObject = function();
-            else
-            {
-                newObject = Activator.CreateInstance(mappedType);
-                if (newObject == null)
-                    throw new InvalidOperationException(
-                        $"Could not create instance of object of type '{mappedType}.  Verify a default constructor exists");
-                InitializeObject(newObject, maxRecursion);
-            }
-
-            propertyInfo.SetValue(objectToInitialize, newObject);
-        }
-
-        private void SetStringProperty<T>(T objectToInitialize, PropertyInfo propertyInfo)
-        {
-            var value = GenerateStringForFieldName(propertyInfo.Name);
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                int maxSize = GenerateInt(30, 50);
-
-                var stringLengthAttribute =
-                    propertyInfo.GetCustomAttribute<StringLengthAttribute>();
-                if (stringLengthAttribute != null)
-                    maxSize = stringLengthAttribute.MaximumLength;
-                var maxLengthAttribute = propertyInfo.GetCustomAttribute<MaxLengthAttribute>();
-                if (maxLengthAttribute != null)
-                    maxSize = maxLengthAttribute.Length;
-                value = GenerateString(maxSize);
-            }
-
-            propertyInfo.SetValue(objectToInitialize, value);
-        }
-
+        
         protected virtual void AssignValueToProperty<T>(T objectToInitialize, PropertyInfo propertyInfo,
             int maxRecursion)
         {
@@ -471,130 +574,52 @@ namespace Bambit.TestUtility.DataGeneration
                 propertyInfo.SetValue(objectToInitialize, GenerateGuid());
             }
         }
+        #endregion Protected Methods
 
-        public virtual T InitializeObject<T>(T objectToInitialize) 
-            where T : notnull 
+        #region private Methods
+
+        private void SetProperty<T>(T objectToInitialize, PropertyInfo propertyInfo, Type mappedType, int maxRecursion)
         {
-            return InitializeObject(objectToInitialize, MaxRecursion);
-        }
-
-        public virtual T InitializeObject<T>(T objectToInitialize, int maxRecursion) where T : notnull
-        {
-            if (--maxRecursion < 1)
-                throw new InvalidOperationException("Maximum recursion level hit");
-            Type objectType = objectToInitialize.GetType();
-            PropertyInfo[] propertyInfos =
-                objectType.GetProperties(BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.Public)
-                    .Where(p => p is { CanRead: true, CanWrite: true }).ToArray();
-
-            foreach (PropertyInfo propertyInfo in propertyInfos)
+            
+            object? newObject;
+            if (MappedInitializeFunctions.TryGetValue(mappedType, out Func<object>? function))
+                newObject = function();
+            else
             {
-                AssignValueToProperty(objectToInitialize, propertyInfo, maxRecursion);
-
+                newObject = Activator.CreateInstance(mappedType);
+                if (newObject == null)
+                    throw new InvalidOperationException(
+                        $"Could not create instance of object of type '{mappedType}.  Verify a default constructor exists");
+                InitializeObject(newObject, maxRecursion);
             }
 
-            return objectToInitialize;
+            propertyInfo.SetValue(objectToInitialize, newObject);
         }
 
-
-
-        public virtual T InitializeObject<T>(T objectToInitialize, Action<T>? modifierFunction)
-            where T : notnull 
+        private void SetStringProperty<T>(T objectToInitialize, PropertyInfo propertyInfo)
         {
-
-
-            Type objectType = objectToInitialize.GetType();
-            PropertyInfo[] propertyInfos =
-                objectType.GetProperties(BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.Public)
-                    .Where(p => p is { CanRead: true, CanWrite: true }).ToArray();
-
-            foreach (PropertyInfo propertyInfo in propertyInfos)
+            var value = GenerateStringForFieldName(propertyInfo.Name);
+            if (string.IsNullOrWhiteSpace(value))
             {
-                AssignValueToProperty(objectToInitialize, propertyInfo, MaxRecursion);
+                int maxSize = GenerateInt(30, 50);
 
+                var stringLengthAttribute =
+                    propertyInfo.GetCustomAttribute<StringLengthAttribute>();
+                if (stringLengthAttribute != null)
+                    maxSize = stringLengthAttribute.MaximumLength;
+                var maxLengthAttribute = propertyInfo.GetCustomAttribute<MaxLengthAttribute>();
+                if (maxLengthAttribute != null)
+                    maxSize = maxLengthAttribute.Length;
+                value = GenerateString(maxSize);
             }
 
-            modifierFunction?.Invoke(objectToInitialize);
-            return objectToInitialize;
+            propertyInfo.SetValue(objectToInitialize, value);
         }
 
-        public virtual DateTime GetFirstDayOfMonth(DateTime? monthDate = null)
-        {
-            monthDate ??= DateTime.Today;
-            return new DateTime(monthDate.Value.Year, monthDate.Value.Month, 1);
-        }
-
-        public virtual DateTime GetLastDayOfMonth(DateTime? monthDate = null)
-        {
-            return GetFirstDayOfMonth(monthDate).AddMonths(1).AddDays(-1);
-        }
-
-        public virtual DateTime GenerateDate(int daysAgoMinimum = -30, int daysFutureMaximum = 30)
-        {
-            return DateTime.Today.AddDays(GenerateInt(daysAgoMinimum, daysFutureMaximum));
-        }
+        
+        #endregion private Methods
 
 
-        public virtual DateTime GenerateDateTime(int daysAgoMinimum = -30, int daysFutureMaximum = 30)
-        {
-            return DateTime.Today.AddDays(GenerateInt(daysAgoMinimum, daysFutureMaximum))
-                    .AddSeconds(GenerateDouble(0, 24 * 60 * 60))
-                    .AddMilliseconds(GenerateDouble(0, 1000))
-                    .AddMicroseconds(GenerateDouble(0, 1000))
-                ;
-        }
-
-
-
-        public T GenerateEnum<T>() where T : struct, Enum, IConvertible
-        {
-            if (!typeof(T).IsEnum)
-                throw new ArgumentException("Type must be an enum");
-            string[] names = Enum.GetNames(typeof(T));
-            Enum.TryParse(GetEntry(names), out T result);
-            return result;
-        }
-
-        public virtual Guid GenerateGuid()
-        {
-            return Guid.NewGuid();
-        }
-
-        public virtual bool GenerateBoolean()
-        {
-            return GenerateInt() % 2 == 0;
-        }
-
-        public T CoinToss<T>(T heads, T tails)
-        {
-            return GenerateInt(0, 2) == 0 ? heads : tails;
-        }
-
-        public T GetListEntry<T>(List<T> list)
-        {
-            return list[GenerateInt(0, list.Count)];
-        }
-
-        public T GetEntry<T>(T[] list)
-        {
-            return list[GenerateInt(0, list.Length)];
-        }
-
-        public string GenerateFirstName()
-        {
-            return FirstNames[GenerateInt(0, FirstNames.Length)];
-        }
-
-        public string GenerateLastName()
-        {
-            return LastNames[GenerateInt(0, LastNames.Length)];
-        }
-
-        public string GenerateName()
-        {
-            return $"{GenerateFirstName()} {GenerateLastName()}";
-
-        }
     }
 
 }

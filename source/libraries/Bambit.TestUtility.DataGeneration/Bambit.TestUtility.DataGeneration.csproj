@@ -3,6 +3,22 @@
   <PropertyGroup>
 	  <TargetFrameworks>net8.0</TargetFrameworks>
 	  <Nullable>enable</Nullable>
+	  <PackageId>Bambiit.TestUtility.DataGeneration</PackageId>
+	  <Version>1.0.0</Version>
+	  <Authors>Law Metler</Authors>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <Company>Bambit Technologies, Inc.</Company>
+	  <Copyright>2024 Bambit Technologies, Inc</Copyright>
+	  <Description>Provides quick random data generation routines to generate or populate random objects.</Description>
+	  <PackageProjectUrl>https://github.com/bambit/test-utils</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/bambit/test-utils</RepositoryUrl>
+     <PackageReadmeFile>Readme.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="docs/Readme.md"  Pack="true" PackagePath="\"/>
+  </ItemGroup>
+
+
 
 </Project>
