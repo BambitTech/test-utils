@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+     <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <TargetFrameworks>net8.0</TargetFrameworks>
 	  <Nullable>enable</Nullable>
 	  <PackageId>Bambit.TestUtility.DataGeneration</PackageId>
@@ -13,10 +14,24 @@
 	  <PackageProjectUrl>https://github.com/bambit/test-utils</PackageProjectUrl>
 	  <RepositoryUrl>https://github.com/bambit/test-utils</RepositoryUrl>
      <PackageReadmeFile>Readme.md</PackageReadmeFile>
+     <PackageTags>Testing;Data Generation</PackageTags>
+     <PackageIcon>icon.png</PackageIcon>
+     <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0|AnyCPU'">
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="docs/Readme.md" Pack="true" PackagePath="\" />
+    <None Include="docs/icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
