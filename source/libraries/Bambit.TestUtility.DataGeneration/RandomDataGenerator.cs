@@ -79,12 +79,12 @@ namespace Bambit.TestUtility.DataGeneration
         #region Static Fields
 
         /// <summary>
-        /// The Randomg class is used for all random generatios
+        /// The Random class is used for all random generators
         /// </summary>
-        protected static Random Random = new();
+        protected static Random Random = new Random();
 
         /// <summary>
-        /// A static implememtation (lazy backer) for a default generator
+        /// A static implementation (lazy backer) for a default generator
         /// </summary>
         protected static Lazy<RandomDataGenerator> LazyInstance = new(() => new RandomDataGenerator());
 
@@ -276,17 +276,12 @@ namespace Bambit.TestUtility.DataGeneration
 
 
 
-        public virtual T InitializeObject<T>(
-            Action<T> modifierFunction
-        ) where T :
-#if NET6_0_OR_GREATER
-            notnull, 
-#endif
-            new()
+        public virtual T InitializeObject<T>(Action<T>? modifierFunction) 
+            where T :  notnull, new()
         {
             Type t = typeof(T);
             T newObject;
-            if (MappedInitializeFunctions.TryGetValue(t, out Func<object> function))
+            if (MappedInitializeFunctions.TryGetValue(t, out Func<object>? function))
                 newObject = (T)function();
             else
             {
@@ -321,11 +316,8 @@ namespace Bambit.TestUtility.DataGeneration
             return list;
         }
 
-        public virtual IList<T> InitializeList<T>(int numberItems, Action<T> postCreate) where T : 
-#if NET6_0_OR_GREATER
-            notnull, 
-#endif
-            new()
+        public virtual IList<T> InitializeList<T>(int numberItems, Action<T> postCreate) 
+            where T : notnull, new()
         {
             List<T> list = new(numberItems);
             for (int x = 0; x < numberItems; x++)
@@ -350,9 +342,8 @@ namespace Bambit.TestUtility.DataGeneration
 
         public virtual object CreateObject(Type objectType)
         {
-
             object? newObject;
-            if (MappedInitializeFunctions.TryGetValue(objectType, out Func<object> function))
+            if (MappedInitializeFunctions.TryGetValue(objectType, out Func<object>? function))
                 newObject = function();
             else
             {
@@ -367,17 +358,18 @@ namespace Bambit.TestUtility.DataGeneration
 
             return newObject;
         }
-
+        
         protected virtual string? GenerateStringForFieldName(string fieldName)
         {
             return
-                FieldNamesToGenerators.TryGetValue(fieldName, out Func<string> generator)
+                FieldNamesToGenerators.TryGetValue(fieldName, out Func<string>? generator)
                     ? generator.Invoke()
                     : null;
         }
 
         private void SetProperty<T>(T objectToInitialize, PropertyInfo propertyInfo, Type mappedType, int maxRecursion)
         {
+            
             object? newObject;
             if (MappedInitializeFunctions.TryGetValue(mappedType, out Func<object>? function))
                 newObject = function();
@@ -395,15 +387,16 @@ namespace Bambit.TestUtility.DataGeneration
 
         private void SetStringProperty<T>(T objectToInitialize, PropertyInfo propertyInfo)
         {
-            string? value = GenerateStringForFieldName(propertyInfo.Name);
+            var value = GenerateStringForFieldName(propertyInfo.Name);
             if (string.IsNullOrWhiteSpace(value))
             {
                 int maxSize = GenerateInt(30, 50);
-                StringLengthAttribute? stringLengthAttribute =
+
+                var stringLengthAttribute =
                     propertyInfo.GetCustomAttribute<StringLengthAttribute>();
                 if (stringLengthAttribute != null)
                     maxSize = stringLengthAttribute.MaximumLength;
-                MaxLengthAttribute? maxLengthAttribute = propertyInfo.GetCustomAttribute<MaxLengthAttribute>();
+                var maxLengthAttribute = propertyInfo.GetCustomAttribute<MaxLengthAttribute>();
                 if (maxLengthAttribute != null)
                     maxSize = maxLengthAttribute.Length;
                 value = GenerateString(maxSize);
@@ -417,13 +410,13 @@ namespace Bambit.TestUtility.DataGeneration
         {
             Type propertyType = propertyInfo.PropertyType;
 
-            Type? underlyingType = Nullable.GetUnderlyingType(propertyInfo.PropertyType);
+            var underlyingType = Nullable.GetUnderlyingType(propertyInfo.PropertyType);
             if (underlyingType != null)
             {
                 propertyType = underlyingType;
             }
 
-            if (AutoProperties.TryGetValue(propertyType, out Type? mappedType))
+            if (AutoProperties.TryGetValue(propertyType, out var mappedType))
             {
                 SetProperty(objectToInitialize, propertyInfo, mappedType, maxRecursion);
             }
@@ -453,7 +446,7 @@ namespace Bambit.TestUtility.DataGeneration
             }
             else if (propertyType == typeof(decimal))
             {
-                DecimalPrecisionAttribute? precisionAttribute =
+                var precisionAttribute =
                     propertyInfo.GetCustomAttribute<DecimalPrecisionAttribute>();
                 propertyInfo.SetValue(objectToInitialize,
                     precisionAttribute == null
@@ -462,7 +455,7 @@ namespace Bambit.TestUtility.DataGeneration
             }
             else if (propertyType == typeof(double))
             {
-                DecimalPrecisionAttribute? precisionAttribute =
+                var precisionAttribute =
                     propertyInfo.GetCustomAttribute<DecimalPrecisionAttribute>();
                 propertyInfo.SetValue(objectToInitialize,
                     precisionAttribute == null
@@ -479,7 +472,8 @@ namespace Bambit.TestUtility.DataGeneration
             }
         }
 
-        public virtual T InitializeObject<T>(T objectToInitialize) where T : notnull
+        public virtual T InitializeObject<T>(T objectToInitialize) 
+            where T : notnull 
         {
             return InitializeObject(objectToInitialize, MaxRecursion);
         }
@@ -502,7 +496,10 @@ namespace Bambit.TestUtility.DataGeneration
             return objectToInitialize;
         }
 
-        public virtual T InitializeObject<T>(T objectToInitialize, Action<T>? modifierFunction) where T : notnull
+
+
+        public virtual T InitializeObject<T>(T objectToInitialize, Action<T>? modifierFunction)
+            where T : notnull 
         {
 
 
@@ -543,13 +540,7 @@ namespace Bambit.TestUtility.DataGeneration
             return DateTime.Today.AddDays(GenerateInt(daysAgoMinimum, daysFutureMaximum))
                     .AddSeconds(GenerateDouble(0, 24 * 60 * 60))
                     .AddMilliseconds(GenerateDouble(0, 1000))
-
-#if NET8_0_OR_GREATER
-
-
-
-            .AddMicroseconds(GenerateDouble(0, 1000))
-#endif
+                    .AddMicroseconds(GenerateDouble(0, 1000))
                 ;
         }
 

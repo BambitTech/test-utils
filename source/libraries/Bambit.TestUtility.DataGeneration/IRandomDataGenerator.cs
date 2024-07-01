@@ -30,9 +30,9 @@ namespace Bambit.TestUtility.DataGeneration
         void AddAutoProperties<T>() where T : new();
     
         void AddCustomObjectInitialization<T>(Func<IRandomDataGenerator, T> initMethod)
-#if NET6_0_OR_GREATER
+
             where T : notnull
-#endif
+
             ;
 
         
@@ -44,9 +44,9 @@ namespace Bambit.TestUtility.DataGeneration
         /// <param name="initMethod">The method to use when instantiating an object of type <see cref="T"/> </param>
         /// <remarks>   </remarks>
         void AddCustomObjectInitialization<T>(Func<IRandomDataGenerator, T> initMethod, bool autoProperty)  where T:
-#if NET6_0_OR_GREATER
+
             notnull, 
-#endif
+
             new();
  
         #endregion Configuration Methods
@@ -115,9 +115,8 @@ namespace Bambit.TestUtility.DataGeneration
         /// <summary>
         /// Generates a random enum value fo the specified type
         /// </summary>
-        /// <param name="T">The Type of enum to generate.  
-        /// Random <see cref="T"/> enum
-        /// </param>
+        /// <typeparam name="T">The Type of enum to generate.  
+        /// </typeparam>>
         /// <returns>A random value of the supplied Enum</returns>
         T GenerateEnum<T>() where T : struct,Enum, IConvertible ;
 
@@ -188,9 +187,9 @@ namespace Bambit.TestUtility.DataGeneration
         /// <returns>A new Dictionary{String,TValue} with <see cref="numberItems"/> entries</returns>
         Dictionary<string, TValue> InitializeDictionary<TValue>(int numberItems)
             where TValue :
-#if NET6_0_OR_GREATER
+
             notnull, 
-#endif
+
             new();
 
         /// <summary>
@@ -202,14 +201,14 @@ namespace Bambit.TestUtility.DataGeneration
         /// <returns>A new Dictionary{String,TValue} with <see cref="numberItems"/> entries</returns>
         Dictionary<TKey, TValue> InitializeDictionary<TKey, TValue>(int numberItems)
             where TKey : 
-#if NET6_0_OR_GREATER
+
             notnull, 
-#endif
+
              new()
             where TValue : 
-#if NET6_0_OR_GREATER
+
             notnull, 
-#endif
+
             new();
 
         /// <summary>
@@ -227,9 +226,9 @@ namespace Bambit.TestUtility.DataGeneration
         /// <param name="numberItems">The number of items to generate</param>
         /// <returns>A <see cref="IList{T}"/> of <see cref="numberItems"/> object of type <see cref="T"/></returns>
         IList<T> InitializeList<T>(int numberItems) where T : 
-#if NET6_0_OR_GREATER
+
             notnull, 
-#endif
+
             new();
 
         /// <summary>
@@ -240,9 +239,9 @@ namespace Bambit.TestUtility.DataGeneration
         /// <param name="numberItems">The number of items to generate</param>
         /// <returns>A <see cref="IList{T}"/> of <see cref="numberItems"/> object of type <see cref="T"/></returns>
         IList<T> InitializeList<T>(int numberItems, Action<T> postCreate) where T : 
-#if NET6_0_OR_GREATER
+
             notnull, 
-#endif
+
             new();
 
         /// <summary>
@@ -254,9 +253,9 @@ namespace Bambit.TestUtility.DataGeneration
         /// will not be initialized unless a function has been added with
         /// <see cref="AddAutoProperties{T,T2}">AddAutoProperties</see></remarks>
         T InitializeObject<T>() where T : 
-#if NET6_0_OR_GREATER
+
             notnull, 
-#endif
+
             new();
 
         /// <summary>
@@ -271,9 +270,9 @@ namespace Bambit.TestUtility.DataGeneration
         T InitializeObject<T>(
                 Action<T> modifierFunction
             ) where T :
-#if NET6_0_OR_GREATER
+
             notnull, 
-#endif
+
             new();
 
 
@@ -285,17 +284,23 @@ namespace Bambit.TestUtility.DataGeneration
         /// <returns>The supplied <see cref="objectToInitialize"/> with properties initialized</returns>
         /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
         /// will not be initialized unless a function has been added with
-        /// <see cref="AddCustomObjectInitialization{T}(System.Func{Bambit.TestUtility.DataGeneration.IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
-        T InitializeObject<T>(T objectToInitialize)  
-#if NET6_0_OR_GREATER
-            where T : notnull 
-#endif
-        ;
+        /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
+        T InitializeObject<T>(T objectToInitialize) where T : notnull;
 
+        /// <summary>
+        /// Populates the properties of the supplied object, calling <see cref="modifierFunction"/> on each populated object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="objectToInitialize">The object to initialize</param>
+        /// <param name="modifierFunction">An <see cref="Action{T}"> </see></param>
+        /// <returns>The supplied <see cref="objectToInitialize"/> with fields set randomly.</returns>
+        /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
+        /// will not be initialized unless a function has been added with
+        /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
         T InitializeObject<T>(T objectToInitialize, Action<T> modifierFunction)   
-#if NET6_0_OR_GREATER
+
             where T : notnull 
-#endif
+
         ;
         #endregion Instantiation Methods
 

@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.DataGeneration", "libraries\Bambit.TestUtility.DataGeneration\Bambit.TestUtility.DataGeneration.csproj", "{EF533FFF-591C-4774-83E7-F988CE7571CF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6881F3C9-BCA5-4654-B19D-8BE33E29DF3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.DataGeneration.Tests", "tests\Bambit.TestUtility.DataGeneration.Tests\Bambit.TestUtility.DataGeneration.Tests.csproj", "{1A346C18-FE26-4C1A-A654-2C3BFCEF4269}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +24,13 @@ Global
 		{EF533FFF-591C-4774-83E7-F988CE7571CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF533FFF-591C-4774-83E7-F988CE7571CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF533FFF-591C-4774-83E7-F988CE7571CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A346C18-FE26-4C1A-A654-2C3BFCEF4269}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A346C18-FE26-4C1A-A654-2C3BFCEF4269}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A346C18-FE26-4C1A-A654-2C3BFCEF4269}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A346C18-FE26-4C1A-A654-2C3BFCEF4269}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{EF533FFF-591C-4774-83E7-F988CE7571CF} = {AE3CBE26-A480-4AFF-AAEA-2B1F5D36F49F}
+		{1A346C18-FE26-4C1A-A654-2C3BFCEF4269} = {6881F3C9-BCA5-4654-B19D-8BE33E29DF3A}
 	EndGlobalSection
 EndGlobal
