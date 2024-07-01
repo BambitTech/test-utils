@@ -12,23 +12,28 @@ namespace Bambit.TestUtility.DataGeneration
         
         #region Configuration Methods
         /// <summary>
-        /// Adds a type, <see cref="T"/>, that will be instantiated by type <see cref="T2"/> of if it is a property of an object that is being instantiated.
+        /// Adds a type, t, that will be instantiated by type T2 of if it is a property of an object that is being instantiated.
         /// </summary>
         /// <typeparam name="T">The type that, if a property of an object is one, will be instantiated</typeparam>
-        /// <typeparam name="T2">The type to used to instantiate <see cref="T"/></typeparam>
+        /// <typeparam name="T2">The type to used to instantiate t</typeparam>
         void AddAutoProperties<T, T2>() where T2 : T, new();
 
         /// <summary>
-        /// Adds a <see cref="Func{IRandomDataGenerator, TResult}"/> that will be called to create a new object of type <see cref="T"/> 
+        /// Adds a <see cref="Func{IRandomDataGenerator, TResult}"/> that will be called to create a new object of type t 
         /// </summary>
         /// <remarks>When <see cref="CreateObject"/>, <see cref="InitializeList{T}(int)"/> or <see cref="InitializeObject{T}()"/> is called, this method instead of just
         /// using a CTOR</remarks>
         /// <summary>
-        /// Adds a type, <see cref="T"/>, that will be instantiated if it is a property of an object that is being instantiated.
+        /// Adds a type, t, that will be instantiated if it is a property of an object that is being instantiated.
         /// </summary>
         /// <typeparam name="T">The type that, if a property of an object is one, will be instantiated</typeparam>
         void AddAutoProperties<T>() where T : new();
     
+        /// <summary>
+        /// Defines a function that will be used to initialize a specific object type
+        /// </summary>
+        /// <typeparam name="T">The type of object that will use the generated function</typeparam>
+        /// <param name="initMethod">The <see cref="Func{T,TResult}"/> that will be used to initialize the object</param>
         void AddCustomObjectInitialization<T>(Func<IRandomDataGenerator, T> initMethod)
 
             where T : notnull
@@ -37,11 +42,11 @@ namespace Bambit.TestUtility.DataGeneration
 
         
         /// <summary>
-        /// Adds a <see cref="Func{IRandomDataGenerator, TResult}"/> that will be called to create a new object of type <see cref="T"/> 
+        /// Adds a <see cref="Func{IRandomDataGenerator, TResult}"/> that will be called to create a new object of type t 
         /// </summary>
         /// <typeparam name="T">Tne type to instantiate</typeparam>
         /// <param name="autoProperty">Whether to auto initialize properties of this type.</param>
-        /// <param name="initMethod">The method to use when instantiating an object of type <see cref="T"/> </param>
+        /// <param name="initMethod">The method to use when instantiating an object of type t </param>
         /// <remarks>   </remarks>
         void AddCustomObjectInitialization<T>(Func<IRandomDataGenerator, T> initMethod, bool autoProperty)  where T:
 
@@ -59,22 +64,22 @@ namespace Bambit.TestUtility.DataGeneration
         bool GenerateBoolean();
 
         /// <summary>
-        /// Generates a random DateTime between <see cref="daysAgoMinimum"/> and <see cref="daysFutureMaximum"/>
+        /// Generates a random DateTime between daysAgoMinimum and daysFutureMaximum
         /// </summary>
         /// <param name="daysAgoMinimum">The minimum days from today for which to generate DateTime. Negative numbers represent the past.  By default, this is -30</param>
         /// <param name="daysFutureMaximum">The maximum days from today for which to generate a DateTime. Negative numbers represent the past.  By default, this is 30</param>
-        /// <returns>A random date between <see cref="daysAgoMinimum"/> and <see cref="daysFutureMaximum"/> days from today</returns>
+        /// <returns>A random date between daysAgoMinimum and daysFutureMaximum days from today</returns>
         /// <remarks>
         /// The returned DateTime object will always be at midnight.
         /// </remarks>
         DateTime GenerateDate(int daysAgoMinimum = -30, int daysFutureMaximum = 30);
 
         /// <summary>
-        /// Generates a random DateTime between <see cref="daysAgoMinimum"/> and <see cref="daysFutureMaximum"/>
+        /// Generates a random DateTime between daysAgoMinimum and daysFutureMaximum
         /// </summary>
         /// <param name="daysAgoMinimum">The minimum days from today for which to generate DateTime. Negative numbers represent the past.  By default, this is -30</param>
         /// <param name="daysFutureMaximum">The maximum days from today for which to generate a DateTime. Negative numbers represent the past.  By default, this is 30</param>
-        /// <returns>A random date between <see cref="daysAgoMinimum"/> and <see cref="daysFutureMaximum"/> days from today</returns>
+        /// <returns>A random date between daysAgoMinimum and daysFutureMaximum days from today</returns>
         /// <remarks>
         /// Similar to <see cref="GenerateDate"/> except the time value is randomly generated.
         /// </remarks>
@@ -176,15 +181,15 @@ namespace Bambit.TestUtility.DataGeneration
         /// <param name="objectType">The Type of object to generate.  The type must have a
         /// parameterless constructor</param>
         /// <returns>A newly created object</returns>
-        /// <exception cref="InvalidOperationException">The <see cref="objectType"/> did not have a parameterless constructor</exception>
+        /// <exception cref="InvalidOperationException">The objectType did not have a parameterless constructor</exception>
         object CreateObject(Type objectType);
 
         /// <summary>
-        /// Initializes a new Dictionary with string keys and <see cref="TValue"/> values
+        /// Initializes a new Dictionary with string keys and TValue values
         /// </summary>
         /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
         /// <param name="numberItems">The number of random entries to create</param>
-        /// <returns>A new Dictionary{String,TValue} with <see cref="numberItems"/> entries</returns>
+        /// <returns>A new Dictionary{String,TValue} with numberItemss entries</returns>
         Dictionary<string, TValue> InitializeDictionary<TValue>(int numberItems)
             where TValue :
 
@@ -193,12 +198,12 @@ namespace Bambit.TestUtility.DataGeneration
             new();
 
         /// <summary>
-        /// Initializes a new Dictionary with <see cref="TKey"/> key sand <see cref="TValue"/> values
+        /// Initializes a new Dictionary with TKey key sand TValue values
         /// </summary>
         /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
         /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
         /// <param name="numberItems">The number of random entries to create</param>
-        /// <returns>A new Dictionary{String,TValue} with <see cref="numberItems"/> entries</returns>
+        /// <returns>A new Dictionary{String,TValue} with numberItemss entries</returns>
         Dictionary<TKey, TValue> InitializeDictionary<TKey, TValue>(int numberItems)
             where TKey : 
 
@@ -212,19 +217,19 @@ namespace Bambit.TestUtility.DataGeneration
             new();
 
         /// <summary>
-        /// Initializes a random list of  <see cref="numberItems"/> strings, each with a length no greater than <see cref="maxLength"/>
+        /// Initializes a random list of  numberItemss strings, each with a length no greater than maxLength
         /// </summary>
         /// <param name="numberItems">The number of strings to generate</param>
         /// <param name="maxLength">The maximum length of each string</param>
-        /// <returns>A <see cref="IList{T}"/> of <see cref="numberItems"/> strings</returns>
+        /// <returns>A <see cref="IList{T}"/> of numberItemss strings</returns>
         IList<string> InitializeList(int numberItems, int maxLength);
 
         /// <summary>
-        /// Creates a list of random object of type <see cref="T"/>
+        /// Creates a list of random object of type t
         /// </summary>
         /// <typeparam name="T">The type of objects to generate</typeparam>
         /// <param name="numberItems">The number of items to generate</param>
-        /// <returns>A <see cref="IList{T}"/> of <see cref="numberItems"/> object of type <see cref="T"/></returns>
+        /// <returns>A <see cref="IList{T}"/> of numberItemss object of type t</returns>
         IList<T> InitializeList<T>(int numberItems) where T : 
 
             notnull, 
@@ -232,12 +237,12 @@ namespace Bambit.TestUtility.DataGeneration
             new();
 
         /// <summary>
-        /// Creates a list of random object of type <see cref="T"/>, calling <see cref="postCreate"/> on each before returning
+        /// Creates a list of random object of type t, calling postCreate on each before returning
         /// </summary>
         /// <typeparam name="T">The type of objects to generate</typeparam>
         /// <param name="postCreate">The <see cref="Action{T}"/> to call on each entity before returning.</param>
         /// <param name="numberItems">The number of items to generate</param>
-        /// <returns>A <see cref="IList{T}"/> of <see cref="numberItems"/> object of type <see cref="T"/></returns>
+        /// <returns>A <see cref="IList{T}"/> of numberItemss object of type t</returns>
         IList<T> InitializeList<T>(int numberItems, Action<T> postCreate) where T : 
 
             notnull, 
@@ -245,10 +250,10 @@ namespace Bambit.TestUtility.DataGeneration
             new();
 
         /// <summary>
-        /// Creates and initializes an object of type <see cref="T"/>
+        /// Creates and initializes an object of type t
         /// </summary>
         /// <typeparam name="T">The type of object to generate.  It must have a parameterless constructor</typeparam>
-        /// <returns>A new object of type <see cref="T"/></returns>
+        /// <returns>A new object of type t</returns>
         /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
         /// will not be initialized unless a function has been added with
         /// <see cref="AddAutoProperties{T,T2}">AddAutoProperties</see></remarks>
@@ -259,11 +264,11 @@ namespace Bambit.TestUtility.DataGeneration
             new();
 
         /// <summary>
-        /// Creates and initializes an object of type <see cref="T"/>, calling the supplied <see cref="modifierFunction"/> on it before returning.
+        /// Creates and initializes an object of type t, calling the supplied modifierFunction on it before returning.
         /// </summary>
         /// <typeparam name="T">The type of object to generate.  It must have a parameterless constructor</typeparam>
         /// <param name="modifierFunction">An <see cref="Action{T}"/> that will be called on the generated object.</param>
-        /// <returns>A new object of type <see cref="T"/></returns>
+        /// <returns>A new object of type t</returns>
         /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
         /// will not be initialized unless a function has been added with
         /// <see cref="AddAutoProperties{T,T2}">AddAutoProperties</see></remarks>
@@ -281,19 +286,19 @@ namespace Bambit.TestUtility.DataGeneration
         /// </summary>
         /// <typeparam name="T">The type of object that will be initialized.</typeparam>
         /// <param name="objectToInitialize">The object which to have its properties initialize</param>
-        /// <returns>The supplied <see cref="objectToInitialize"/> with properties initialized</returns>
+        /// <returns>The supplied objectToInitialize with properties initialized</returns>
         /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
         /// will not be initialized unless a function has been added with
         /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
         T InitializeObject<T>(T objectToInitialize) where T : notnull;
 
         /// <summary>
-        /// Populates the properties of the supplied object, calling <see cref="modifierFunction"/> on each populated object
+        /// Populates the properties of the supplied object, calling modifierFunction on each populated object
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="objectToInitialize">The object to initialize</param>
         /// <param name="modifierFunction">An <see cref="Action{T}"> </see></param>
-        /// <returns>The supplied <see cref="objectToInitialize"/> with fields set randomly.</returns>
+        /// <returns>The supplied objectToInitialize with fields set randomly.</returns>
         /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
         /// will not be initialized unless a function has been added with
         /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
@@ -310,7 +315,7 @@ namespace Bambit.TestUtility.DataGeneration
         /// Gets the first day of the supplied month.
         /// </summary>
         /// <param name="monthDate">The date to retrieve the first date for</param>
-        /// <returns>A <see cref="DateTime"/> with the <see cref="DateTime.Day"/> value being 1 and other values matching the supplied <see cref="monthDate"/></returns>
+        /// <returns>A <see cref="DateTime"/> with the <see cref="DateTime.Day"/> value being 1 and other values matching the supplied monthDate</returns>
         DateTime GetFirstDayOfMonth(DateTime monthDate);
         /// <summary>
         ///  Gets the first day of the current month
@@ -322,7 +327,7 @@ namespace Bambit.TestUtility.DataGeneration
         /// Gets the last day of the supplied month.
         /// </summary>
         /// <param name="monthDate">The date to retrieve the last date for</param>
-        /// <returns>A <see cref="DateTime"/> with the <see cref="DateTime.Day"/> value being the last day of the supplied <see cref="monthDate"/>, and other value matches</returns>
+        /// <returns>A <see cref="DateTime"/> with the <see cref="DateTime.Day"/> value being the last day of the supplied monthDate, and other value matches</returns>
         DateTime GetLastDayOfMonth(DateTime monthDate );
         /// <summary>
         ///  Gets the last day of the current month

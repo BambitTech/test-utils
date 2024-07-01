@@ -17,7 +17,7 @@
      <PackageTags>Testing;Data Generation</PackageTags>
      <PackageIcon>icon.png</PackageIcon>
      <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
      <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 

@@ -56,10 +56,11 @@ namespace Bambit.TestUtility.DataGeneration.Tests.Helpers
         public string SubName { get; set; } = null!;
         public bool BoolField { get; set; }
 
-        public TestGrandChild  TestGrandChild {
+        public TestGrandChild TestGrandChild
+        {
             get;
             set;
-        }
+        } = null!;
     }
     
     public class TestGrandChild 
@@ -69,7 +70,7 @@ namespace Bambit.TestUtility.DataGeneration.Tests.Helpers
     }
     public class RecursiveClass
     {
-        public RecursiveClass Child { get; set; }
+        public RecursiveClass Child { get; set; } = null!;
     }
 
     public enum TestEnum

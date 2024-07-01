@@ -8,6 +8,9 @@ using Bambit.TestUtility.DataGeneration.Attributes;
 
 namespace Bambit.TestUtility.DataGeneration
 {
+    /// <summary>
+    /// General implementation of the <see cref="IRandomDataGenerator"/> class
+    /// </summary>
     public class RandomDataGenerator : IRandomDataGenerator
     {
         #region Lookup Data
@@ -118,7 +121,9 @@ namespace Bambit.TestUtility.DataGeneration
         /// </summary>
         private readonly Dictionary<Type, Func<object>> MappedInitializeFunctions;
 
-
+        /// <summary>
+        /// The maximum number of child entries that will be recursed into
+        /// </summary>
         public int MaxRecursion { get; set; } = 20;
 
         #endregion Fields
@@ -142,7 +147,8 @@ namespace Bambit.TestUtility.DataGeneration
         #region Generation Methods
 
         #region Basic types
-
+        
+        /// <inheritdoc />
         public virtual string GenerateString(int length)
         {
             if (length <= 0)
@@ -157,14 +163,16 @@ namespace Bambit.TestUtility.DataGeneration
             return stringBuilder.ToString();
 
         }
-
+        
+        /// <inheritdoc />
         public virtual double GenerateDouble(double low = 0, double high = double.MaxValue)
         {
             double range = high - low;
             double rand = Random.NextDouble();
             return range * rand + low;
         }
-
+        
+        /// <inheritdoc />
         public virtual double GenerateDouble(byte precision, byte scale)
         {
             if (precision - scale > 10)
@@ -177,12 +185,14 @@ namespace Bambit.TestUtility.DataGeneration
             double value = Math.Floor(GenerateDouble(0, high));
             return value / divisor;
         }
-
+        
+        /// <inheritdoc />
         public virtual int GenerateInt(int low = 0, int high = int.MaxValue / 100)
         {
             return Random.Next(low, high);
         }
-
+        
+        /// <inheritdoc />
         public virtual decimal GenerateDecimal(byte precision, byte scale)
         {
             if (precision - scale > 10)
@@ -196,27 +206,32 @@ namespace Bambit.TestUtility.DataGeneration
             return Convert.ToDecimal(value / divisor);
         }
         
+        /// <inheritdoc />
         public virtual Guid GenerateGuid()
         {
             return Guid.NewGuid();
         }
-
+        
+        /// <inheritdoc />
         public virtual bool GenerateBoolean()
         {
             return GenerateInt() % 2 == 0;
         }
-
+        
+        /// <inheritdoc />
         public virtual decimal GenerateDecimal(decimal low = 0m, decimal high = 10000000000m)
         {
             double value = GenerateDouble((double)low, (double)high);
             return Convert.ToDecimal(value);
         }
+        /// <inheritdoc />
         public virtual DateTime GenerateDate(int daysAgoMinimum = -30, int daysFutureMaximum = 30)
         {
             return DateTime.Today.AddDays(GenerateInt(daysAgoMinimum, daysFutureMaximum));
         }
 
-
+        
+        /// <inheritdoc />
         public virtual DateTime GenerateDateTime(int daysAgoMinimum = -30, int daysFutureMaximum = 30)
         {
             return DateTime.Today.AddDays(GenerateInt(daysAgoMinimum, daysFutureMaximum))
@@ -227,16 +242,19 @@ namespace Bambit.TestUtility.DataGeneration
         }
 
         
+        /// <inheritdoc />
         public string GenerateFirstName()
         {
             return FirstNames[GenerateInt(0, FirstNames.Length)];
         }
-
+        
+        /// <inheritdoc />
         public string GenerateLastName()
         {
             return LastNames[GenerateInt(0, LastNames.Length)];
         }
-
+        
+        /// <inheritdoc />
         public string GenerateName()
         {
             return $"{GenerateFirstName()} {GenerateLastName()}";
@@ -244,7 +262,8 @@ namespace Bambit.TestUtility.DataGeneration
         }
 
         #endregion Basic types
-
+        
+        /// <inheritdoc />
         public virtual decimal GenerateMoney(decimal low = 0m, decimal high = 10000000000m)
         {
             return Math.Floor(GenerateDecimal(low, high) * 100) / 100;
@@ -253,11 +272,18 @@ namespace Bambit.TestUtility.DataGeneration
 
         #region Configuration 
 
+        /// <summary>
+        /// Add a string generator for a specified type of name
+        /// </summary>
+        /// <param name="fieldName">The name of the field to match when generating</param>
+        /// <param name="generator">The generator to use</param>
         public void AddStringFieldNameGenerator(string fieldName, Func<string> generator)
         {
             FieldNamesToGenerators[fieldName] = generator;
         }
-
+        
+        
+        /// <inheritdoc />
         public void AddCustomObjectInitialization<T>(Func<IRandomDataGenerator, T> initMethod) where T : notnull
         {
             Type t = typeof(T);
@@ -266,7 +292,9 @@ namespace Bambit.TestUtility.DataGeneration
             else
                 MappedInitializeFunctions[t] = () => initMethod(this);
         }
-
+        
+        
+        /// <inheritdoc />
         public void AddCustomObjectInitialization<T>(Func<IRandomDataGenerator, T> initMethod, bool autoProperty)
             where T : notnull, new()
         {
@@ -274,14 +302,18 @@ namespace Bambit.TestUtility.DataGeneration
             if (autoProperty)
                 AddAutoProperties<T>();
         }
-
+        
+        
+        /// <inheritdoc />
         public void AddAutoProperties<T, T2>() where T2 : T, new()
         {
             Type t = typeof(T);
             Type t2 = typeof(T2);
             AutoProperties[t] = t2;
         }
-
+        
+        
+        /// <inheritdoc />
         public void AddAutoProperties<T>() where T : new()
         {
             AddAutoProperties<T, T>();
@@ -290,6 +322,7 @@ namespace Bambit.TestUtility.DataGeneration
         #endregion Configuration 
         
         #region Instantiation Methods
+        /// <inheritdoc />
         public virtual Dictionary<string, TValue> InitializeDictionary<TValue>(int numberItems)
             where TValue : notnull, new()
         {
@@ -301,7 +334,16 @@ namespace Bambit.TestUtility.DataGeneration
 
             return results;
         }
-
+        
+        /// <summary>
+        /// Creates and initializes an object of type t
+        /// </summary>
+        /// <typeparam name="TKey">The type of object to generate.  It must have a parameterless constructor</typeparam>
+        /// <typeparam name="TValue">The value of object to generate.  It must have a parameterless constructor</typeparam>
+        /// <returns>A new object of type t</returns>
+        /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
+        /// will not be initialized unless a function has been added with
+        /// <see cref="AddAutoProperties{T,T2}">AddAutoProperties</see></remarks>
         public virtual Dictionary<TKey, TValue> InitializeDictionary<TKey, TValue>(int numberItems)
             where TKey : notnull, new()
             where TValue : notnull, new()
@@ -314,12 +356,14 @@ namespace Bambit.TestUtility.DataGeneration
 
             return results;
         }
-
+        
+        /// <inheritdoc />
         public virtual T InitializeObject<T>() where T : notnull, new()
         {
             return InitializeObject<T>(null);
         }
-
+        
+        /// <inheritdoc />
         public virtual T InitializeObject<T>(Action<T>? modifierFunction) 
             where T :  notnull, new()
         {
@@ -336,7 +380,8 @@ namespace Bambit.TestUtility.DataGeneration
             modifierFunction?.Invoke(newObject);
             return newObject;
         }
-
+        
+        /// <inheritdoc />
         public virtual List<T> InitializeList<T>(int numberItems, Func<IRandomDataGenerator, T> initializeFunction)
             where T : new()
         {
@@ -348,7 +393,8 @@ namespace Bambit.TestUtility.DataGeneration
 
             return list;
         }
-
+        
+        /// <inheritdoc />
         public virtual IList<T> InitializeList<T>(int numberItems) where T : notnull, new()
         {
             List<T> list = new(numberItems);
@@ -359,7 +405,8 @@ namespace Bambit.TestUtility.DataGeneration
 
             return list;
         }
-
+        
+        /// <inheritdoc />
         public virtual IList<T> InitializeList<T>(int numberItems, Action<T> postCreate) 
             where T : notnull, new()
         {
@@ -372,7 +419,8 @@ namespace Bambit.TestUtility.DataGeneration
 
             return list;
         }
-
+        
+        /// <inheritdoc />
         public virtual IList<string> InitializeList(int numberItems, int maxLength)
         {
             List<string> list = new(numberItems);
@@ -383,7 +431,8 @@ namespace Bambit.TestUtility.DataGeneration
 
             return list;
         }
-
+        
+        /// <inheritdoc />
         public virtual object CreateObject(Type objectType)
         {
             object? newObject;
@@ -403,13 +452,32 @@ namespace Bambit.TestUtility.DataGeneration
             return newObject;
         }
         
+        /// <summary>
+        /// Populates the properties of the supplied object.
+        /// </summary>
+        /// <typeparam name="T">The type of object that will be initialized.</typeparam>
+        /// <param name="objectToInitialize">The object which to have its properties initialize</param>
+        /// <returns>The supplied objectToInitialize with properties initialized</returns>
+        /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
+        /// will not be initialized unless a function has been added with
+        /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
         public virtual T InitializeObject<T>(T objectToInitialize) 
             where T : notnull 
         {
             return InitializeObject(objectToInitialize, MaxRecursion);
         }
-
-        public virtual T InitializeObject<T>(T objectToInitialize, int maxRecursion) where T : notnull
+        
+        /// <summary>
+        /// Populates the properties of the supplied object.
+        /// </summary>
+        /// <typeparam name="T">The type of object that will be initialized.</typeparam>
+        /// <param name="objectToInitialize">The object which to have its properties initialize</param>
+        /// <param name="maxRecursion">The maximum depth of child objects to create</param>
+        /// <returns>The supplied objectToInitialize with properties initialized</returns>
+        /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
+        /// will not be initialized unless a function has been added with
+        /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
+        protected virtual T InitializeObject<T>(T objectToInitialize, int maxRecursion) where T : notnull
         {
             if (--maxRecursion < 1)
                 throw new InvalidOperationException("Maximum recursion level hit");
@@ -428,7 +496,17 @@ namespace Bambit.TestUtility.DataGeneration
         }
 
 
-
+        
+        /// <summary>
+        /// Populates the properties of the supplied object, calling modifierFunction on each populated object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="objectToInitialize">The object to initialize</param>
+        /// <param name="modifierFunction">An <see cref="Action{T}"> </see></param>
+        /// <returns>The supplied objectToInitialize with fields set randomly.</returns>
+        /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
+        /// will not be initialized unless a function has been added with
+        /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
         public virtual T InitializeObject<T>(T objectToInitialize, Action<T>? modifierFunction)
             where T : notnull 
         {
@@ -451,20 +529,25 @@ namespace Bambit.TestUtility.DataGeneration
         #endregion Instantiation Methods
 
         #region Misc Methods
-
+        
+        /// <inheritdoc />
         public virtual DateTime GetFirstDayOfMonth()
         {
             return GetFirstDayOfMonth(DateTime.Today);
         }
+        /// <inheritdoc />
         public virtual DateTime GetFirstDayOfMonth(DateTime monthDate)
         {
             return new DateTime(monthDate.Year, monthDate.Month, 1);
         }
 
+        /// <inheritdoc />
         public virtual DateTime GetLastDayOfMonth()
         {
             return GetLastDayOfMonth(DateTime.Today);
-;        }
+        }
+
+        /// <inheritdoc />
         public virtual DateTime GetLastDayOfMonth(DateTime monthDate)
         {
             return GetFirstDayOfMonth(monthDate).AddMonths(1).AddDays(-1);
@@ -472,6 +555,7 @@ namespace Bambit.TestUtility.DataGeneration
         #endregion Misc Methods
 
         #region Selection methods
+        /// <inheritdoc />
         public T GenerateEnum<T>() where T : struct, Enum, IConvertible
         {
             if (!typeof(T).IsEnum)
@@ -480,17 +564,20 @@ namespace Bambit.TestUtility.DataGeneration
             Enum.TryParse(GetEntry(names), out T result);
             return result;
         }
-
+        
+        /// <inheritdoc />
         public T CoinToss<T>(T heads, T tails)
         {
             return GenerateInt(0, 2) == 0 ? heads : tails;
         }
-
+        
+        /// <inheritdoc />
         public T GetListEntry<T>(List<T> list)
         {
             return list[GenerateInt(0, list.Count)];
         }
-
+        
+        /// <inheritdoc />
         public T GetEntry<T>(T[] list)
         {
             return list[GenerateInt(0, list.Length)];
@@ -500,6 +587,11 @@ namespace Bambit.TestUtility.DataGeneration
         #endregion IRandomDataGenerator Implementation
 
         #region Protected Methods
+        /// <summary>
+        /// Generates a string for a given field name
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
         protected virtual string? GenerateStringForFieldName(string fieldName)
         {
             return
@@ -508,6 +600,13 @@ namespace Bambit.TestUtility.DataGeneration
                     : null;
         }
         
+        /// <summary>
+        /// Assigns a value to a property, based on it's type
+        /// </summary>
+        /// <typeparam name="T">The type of object holding the property to be assigned</typeparam>
+        /// <param name="objectToInitialize">The object to assign the property to</param>
+        /// <param name="propertyInfo">Information about the property being assigned</param>
+        /// <param name="maxRecursion">The maximum depth to descent for children</param>
         protected virtual void AssignValueToProperty<T>(T objectToInitialize, PropertyInfo propertyInfo,
             int maxRecursion)
         {
