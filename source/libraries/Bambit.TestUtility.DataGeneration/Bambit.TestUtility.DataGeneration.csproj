@@ -5,7 +5,6 @@
 	  <TargetFrameworks>net8.0</TargetFrameworks>
 	  <Nullable>enable</Nullable>
 	  <PackageId>Bambit.TestUtility.DataGeneration</PackageId>
-	  <Version>1.0.0</Version>
 	  <Authors>Law Metler</Authors>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <Company>Bambit Technologies, Inc.</Company>
@@ -14,12 +13,13 @@
 	  <PackageProjectUrl>https://github.com/bambit/test-utils</PackageProjectUrl>
 	  <RepositoryUrl>https://github.com/bambit/test-utils</RepositoryUrl>
      <PackageReadmeFile>Readme.md</PackageReadmeFile>
-     <PackageTags>Testing;Data Generation</PackageTags>
+     <PackageTags>Testing;Data Generation;library</PackageTags>
      <PackageIcon>icon.png</PackageIcon>
      <IncludeSymbols>true</IncludeSymbols>
      <SymbolPackageFormat>snupkg</SymbolPackageFormat>
      <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
      <EnablePackageValidation>true</EnablePackageValidation>
+     <Version>1.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
