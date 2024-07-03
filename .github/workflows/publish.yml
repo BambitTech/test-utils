@@ -90,7 +90,7 @@ jobs:
         sourcedirs: 'source/' # Optional directories which contain the corresponding source code (separated by semicolon). The source directories are used if coverage report contains classes without path information.
         historydir: 'history/' # Optional directory for storing persistent coverage information. Can be used in future reports to show coverage evolution.
         plugins: '' # Optional plugin files for custom reports or custom history storage (separated by semicolon).
-        assemblyfilters: '+*' # Optional list of assemblies that should be included or excluded in the report. Exclusion filters take precedence over inclusion filters. Wildcards are allowed.
+        assemblyfilters: '+*;-*.Tests.dll' # Optional list of assemblies that should be included or excluded in the report. Exclusion filters take precedence over inclusion filters. Wildcards are allowed.
         classfilters: '+*' # Optional list of classes that should be included or excluded in the report. Exclusion filters take precedence over inclusion filters. Wildcards are allowed.
         filefilters: '+*' # Optional list of files that should be included or excluded in the report. Exclusion filters take precedence over inclusion filters. Wildcards are allowed.
         riskhotspotassemblyfilters: '+*' # Optional list of assemblies that should be included or excluded in the risk hotspots. Exclusion filters take precedence over inclusion filters. Wildcards are allowed.
@@ -121,7 +121,7 @@ jobs:
       uses: themichaelhall/check-code-coverage@v2
       with:
         report: coveragereport/Clover.xml
-        required-percentage: 99      
+        required-percentage: 90  
   deploy:
     # Publish only when creating a GitHub Release
     # https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository

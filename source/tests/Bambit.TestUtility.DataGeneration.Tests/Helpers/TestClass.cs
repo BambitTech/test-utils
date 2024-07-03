@@ -73,6 +73,10 @@ namespace Bambit.TestUtility.DataGeneration.Tests.Helpers
         public RecursiveClass Child { get; set; } = null!;
     }
 
+    public class NoDefaultCtorClass(int v)
+    {
+        public int IntField { get; set; } = v;
+    }
     public enum TestEnum
     {
         Freddy,

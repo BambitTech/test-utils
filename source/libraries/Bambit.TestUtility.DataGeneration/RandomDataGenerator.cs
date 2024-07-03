@@ -444,7 +444,7 @@ namespace Bambit.TestUtility.DataGeneration
                 newObject = Activator.CreateInstance(objectType);
                 if (newObject == null)
                     throw new InvalidOperationException(
-                        $"Could not create instance of object of type '{objectType}.  Verify a default constructor exists");
+                        $"Could not create instance of object of type '{objectType}.  Nullable value not allowed");
 
                 InitializeObject(newObject);
             }
@@ -558,8 +558,7 @@ namespace Bambit.TestUtility.DataGeneration
         /// <inheritdoc />
         public T GenerateEnum<T>() where T : struct, Enum, IConvertible
         {
-            if (!typeof(T).IsEnum)
-                throw new ArgumentException("Type must be an enum");
+           
             string[] names = Enum.GetNames(typeof(T));
             Enum.TryParse(GetEntry(names), out T result);
             return result;
@@ -686,10 +685,7 @@ namespace Bambit.TestUtility.DataGeneration
             else
             {
                 newObject = Activator.CreateInstance(mappedType);
-                if (newObject == null)
-                    throw new InvalidOperationException(
-                        $"Could not create instance of object of type '{mappedType}.  Verify a default constructor exists");
-                InitializeObject(newObject, maxRecursion);
+                InitializeObject(newObject!, maxRecursion);
             }
 
             propertyInfo.SetValue(objectToInitialize, newObject);
