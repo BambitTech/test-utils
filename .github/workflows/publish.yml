@@ -120,7 +120,7 @@ jobs:
     - name: Verify Coverage
       uses: themichaelhall/check-code-coverage@v2
       with:
-        report: coverage.xml
+        report: coveragereport/Clover.xml
         required-percentage: 80        
   deploy:
     # Publish only when creating a GitHub Release
