@@ -1,10 +1,13 @@
 
+using System.Diagnostics.CodeAnalysis;
 using Bambit.TestUtility.DataGeneration.Tests.Helpers;
 using FluentAssertions;
 
 namespace Bambit.TestUtility.DataGeneration.Tests;
 
 [TestClass]
+[ExcludeFromCodeCoverage]
+
 public class RandomDataGeneratorTest
 {
     private const string PresetString="A constant string";

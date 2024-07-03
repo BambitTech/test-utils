@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Bambit.TestUtility.DataGeneration.Tests.Helpers
 {
+    [ExcludeFromCodeCoverage]
     public class TestClass
     {
         public string FirstName { get; set; } = null!;
@@ -47,6 +49,7 @@ namespace Bambit.TestUtility.DataGeneration.Tests.Helpers
         bool BoolField { get; set; }
     }
 
+    [ExcludeFromCodeCoverage]
     public class TestChildClass : ITestChildClass
     {
         [StringLength(4)]
@@ -62,17 +65,20 @@ namespace Bambit.TestUtility.DataGeneration.Tests.Helpers
             set;
         } = null!;
     }
+    [ExcludeFromCodeCoverage]
     
     public class TestGrandChild 
     {
         public string GrandChildName { get; set; } = null!;
      
     }
+    [ExcludeFromCodeCoverage]
     public class RecursiveClass
     {
         public RecursiveClass Child { get; set; } = null!;
     }
 
+    [ExcludeFromCodeCoverage]
     public class NoDefaultCtorClass(int v)
     {
         public int IntField { get; set; } = v;
