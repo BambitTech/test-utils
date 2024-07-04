@@ -1,10 +1,13 @@
 
+using System.Diagnostics.CodeAnalysis;
 using Bambit.TestUtility.DataGeneration.Tests.Helpers;
 using FluentAssertions;
 
 namespace Bambit.TestUtility.DataGeneration.Tests;
 
 [TestClass]
+[ExcludeFromCodeCoverage]
+
 public class RandomDataGeneratorTest
 {
     private const string PresetString="A constant string";
@@ -225,12 +228,24 @@ public class RandomDataGeneratorTest
         }
     }
 
+    
+
+    [TestMethod]
+    public void GetFirstDayOfMonth_NoParameters_ReturnsFirstDayOfCurrentMonth()
+    {
+                DateTime result = RandomDataGenerator.Instance.GetFirstDayOfMonth();
+                result.Year.Should().Be(DateTime.Today.Year);
+                result.Month.Should().Be(DateTime.Today.Month);
+                result.Day.Should().Be(1);
+    }
+
+
     #endregion GetFirstDayOfMonth
     #region  GetLastDayOfMonth
 
 
     [TestMethod]
-    public void GetLastDayOfMonth_ReturnsFirstDayOfEachMonth()
+    public void GetLastDayOfMonth_ReturnsLastDayOfEachMonth()
     {
         int year = DateTime.Today.Year;
         for (int x = -5; x < 6; x++)
@@ -252,6 +267,24 @@ public class RandomDataGeneratorTest
                     result.Month.Should().Be(testDate.Month+1);
                 }
             }
+        }
+    }
+
+    [TestMethod]
+    public void GetLastDayOfMonth_NoParameter_ReturnsLasstDayOfCurrentMonth()
+    {
+
+        DateTime result = RandomDataGenerator.Instance.GetLastDayOfMonth().AddDays(1);
+        result.Day.Should().Be(1);
+        if (DateTime.Today.Month == 12)
+        {
+            result.Year.Should().Be(DateTime.Today.Year + 1);
+            result.Month.Should().Be(1);
+        }
+        else
+        {
+            result.Year.Should().Be(DateTime.Today.Year);
+            result.Month.Should().Be(DateTime.Today.Month + 1);
         }
     }
 
@@ -684,6 +717,22 @@ public class RandomDataGeneratorTest
         testClass.DoubleField.Should().NotBe(0);
         testClass.IntField.Should().NotBe(0);
         testClass.FirstName.Should().NotBeNull().And.NotBeEmpty();
+    }
+    
+    [TestMethod]
+    public void CreateObject_NoDefaultCtor_ThrowsException()
+    {
+
+        RandomDataGenerator.Instance.Invoking(d => d.CreateObject(typeof(NoDefaultCtorClass))).Should()
+            .Throw<MissingMethodException>();
+    }
+
+    
+    [TestMethod]
+    public void CreateObject_NullableType_ThrowsException()
+    {
+        RandomDataGenerator.Instance.Invoking(d => d.CreateObject(typeof(int?))).Should()
+            .Throw<InvalidOperationException>();
     }
 
         
