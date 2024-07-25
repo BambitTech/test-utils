@@ -6,9 +6,10 @@
 
  * Initial colleciton of Generators and initializers
 
-## Upcoming:
-
+## Version 1.1
 ### Functionality Changes:
  * Exposes `InitializeList<T>(int numberItems, Func<IRandomDataGenerator, T> initializeFunction)` method in 
 `IRandomDataGenerator` interface
  * Adds `GenerateByte` generator
+## Upcoming:
+

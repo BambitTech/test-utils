@@ -1,5 +1,8 @@
 ﻿namespace Bambit.TestUtility.DatabaseTools;
 
+/// <summary>
+/// Base implementation of the <see cref="IDatabaseCatalogRecord"/>
+/// </summary>
 public abstract class DatabaseCatalogRecord : IDatabaseCatalogRecord
 {
     #region Properties

@@ -3,6 +3,9 @@ using Bambit.TestUtility.DatabaseTools.Attributes;
 
 namespace Bambit.TestUtility.DatabaseTools
 {
+    /// <summary>
+    /// base class used when generating object from database tables via <see cref="ITableToClassBuilder"/>
+    /// </summary>
     public abstract class DatabaseMappedClass
     {
         /// <summary>
@@ -28,6 +31,14 @@ namespace Bambit.TestUtility.DatabaseTools
             }
         }
 
+        /// <summary>
+        /// Retrieves the property on the class with the specified name
+        /// </summary>
+        /// <typeparam name="T">The data type of the property</typeparam>
+        /// <param name="propertyName">The name of the property to retrieve</param>
+        /// <returns>The value of the field</returns>
+        /// <exception cref="ArgumentException">The specified property name does not exist on the class</exception>
+        /// <remarks>Used if not implementing class as a dynamic</remarks>
         public T?  GetValue<T>(string propertyName) 
         {
             PropertyInfo? propertyInfo = GetType().GetProperties().FirstOrDefault(p => p.Name == propertyName);

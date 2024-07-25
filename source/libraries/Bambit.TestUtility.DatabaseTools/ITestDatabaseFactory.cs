@@ -14,7 +14,7 @@ public interface ITestDatabaseFactory
     /// <summary>
     /// Gets a new <see cref="ITestDbConnection"/> for the specified name
     /// </summary>
-    /// <param name="name">The <see cref="name"/> of the test generator to return</param>
+    /// <param name="name">The name of the test generator to return</param>
     /// <returns></returns>
     ITestDbConnection GetConnection(string name);
 

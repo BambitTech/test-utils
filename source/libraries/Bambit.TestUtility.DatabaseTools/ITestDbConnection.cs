@@ -2,6 +2,12 @@
 
 namespace Bambit.TestUtility.DatabaseTools
 {
+    /// <summary>
+    /// Contains results of a comparison
+    /// </summary>
+    /// <param name="IsSuccess">Bool indicating if the comparison was valid</param>
+    /// <param name="NumberRowsMissing">Indicates the number of rows that were expected by not there</param>
+    /// <param name="NumberRowsNotExpected">Indicates the number of rows that were not expected by were present</param>
     public record DataComparisonResults(bool IsSuccess, int NumberRowsMissing, int NumberRowsNotExpected);
 
     /// <summary>
@@ -9,7 +15,10 @@ namespace Bambit.TestUtility.DatabaseTools
     /// </summary>
     public interface ITestDbConnection : IDbConnection
     {
-        static DataComparisonResults Success = new(true, 0, 0);
+        /// <summary>
+        /// Static success result
+        /// </summary>
+        static readonly DataComparisonResults Success = new(true, 0, 0);
         
         /// <summary>
         /// Event fire for any messages that need conveying
