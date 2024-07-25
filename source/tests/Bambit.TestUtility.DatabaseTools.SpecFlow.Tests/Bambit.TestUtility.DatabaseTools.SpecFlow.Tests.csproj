@@ -31,6 +31,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\Bambit.TestUtility.DatabaseTools.SpecFlow\Bambit.TestUtility.DatabaseTools.SpecFlow.csproj" />
     <ProjectReference Include="..\..\libraries\Bambit.TestUtility.DatabaseTools.SqlServer\Bambit.TestUtility.DatabaseTools.SqlServer.csproj" />
+    <ProjectReference Include="..\..\libraries\Bambit.TestUtility.DatabaseTools\Bambit.TestUtility.DatabaseTools.csproj" />
     <ProjectReference Include="..\..\libraries\Bambit.TestUtility.DataGeneration\Bambit.TestUtility.DataGeneration.csproj" />
     <ProjectReference Include="..\Bambit.TestUtility.TestHelper\Bambit.TestUtility.TestHelper.csproj" />
   </ItemGroup>

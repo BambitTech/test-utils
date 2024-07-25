@@ -7,24 +7,40 @@ using TechTalk.SpecFlow.Infrastructure;
 
 namespace Bambit.TestUtility.DatabaseTools.SpecFlow
 {
+    /// <summary>
+    /// Steps that apply to a Database table
+    /// </summary>
+    /// <param name="context">The current <see cref="ScenarioContext"/></param>
+    /// <param name="outputHelper">The current <see cref="ISpecFlowOutputHelper"/></param>
     [Binding]
     public class TableSteps(ScenarioContext context, ISpecFlowOutputHelper outputHelper)
         : DatabaseSteps(context, outputHelper)
     {
-        
+        /// <summary>
+        /// Clears out a table and adds in the supplied rows
+        /// </summary>
+        /// <param name="schema">The schema of the table</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="connectionName">The applied connection name</param>
+        /// <param name="data">The data to insert</param>
         [Given(
             @"[Oo]nly the following records exist in the (?<schema>.*)\.(?<tableName>.*) table in the (?<connectionName>.*) database:")]
-        public void GivenOnlyTheFollowingRecordsExistInTheTableInTheDatabase(string schema, string tableName,
+        public void EmptyTableAndAddRows(string schema, string tableName,
             string connectionName,
             MappedTable data)
         {
-            GivenTheTableInTheDatabaseIsEmpty(schema, tableName, connectionName);
-            GivenTheFollowingRecordsExistInTheDatabase(schema, tableName, connectionName, data);
+            EmptyTable(schema, tableName, connectionName);
+            AddRecordsToDatabase(schema, tableName, connectionName, data);
         }
-
+        /// <summary>
+        /// Clear our all records in a table
+        /// </summary>
+        /// <param name="schema">The schema of the table</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="connectionName">The applied connection name</param>
        
         [Given(@"[Tt]he table (?<schema>.*)\.(?<tableName>.*) is empty in the (?<connectionName>.*) database")]
-        public void GivenTheTableInTheDatabaseIsEmpty(string schema, string tableName, string connectionName)
+        public void EmptyTable(string schema, string tableName, string connectionName)
         {
 
             using IDbConnection connection = OpenConnectionForName(connectionName);
@@ -35,56 +51,99 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             );
         }
 
+        /// <summary>
+        /// Clear our all records in a table for the last connection used
+        /// </summary>
+        /// <param name="schema">The schema of the table</param>
+        /// <param name="tableName">The name of the table</param>
         [Given(@"[Tt]he table (?<schema>.*)\.(?<tableName>.*) is empty")]
-        public void GivenTheTableIsEmpty(string schema, string tableName)
+        public void EmptyTable(string schema, string tableName)
         {
-            GivenTheTableInTheDatabaseIsEmpty(schema, tableName, LastDatabaseConnectionName);
+            EmptyTable(schema, tableName, LastDatabaseConnectionName);
         }
 
+        /// <summary>
+        /// Adds a collection of records to a table
+        /// </summary>
+        /// <param name="schema">The schema of the table</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="connectionName">The applied connection name</param>
+        /// <param name="data">The data to insert</param>
         
         [Given(@"[Tt]he following records exist in the (?<schema>.*)\.(?<tableName>.*) table in the (?<connectionName>.*) database:")]
-        public void GivenTheFollowingRecordsExistInTheDatabase(string schema, string tableName, string connectionName,
+        public void AddRecordsToDatabase(string schema, string tableName, string connectionName,
             MappedTable data)
         {
             GenerateAndPersistDatabaseTableObjects(schema, tableName, connectionName, data);
         }
-        
+        /// <summary>
+        /// Clears out a table and adds in the supplied rows
+        /// </summary>
+        /// <param name="schema">The schema of the table</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="data">The data to insert</param>
         [Given(@"[Oo]nly the following records exist in the (?<schema>.*)\.(?<tableName>.*) table:")]
-        public void GivenOnlyTheFollowingRecordsExistInTheTable(string schema, string tableName, MappedTable data)
+        public void EmptyTableAndAddRows(string schema, string tableName, MappedTable data)
         {
-            GivenOnlyTheFollowingRecordsExistInTheTableInTheDatabase(schema, tableName, StateManager.LastDatabaseConnectionName , data);
+            EmptyTableAndAddRows(schema, tableName, StateManager.LastDatabaseConnectionName , data);
         }
-        
+        /// <summary>
+        /// Verifies that only the supplied records exist in the table, using the most recent connection
+        /// </summary>
+        /// <param name="schema">The schema of the table</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="data">The data to verify</param>
         [Then(@"[Oo]nly the following records should exist in the (?<schema>.*)\.(?<tableName>.*) (?:table|view):")]
-        public void ThenOnlyTheFollowingRecordsShouldExistInTheTable(string schema, string tableName,
+        public void VerifyOnlyRecordsExistInTable(string schema, string tableName,
             MappedTable data)
         {
             CompareTableToDataset(schema, tableName, StateManager.LastDatabaseConnectionName, data, false);
         }
+        /// <summary>
+        /// Verifies that only the supplied records exist in the table
+        /// </summary>
+        /// <param name="schema">The schema of the table</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="connectionName">The applied connection name</param>
+        /// <param name="data">The data to verify</param>
 
         [Then(@"[Oo]nly the following records should exist in the (?<schema>.*)\.(?<tableName>.*) table in the (?<connectionName>.*) database:")]
-        public void ThenOnlyTheFollowingRecordsShouldExistInTheTableInTheDatabase(string schema, string tableName,
+        public void VerifyOnlyRecordsExistInTable(string schema, string tableName,
             string connectionName, MappedTable data)
         {
             CompareTableToDataset(schema, tableName, connectionName, data, false);
         }
         
+        /// <summary>
+        /// Verifies the supplied records exist in the table, but other records may exist
+        /// </summary>
+        /// <param name="schema">The schema of the table</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="connectionName">The applied connection name</param>
+        /// <param name="data">The data to verify</param>
         [Then(@"[Tt]he following records should exist in the (?<schema>.*)\.(?<tableName>.*) (?:table|view) in the (?<connectionName>.*) database:")]
-        public void ThenTheFollowingRecordsShouldExistInTheTableInTheDatabase(string schema, string tableName,
+        public void VerifyRecordsExistInTable(string schema, string tableName,
             string connectionName, MappedTable data)
         {
             CompareTableToDataset(schema, tableName, connectionName, data, true);
         }
-
+        
+        /// <summary>
+        /// Verifies the supplied records, when inserted into a table, will throw an exception
+        /// </summary>
+        /// <param name="schema">The schema of the table</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="connectionName">The applied connection name</param>
+        /// <param name="data">The data to verify</param>
         [Then(@"[Ii]nserting the following records in the (?<schema>.*)\.(?<tableName>.*) table in the (?<connectionName>.*) database will throw an error:")]
-        public void ThenInsertingTheFollowingRecordsInTheTableInTheDatabaseWillThrowAnError(string schema, string tableName,
+        public void VerifyRecordsThrowError(string schema, string tableName,
             string connectionName,
             MappedTable data)
         {
             StateManager.LastDatabaseConnectionName = connectionName;
             try
             {
-                GivenTheFollowingRecordsExistInTheDatabase(schema, tableName, StateManager.LastDatabaseConnectionName, data);
+                AddRecordsToDatabase(schema, tableName, StateManager.LastDatabaseConnectionName, data);
             }
             catch (SqlException exc)
             {
@@ -96,16 +155,26 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             Assert.Fail();
         }
         
+        /// <summary>
+        /// Verifies the supplied records, when inserted into a table, will throw an exception.  Users last connection
+        /// </summary>
+        /// <param name="schema">The schema of the table</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="data">The data to verify</param>
         [Then(@"[Ii]nserting the following records in the (?<schema>.*)\.(?<tableName>.*) table will throw an error:")]
-        public void ThenInsertingTheFollowingRecordsInTheTableInTheDatabaseWillThrowAnError(string schema, string tableName,
+        public void VerifyRecordsThrowError(string schema, string tableName,
             MappedTable data)
         {
-            ThenInsertingTheFollowingRecordsInTheTableInTheDatabaseWillThrowAnError(schema, tableName,StateManager.LastDatabaseConnectionName, data);
+            VerifyRecordsThrowError(schema, tableName,StateManager.LastDatabaseConnectionName, data);
         }
 
+        /// <summary>
+        /// Verifies that the last exception thrown contains a phrase
+        /// </summary>
+        /// <param name="expectedPhrase">The phrase expected</param>
      
         [Then(@"[Tt]he last SQL exception will contain the phrase ""(?<expectedPhrase>.*)""")]
-        public void ThenTheLastExceptionWillContainThePhrase(string expectedPhrase)
+        public void VerifyLastExceptionPhrase(string expectedPhrase)
         {
             SqlException sqlException = Context.Get<SqlException>();
             Assert.IsNotNull(sqlException, "No Sql Exception found");
@@ -115,8 +184,15 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
                 $"Exception '{sqlException.Message}' did not contain string '{expectedPhrase}");
         }
         
+        /// <summary>
+        /// Verifies the table has the exact number of rows
+        /// </summary>
+        /// <param name="schema">The schema of the table</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="connectionName">The applied connection name</param>
+        /// <param name="expectedRows">Number of rows expected</param>
         [Then(@"[Tt]he (?<schema>.*)\.(?<tableName>.*) table in the (?<connectionName>.*) database will have (?<expectedRows>\d.*) rows")]
-        public void ThenTheTableInTheDatabaseWillHaveRows(string schema,
+        public void VerifyRowCountInTable(string schema,
             string tableName, string connectionName, int expectedRows)
         {
             
@@ -130,11 +206,18 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             }
         }
         
+        
+        /// <summary>
+        /// Verifies the table has no rows
+        /// </summary>
+        /// <param name="schema">The schema of the table</param>
+        /// <param name="tableName">The name of the table</param>
+        /// <param name="connectionName">The applied connection name</param>
         [Then(@"[Tt]he (?<schema>.*)\.(?<tableName>.*) table in the (?<connectionName>.*) database will have no rows")]
-        public void ThenTheTableInTheDatabaseWillHaveNoRows(string schema,
+        public void VerifyTableIsEmpty(string schema,
             string tableName, string connectionName)
         {
-            ThenTheTableInTheDatabaseWillHaveRows(schema, tableName, connectionName, 0);
+            VerifyRowCountInTable(schema, tableName, connectionName, 0);
         }
 
     }

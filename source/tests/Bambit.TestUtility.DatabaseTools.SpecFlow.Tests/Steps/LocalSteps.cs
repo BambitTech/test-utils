@@ -50,7 +50,7 @@ public class LocalSteps(ScenarioContext context, ISpecFlowOutputHelper outputHel
         TableSteps tableSteps = new (Context, OutputHelper);
         try
         {
-            tableSteps.ThenInsertingTheFollowingRecordsInTheTableInTheDatabaseWillThrowAnError(schema, tableName, data);
+            tableSteps.VerifyRecordsThrowError(schema, tableName, data);
         }
         catch 
         {
@@ -67,7 +67,7 @@ public class LocalSteps(ScenarioContext context, ISpecFlowOutputHelper outputHel
         TableSteps tableSteps = new (Context, OutputHelper);
         try
         {
-            tableSteps.GivenOnlyTheFollowingRecordsExistInTheTableInTheDatabase(schema, tableName, StateManager.LastDatabaseConnectionName , data);
+            tableSteps.EmptyTableAndAddRows(schema, tableName, StateManager.LastDatabaseConnectionName , data);
         }
         catch
         {

@@ -1,18 +1,42 @@
-﻿using System.Data;
+﻿
+using System.Data;
 using System.Text.RegularExpressions;
 using TechTalk.SpecFlow;
 
 namespace Bambit.TestUtility.DatabaseTools.SpecFlow.Mapping;
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// <summary>   A mapped table. </summary>
+///
+/// <remarks>   Law Metzler, 7/25/2024. </remarks>
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 public class MappedTable
 {
     #region Static and private props
+    /// <summary>   The clean RegEx. </summary>
     public static Regex CleanRegex = new("[^a-zA-Z@]");
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   Gets the table rows. </summary>
+    ///
+    /// <value> The table rows. </value>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     private MappedRow[] TableRows { get; }
 
     #endregion Static and private props
 
     #region Ctors
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   Constructor. </summary>
+    ///
+    /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+    ///
+    /// <param name="dataReader">   The data reader. </param>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public MappedTable(IDataReader dataReader)
     {
 
@@ -36,6 +60,15 @@ public class MappedTable
         TableRows = row.ToArray();
 
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   Constructor. </summary>
+    ///
+    /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+    ///
+    /// <param name="sourceTable">  Source table. </param>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public MappedTable(Table sourceTable)
     {
         int index = 0;
@@ -65,9 +98,27 @@ public class MappedTable
 
     #region Properties
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   Gets the columns. </summary>
+    ///
+    /// <value> The columns. </value>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public string[] Columns => TableColumns.Select(a => a.ColumnName).ToArray();
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   Gets the table columns. </summary>
+    ///
+    /// <value> The table columns. </value>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public ColumnDescription[] TableColumns { get; }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   Gets the rows. </summary>
+    ///
+    /// <value> The rows. </value>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public ICollection<MappedRow> Rows => TableRows;
 
@@ -75,11 +126,32 @@ public class MappedTable
 
     #region Public methods
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   Gets column description. </summary>
+    ///
+    /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+    ///
+    /// <param name="name"> The name. </param>
+    ///
+    /// <returns>   The column description. </returns>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public ColumnDescription? GetColumnDescription(string name)
     {
         return TableColumns.FirstOrDefault(d =>
             string.Compare(d.ColumnName, name, StringComparison.CurrentCultureIgnoreCase) == 0);
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   Searches for the first header. </summary>
+    ///
+    /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+    ///
+    /// <param name="name"> The name. </param>
+    ///
+    /// <returns>   The zero-based index of the found header, or -1 if no match was found. </returns>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public int IndexOfHeader(string name)
     {
         string normalizedName = NormalizeName(name);
@@ -95,16 +167,47 @@ public class MappedTable
 
     #region Private Methods
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   Normalize name. </summary>
+    ///
+    /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+    ///
+    /// <param name="input">    The input. </param>
+    ///
+    /// <returns>   A string. </returns>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     private string NormalizeName(string input)
     {
         return CleanRegex.Replace(input.ToLower(), "");
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   Parse type. </summary>
+    ///
+    /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+    ///
+    /// <param name="input">    The input. </param>
+    ///
+    /// <returns>   A string? </returns>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private string? ParseType(string input)
     {
         int indexOf = input.IndexOf("@", StringComparison.Ordinal);
         return indexOf > 0 ? input.Substring(indexOf + 1).Trim().ToLower() : null;
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   Parse database type. </summary>
+    ///
+    /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+    ///
+    /// <param name="input">    The input. </param>
+    ///
+    /// <returns>   A string? </returns>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     private string? ParseDatabaseType(string input)
     {
         switch (input)

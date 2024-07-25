@@ -1,31 +1,63 @@
-﻿using Bambit.TestUtility.DatabaseTools.SpecFlow.Configuration;
+﻿
 using TechTalk.SpecFlow;
 
 namespace Bambit.TestUtility.DatabaseTools.SpecFlow
 {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   A configuration steps. </summary>
+    ///
+    /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+    ///
+    /// <param name="context">  The context. </param>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     [Binding]
     public class ConfigurationSteps(ScenarioContext context) : BaseSteps(context)
     {
-        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Sets the null code. </summary>
+        ///
+        /// <value> The null code. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
         protected string NullCode
         {
             set => Configuration.NullStringIdentifier = value;
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Sets the timeout. </summary>
+        ///
+        /// <value> The timeout. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         protected int Timeout
         {
             set => Configuration.TimeoutSeconds = value;
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Treat empty strings as null. </summary>
+        ///
+        /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
         [Given(@"I'm treating empty strings as null")]
-        public void GivenImTreatingEmptyStringsAsNull()
+        public void TreatEmptyStringsAsNull()
         {
             NullCode = string.Empty;
         }
-        
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Sets query timeout. </summary>
+        ///
+        /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+        ///
+        /// <param name="seconds">  The seconds. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [Given(@"I have a query timeout of (?<seconds>.*) seconds")]
-        public void GivenIHaveAQueryTimeoutOfSeconds(int seconds)
+        public void SetQueryTimeout(int seconds)
         {
             Timeout = seconds;
         }
