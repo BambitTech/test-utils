@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Bambit.TestUtility.DataGeneration.Tests.Helpers
+namespace Bambit.TestUtility.TestHelper
 {
     [ExcludeFromCodeCoverage]
     public class TestClass
@@ -9,7 +9,9 @@ namespace Bambit.TestUtility.DataGeneration.Tests.Helpers
         public string FirstName { get; set; } = null!;
         public int IntField { get; set; }
 
+        public byte ByteField { get; set; }
         public double DoubleField { get; set; }
+        public float FloatField { get; set; }
 
         public short ShortField { get; set; }
         public DateTime DateTimeField { get; set; }
@@ -23,8 +25,9 @@ namespace Bambit.TestUtility.DataGeneration.Tests.Helpers
         
         public string? NullableFirstName { get; set; } = null!;
         public int? NullableIntField { get; set; }
-
+        public byte? NullableByteField { get; set; }
         public double? NullableDoubleField { get; set; }
+        public float? NullableFloatField { get; set; }
 
         public short? NullableShortField { get; set; }
         public DateTime? NullableDateTimeField { get; set; }

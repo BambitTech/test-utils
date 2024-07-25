@@ -1,0 +1,20 @@
+{
+
+  "databaseFactory": {
+    "mappedDatabases": {
+
+      "sqlTestDb": {
+        "connectionString": "Server=localhost\\MMXXII; Database=IntegrationTests;Trusted_Connection=true",
+        "databaseCatalog": "SqlServer"
+      }
+    },
+    "databaseCatalogRecordMap": {
+      "sqlServer": "Bambit.TestUtility.DatabaseTools.SqlServer.SqlServerDatabaseCatalogRecord,  Bambit.TestUtility.DatabaseTools.SqlServer"
+    }
+  },
+  "specFlow": {
+    "nullStringIdentifier": "null",
+    "nullIdentifierCaseSensitive": false,
+    "timeoutSeconds": 30
+  }
+}

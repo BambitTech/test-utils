@@ -1,13 +1,13 @@
 
 using System.Diagnostics.CodeAnalysis;
-using Bambit.TestUtility.DataGeneration.Tests.Helpers;
+using Bambit.TestUtility.TestHelper;
 using FluentAssertions;
 
 namespace Bambit.TestUtility.DataGeneration.Tests;
 
 [TestClass]
 [ExcludeFromCodeCoverage]
-
+[TestCategory("Unit")]
 public class RandomDataGeneratorTest
 {
     private const string PresetString="A constant string";
@@ -406,7 +406,16 @@ public class RandomDataGeneratorTest
 
     #endregion GenerateInt
 
+    
+    #region GenerateByte
 
+    [TestMethod]
+    public void GenerateByte_MultipleRuns_DoNotMatch()
+    {
+        TestNoDupes(() => RandomDataGenerator.Instance.GenerateByte(), 5);
+    }
+
+    #endregion GenerateByte
     #region GenerateDecimal
 
     [TestMethod]

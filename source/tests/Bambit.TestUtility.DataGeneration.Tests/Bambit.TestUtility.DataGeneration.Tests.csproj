@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\Bambit.TestUtility.DataGeneration\Bambit.TestUtility.DataGeneration.csproj" />
+    <ProjectReference Include="..\Bambit.TestUtility.TestHelper\Bambit.TestUtility.TestHelper.csproj" />
   </ItemGroup>
 
 </Project>

@@ -18,6 +18,7 @@ namespace Bambit.TestUtility.DataGeneration.Attributes
         /// </summary>
         public byte Scale { get; set; }
 
+
         /// <summary>
         /// Creates a new DecimalPrecisionAttribute with the specified precision and scale
         /// </summary>
@@ -27,6 +28,6 @@ namespace Bambit.TestUtility.DataGeneration.Attributes
         {
             Precision = precision;
             Scale = scale;
-        }
+        }  
     }
 }

@@ -5,19 +5,30 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{AE3CBE26-A480-4AFF-AAEA-2B1F5D36F49F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.DataGeneration", "libraries\Bambit.TestUtility.DataGeneration\Bambit.TestUtility.DataGeneration.csproj", "{EF533FFF-591C-4774-83E7-F988CE7571CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.DataGeneration", "libraries\Bambit.TestUtility.DataGeneration\Bambit.TestUtility.DataGeneration.csproj", "{EF533FFF-591C-4774-83E7-F988CE7571CF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6881F3C9-BCA5-4654-B19D-8BE33E29DF3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.DataGeneration.Tests", "tests\Bambit.TestUtility.DataGeneration.Tests\Bambit.TestUtility.DataGeneration.Tests.csproj", "{1A346C18-FE26-4C1A-A654-2C3BFCEF4269}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.DataGeneration.Tests", "tests\Bambit.TestUtility.DataGeneration.Tests\Bambit.TestUtility.DataGeneration.Tests.csproj", "{1A346C18-FE26-4C1A-A654-2C3BFCEF4269}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.DatabaseTools", "libraries\Bambit.TestUtility.DatabaseTools\Bambit.TestUtility.DatabaseTools.csproj", "{9CE07834-8BC3-4EB5-9263-63F55DD43DFD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.DatabaseTools.Tests", "tests\Bambit.TestUtility.DatabaseTools.Tests\Bambit.TestUtility.DatabaseTools.Tests.csproj", "{44B00C2A-25D8-4C17-B251-48BE6748126B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.DatabaseTools.SqlServer", "libraries\Bambit.TestUtility.DatabaseTools.SqlServer\Bambit.TestUtility.DatabaseTools.SqlServer.csproj", "{2A725EAE-25EF-44A1-9DF8-1D7596035182}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.DatabaseTools.SqlServer.Tests", "tests\Bambit.TestUtility.DatabaseTools.SqlServer.Tests\Bambit.TestUtility.DatabaseTools.SqlServer.Tests.csproj", "{A2C24BD6-958B-40C7-8E9D-7BF6FF92782B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.DatabaseTools.SpecFlow", "libraries\Bambit.TestUtility.DatabaseTools.SpecFlow\Bambit.TestUtility.DatabaseTools.SpecFlow.csproj", "{45BA9317-2525-448E-A92C-CFDF028B4493}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.DatabaseTools.SpecFlow.Tests", "tests\Bambit.TestUtility.DatabaseTools.SpecFlow.Tests\Bambit.TestUtility.DatabaseTools.SpecFlow.Tests.csproj", "{B1F31086-2698-4AFE-A558-7AA6B9D03B7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.TestHelper", "tests\Bambit.TestUtility.TestHelper\Bambit.TestUtility.TestHelper.csproj", "{6F771A44-FC3F-4ED3-BB47-56B32ED1EDDB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{EF533FFF-591C-4774-83E7-F988CE7571CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -28,9 +39,50 @@ Global
 		{1A346C18-FE26-4C1A-A654-2C3BFCEF4269}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A346C18-FE26-4C1A-A654-2C3BFCEF4269}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A346C18-FE26-4C1A-A654-2C3BFCEF4269}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CE07834-8BC3-4EB5-9263-63F55DD43DFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CE07834-8BC3-4EB5-9263-63F55DD43DFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CE07834-8BC3-4EB5-9263-63F55DD43DFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CE07834-8BC3-4EB5-9263-63F55DD43DFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44B00C2A-25D8-4C17-B251-48BE6748126B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44B00C2A-25D8-4C17-B251-48BE6748126B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44B00C2A-25D8-4C17-B251-48BE6748126B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44B00C2A-25D8-4C17-B251-48BE6748126B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A725EAE-25EF-44A1-9DF8-1D7596035182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A725EAE-25EF-44A1-9DF8-1D7596035182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A725EAE-25EF-44A1-9DF8-1D7596035182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A725EAE-25EF-44A1-9DF8-1D7596035182}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2C24BD6-958B-40C7-8E9D-7BF6FF92782B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2C24BD6-958B-40C7-8E9D-7BF6FF92782B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2C24BD6-958B-40C7-8E9D-7BF6FF92782B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2C24BD6-958B-40C7-8E9D-7BF6FF92782B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45BA9317-2525-448E-A92C-CFDF028B4493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45BA9317-2525-448E-A92C-CFDF028B4493}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45BA9317-2525-448E-A92C-CFDF028B4493}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45BA9317-2525-448E-A92C-CFDF028B4493}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1F31086-2698-4AFE-A558-7AA6B9D03B7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1F31086-2698-4AFE-A558-7AA6B9D03B7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1F31086-2698-4AFE-A558-7AA6B9D03B7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1F31086-2698-4AFE-A558-7AA6B9D03B7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F771A44-FC3F-4ED3-BB47-56B32ED1EDDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F771A44-FC3F-4ED3-BB47-56B32ED1EDDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F771A44-FC3F-4ED3-BB47-56B32ED1EDDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F771A44-FC3F-4ED3-BB47-56B32ED1EDDB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{EF533FFF-591C-4774-83E7-F988CE7571CF} = {AE3CBE26-A480-4AFF-AAEA-2B1F5D36F49F}
 		{1A346C18-FE26-4C1A-A654-2C3BFCEF4269} = {6881F3C9-BCA5-4654-B19D-8BE33E29DF3A}
+		{9CE07834-8BC3-4EB5-9263-63F55DD43DFD} = {AE3CBE26-A480-4AFF-AAEA-2B1F5D36F49F}
+		{44B00C2A-25D8-4C17-B251-48BE6748126B} = {6881F3C9-BCA5-4654-B19D-8BE33E29DF3A}
+		{2A725EAE-25EF-44A1-9DF8-1D7596035182} = {AE3CBE26-A480-4AFF-AAEA-2B1F5D36F49F}
+		{A2C24BD6-958B-40C7-8E9D-7BF6FF92782B} = {6881F3C9-BCA5-4654-B19D-8BE33E29DF3A}
+		{45BA9317-2525-448E-A92C-CFDF028B4493} = {AE3CBE26-A480-4AFF-AAEA-2B1F5D36F49F}
+		{B1F31086-2698-4AFE-A558-7AA6B9D03B7F} = {6881F3C9-BCA5-4654-B19D-8BE33E29DF3A}
+		{6F771A44-FC3F-4ED3-BB47-56B32ED1EDDB} = {6881F3C9-BCA5-4654-B19D-8BE33E29DF3A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {72AB2818-10DE-41CE-AA3D-7AB2CC3ED1FB}
 	EndGlobalSection
 EndGlobal

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+// ReSharper disable UnusedMemberInSuper.Global
 
 
 namespace Bambit.TestUtility.DataGeneration
@@ -16,7 +17,8 @@ namespace Bambit.TestUtility.DataGeneration
         /// </summary>
         /// <typeparam name="T">The type that, if a property of an object is one, will be instantiated</typeparam>
         /// <typeparam name="T2">The type to used to instantiate t</typeparam>
-        void AddAutoProperties<T, T2>() where T2 : T, new();
+        void AddAutoProperties<T, T2>() 
+            where T2 : T, new();
 
         /// <summary>
         /// Adds a <see cref="Func{IRandomDataGenerator, TResult}"/> that will be called to create a new object of type t 
@@ -27,7 +29,8 @@ namespace Bambit.TestUtility.DataGeneration
         /// Adds a type, t, that will be instantiated if it is a property of an object that is being instantiated.
         /// </summary>
         /// <typeparam name="T">The type that, if a property of an object is one, will be instantiated</typeparam>
-        void AddAutoProperties<T>() where T : new();
+        void AddAutoProperties<T>() 
+            where T : new();
     
         /// <summary>
         /// Defines a function that will be used to initialize a specific object type
@@ -35,10 +38,7 @@ namespace Bambit.TestUtility.DataGeneration
         /// <typeparam name="T">The type of object that will use the generated function</typeparam>
         /// <param name="initMethod">The <see cref="Func{T,TResult}"/> that will be used to initialize the object</param>
         void AddCustomObjectInitialization<T>(Func<IRandomDataGenerator, T> initMethod)
-
-            where T : notnull
-
-            ;
+            where T : notnull;
 
         
         /// <summary>
@@ -49,10 +49,7 @@ namespace Bambit.TestUtility.DataGeneration
         /// <param name="initMethod">The method to use when instantiating an object of type t </param>
         /// <remarks>   </remarks>
         void AddCustomObjectInitialization<T>(Func<IRandomDataGenerator, T> initMethod, bool autoProperty)  where T:
-
-            notnull, 
-
-            new();
+            notnull, new();
  
         #endregion Configuration Methods
   
@@ -62,6 +59,12 @@ namespace Bambit.TestUtility.DataGeneration
         /// </summary>
         /// <returns></returns>
         bool GenerateBoolean();
+        
+        /// <summary>
+        /// Generates a random <see cref="Byte"/> value
+        /// </summary>
+        /// <returns>A random <see cref="Byte"/></returns>
+        byte GenerateByte();
 
         /// <summary>
         /// Generates a random DateTime between daysAgoMinimum and daysFutureMaximum
@@ -189,13 +192,9 @@ namespace Bambit.TestUtility.DataGeneration
         /// </summary>
         /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
         /// <param name="numberItems">The number of random entries to create</param>
-        /// <returns>A new Dictionary{String,TValue} with numberItemss entries</returns>
+        /// <returns>A new Dictionary{String,TValue} with numberItems entries</returns>
         Dictionary<string, TValue> InitializeDictionary<TValue>(int numberItems)
-            where TValue :
-
-            notnull, 
-
-            new();
+            where TValue : notnull, new();
 
         /// <summary>
         /// Initializes a new Dictionary with TKey key sand TValue values
@@ -203,25 +202,17 @@ namespace Bambit.TestUtility.DataGeneration
         /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
         /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
         /// <param name="numberItems">The number of random entries to create</param>
-        /// <returns>A new Dictionary{String,TValue} with numberItemss entries</returns>
+        /// <returns>A new Dictionary{String,TValue} with numberItems entries</returns>
         Dictionary<TKey, TValue> InitializeDictionary<TKey, TValue>(int numberItems)
-            where TKey : 
-
-            notnull, 
-
-             new()
-            where TValue : 
-
-            notnull, 
-
-            new();
+            where TKey : notnull, new()
+            where TValue : notnull, new();
 
         /// <summary>
-        /// Initializes a random list of  numberItemss strings, each with a length no greater than maxLength
+        /// Initializes a random list of  numberItems strings, each with a length no greater than maxLength
         /// </summary>
         /// <param name="numberItems">The number of strings to generate</param>
         /// <param name="maxLength">The maximum length of each string</param>
-        /// <returns>A <see cref="IList{T}"/> of numberItemss strings</returns>
+        /// <returns>A <see cref="IList{T}"/> of numberItems strings</returns>
         IList<string> InitializeList(int numberItems, int maxLength);
 
         /// <summary>
@@ -229,12 +220,19 @@ namespace Bambit.TestUtility.DataGeneration
         /// </summary>
         /// <typeparam name="T">The type of objects to generate</typeparam>
         /// <param name="numberItems">The number of items to generate</param>
-        /// <returns>A <see cref="IList{T}"/> of numberItemss object of type t</returns>
-        IList<T> InitializeList<T>(int numberItems) where T : 
+        /// <returns>A <see cref="IList{T}"/> of numberItems object of type t</returns>
+        IList<T> InitializeList<T>(int numberItems) 
+            where T : notnull, new();
 
-            notnull, 
-
-            new();
+        /// <summary>
+        /// Creates a list of random objects of type T, calling an initialize function on each as they are generated
+        /// </summary>
+        /// <typeparam name="T">Type of object to initialize</typeparam>
+        /// <param name="numberItems">The number of items to initialize</param>
+        /// <param name="initializeFunction">The Function to call on each item after initialization</param>
+        /// <returns>A <see cref="IList{T}"/> of numberItems object of type t</returns>
+        List<T> InitializeList<T>(int numberItems, Func<IRandomDataGenerator, T> initializeFunction)
+            where T : new();
 
         /// <summary>
         /// Creates a list of random object of type t, calling postCreate on each before returning
@@ -242,12 +240,9 @@ namespace Bambit.TestUtility.DataGeneration
         /// <typeparam name="T">The type of objects to generate</typeparam>
         /// <param name="postCreate">The <see cref="Action{T}"/> to call on each entity before returning.</param>
         /// <param name="numberItems">The number of items to generate</param>
-        /// <returns>A <see cref="IList{T}"/> of numberItemss object of type t</returns>
-        IList<T> InitializeList<T>(int numberItems, Action<T> postCreate) where T : 
-
-            notnull, 
-
-            new();
+        /// <returns>A <see cref="IList{T}"/> of numberItems object of type t</returns>
+        IList<T> InitializeList<T>(int numberItems, Action<T> postCreate) 
+            where T : notnull, new();
 
         /// <summary>
         /// Creates and initializes an object of type t
@@ -257,11 +252,8 @@ namespace Bambit.TestUtility.DataGeneration
         /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
         /// will not be initialized unless a function has been added with
         /// <see cref="AddAutoProperties{T,T2}">AddAutoProperties</see></remarks>
-        T InitializeObject<T>() where T : 
-
-            notnull, 
-
-            new();
+        T InitializeObject<T>() 
+            where T : notnull, new();
 
         /// <summary>
         /// Creates and initializes an object of type t, calling the supplied modifierFunction on it before returning.
@@ -274,11 +266,8 @@ namespace Bambit.TestUtility.DataGeneration
         /// <see cref="AddAutoProperties{T,T2}">AddAutoProperties</see></remarks>
         T InitializeObject<T>(
                 Action<T> modifierFunction
-            ) where T :
-
-            notnull, 
-
-            new();
+            ) 
+            where T : notnull, new();
 
 
         /// <summary>
@@ -290,7 +279,8 @@ namespace Bambit.TestUtility.DataGeneration
         /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
         /// will not be initialized unless a function has been added with
         /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
-        T InitializeObject<T>(T objectToInitialize) where T : notnull;
+        T InitializeObject<T>(T objectToInitialize) 
+            where T : notnull;
 
         /// <summary>
         /// Populates the properties of the supplied object, calling modifierFunction on each populated object
@@ -303,10 +293,7 @@ namespace Bambit.TestUtility.DataGeneration
         /// will not be initialized unless a function has been added with
         /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
         T InitializeObject<T>(T objectToInitialize, Action<T> modifierFunction)   
-
-            where T : notnull 
-
-        ;
+            where T : notnull;
         #endregion Instantiation Methods
 
         #region Misc Methods

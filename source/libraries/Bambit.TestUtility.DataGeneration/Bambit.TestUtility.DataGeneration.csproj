@@ -10,8 +10,8 @@
 	  <Company>Bambit Technologies, Inc.</Company>
 	  <Copyright>2024 Bambit Technologies, Inc</Copyright>
 	  <Description>Provides quick random data generation routines to generate or populate random objects.</Description>
-	  <PackageProjectUrl>https://github.com/bambit/test-utils</PackageProjectUrl>
-	  <RepositoryUrl>https://github.com/bambit/test-utils</RepositoryUrl>
+	  <PackageProjectUrl>https://github.com/BambitTech/test-utils/</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/BambitTech/test-utils/</RepositoryUrl>
      <PackageReadmeFile>Readme.md</PackageReadmeFile>
      <PackageTags>Testing;Data Generation;library</PackageTags>
      <PackageIcon>icon.png</PackageIcon>

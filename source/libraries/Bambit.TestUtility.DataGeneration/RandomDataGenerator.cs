@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Bambit.TestUtility.DatabaseTools.Attributes;
 using Bambit.TestUtility.DataGeneration.Attributes;
 
 namespace Bambit.TestUtility.DataGeneration
@@ -20,7 +21,7 @@ namespace Bambit.TestUtility.DataGeneration
         /// It's not international (sorry) but if needed derived classes can use a different list
         /// </summary>
         public static readonly string[] FirstNames =
-        {
+        [
             "James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda", "William", "Elizabeth",
             "David", "Barbara",
             "Richard", "Susan", "Joseph", "Jessica", "Thomas", "Sarah", "Charles", "Karen", "Christopher", "Nancy",
@@ -51,7 +52,7 @@ namespace Bambit.TestUtility.DataGeneration
             "Abigail", "Logan", "Brittany",
             "Randy", "Rose", "Louis", "Diana", "Russell", "Natalie", "Vincent", "Sophia", "Philip", "Alexis", "Bobby",
             "Lori"
-        };
+        ];
 
         /// <summary>
         /// This list is (mostly) derived from the common last names in America at some point in time.
@@ -59,7 +60,7 @@ namespace Bambit.TestUtility.DataGeneration
         /// </summary>
 
         public static readonly string[] LastNames =
-        {
+        [
             "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor",
             "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez",
             "Robinson", "Clark", "Rodriguez", "Lewis", "Lee", "Walker", "Hall", "Allen", "Young", "Hernandez", "King",
@@ -75,26 +76,28 @@ namespace Bambit.TestUtility.DataGeneration
             "Hughes", "Flores", "Washington", "Butler", "Simmons", "Foster", "Gonzales", "Bryant", "Alexander",
             "Russell", "Griffin",
             "Diaz", "Hayes"
-        };
+        ];
 
         #endregion Lookup Data
 
         #region Static Fields
 
         /// <summary>
-        /// The Random class is used for all random generators
-        /// </summary>
-        protected static Random Random = new Random();
-
-        /// <summary>
         /// A static implementation (lazy backer) for a default generator
         /// </summary>
         protected static Lazy<RandomDataGenerator> LazyInstance = new(() => new RandomDataGenerator());
-
+        
         /// <summary>
         /// Static implementation for default functionality
         /// </summary>
         public static RandomDataGenerator Instance = LazyInstance.Value;
+
+        
+        /// <summary>
+        /// The Random class is used for all random generators
+        /// </summary>
+        protected static Random Random = new();
+
 
         #endregion Static Fields
 
@@ -116,7 +119,7 @@ namespace Bambit.TestUtility.DataGeneration
         private readonly Dictionary<string, Func<string>> FieldNamesToGenerators;
 
         /// <summary>
-        /// Contains a mapping of types to specialized functions to generate them.  Allows for global customaization
+        /// Contains a mapping of types to specialized functions to generate them.  Allows for global customization
         /// of any given type.
         /// </summary>
         private readonly Dictionary<Type, Func<object>> MappedInitializeFunctions;
@@ -149,19 +152,53 @@ namespace Bambit.TestUtility.DataGeneration
         #region Basic types
         
         /// <inheritdoc />
-        public virtual string GenerateString(int length)
+        public virtual bool GenerateBoolean()
         {
-            if (length <= 0)
-                throw new ArgumentException("Invalid number of characters", nameof(length));
+            return GenerateInt() % 2 == 0;
+        }
+        
+        /// <inheritdoc />
+        public virtual byte GenerateByte()
+        {
+            return Convert.ToByte(GenerateInt(0, 255));
+        }
 
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int x = 0; x < length; x++)
+        /// <inheritdoc />
+        public virtual DateTime GenerateDate(int daysAgoMinimum = -30, int daysFutureMaximum = 30)
+        {
+            return DateTime.Today.AddDays(GenerateInt(daysAgoMinimum, daysFutureMaximum));
+        }
+
+        
+        /// <inheritdoc />
+        public virtual DateTime GenerateDateTime(int daysAgoMinimum = -30, int daysFutureMaximum = 30)
+        {
+            return DateTime.Today.AddDays(GenerateInt(daysAgoMinimum, daysFutureMaximum))
+                    .AddSeconds(GenerateDouble(0, 24 * 60 * 60))
+                    .AddMilliseconds(GenerateDouble(0, 1000))
+                    .AddMicroseconds(GenerateDouble(0, 1000))
+                ;
+        }
+
+        /// <inheritdoc />
+        public virtual decimal GenerateDecimal(decimal low = 0m, decimal high = 10000000000m)
+        {
+            double value = GenerateDouble((double)low, (double)high);
+            return Convert.ToDecimal(value);
+        }
+
+        /// <inheritdoc />
+        public virtual decimal GenerateDecimal(byte precision, byte scale)
+        {
+            if (precision - scale > 10)
             {
-                stringBuilder.Append((char)Random.Next(97, 122));
+                precision = (byte)(scale > 10 ? scale : 10);
             }
 
-            return stringBuilder.ToString();
-
+            double high = Math.Pow(10, precision);
+            double divisor = Math.Pow(10, scale);
+            double value = Math.Floor(GenerateDouble(0, high));
+            return Convert.ToDecimal(value / divisor);
         }
         
         /// <inheritdoc />
@@ -187,61 +224,17 @@ namespace Bambit.TestUtility.DataGeneration
         }
         
         /// <inheritdoc />
-        public virtual int GenerateInt(int low = 0, int high = int.MaxValue / 100)
-        {
-            return Random.Next(low, high);
-        }
-        
-        /// <inheritdoc />
-        public virtual decimal GenerateDecimal(byte precision, byte scale)
-        {
-            if (precision - scale > 10)
-            {
-                precision = (byte)(scale > 10 ? scale : 10);
-            }
-
-            double high = Math.Pow(10, precision);
-            double divisor = Math.Pow(10, scale);
-            double value = Math.Floor(GenerateDouble(0, high));
-            return Convert.ToDecimal(value / divisor);
-        }
-        
-        /// <inheritdoc />
         public virtual Guid GenerateGuid()
         {
             return Guid.NewGuid();
         }
-        
+          
         /// <inheritdoc />
-        public virtual bool GenerateBoolean()
+        public virtual int GenerateInt(int low = 0, int high = int.MaxValue / 100)
         {
-            return GenerateInt() % 2 == 0;
-        }
-        
-        /// <inheritdoc />
-        public virtual decimal GenerateDecimal(decimal low = 0m, decimal high = 10000000000m)
-        {
-            double value = GenerateDouble((double)low, (double)high);
-            return Convert.ToDecimal(value);
-        }
-        /// <inheritdoc />
-        public virtual DateTime GenerateDate(int daysAgoMinimum = -30, int daysFutureMaximum = 30)
-        {
-            return DateTime.Today.AddDays(GenerateInt(daysAgoMinimum, daysFutureMaximum));
+            return Random.Next(low, high);
         }
 
-        
-        /// <inheritdoc />
-        public virtual DateTime GenerateDateTime(int daysAgoMinimum = -30, int daysFutureMaximum = 30)
-        {
-            return DateTime.Today.AddDays(GenerateInt(daysAgoMinimum, daysFutureMaximum))
-                    .AddSeconds(GenerateDouble(0, 24 * 60 * 60))
-                    .AddMilliseconds(GenerateDouble(0, 1000))
-                    .AddMicroseconds(GenerateDouble(0, 1000))
-                ;
-        }
-
-        
         /// <inheritdoc />
         public string GenerateFirstName()
         {
@@ -260,6 +253,22 @@ namespace Bambit.TestUtility.DataGeneration
             return $"{GenerateFirstName()} {GenerateLastName()}";
 
         }
+        
+        /// <inheritdoc />
+        public virtual string GenerateString(int length)
+        {
+            if (length <= 0)
+                throw new ArgumentException("Invalid number of characters", nameof(length));
+
+            StringBuilder stringBuilder = new();
+            for (int x = 0; x < length; x++)
+            {
+                stringBuilder.Append((char)Random.Next(97, 122));
+            }
+
+            return stringBuilder.ToString();
+
+        }
 
         #endregion Basic types
         
@@ -271,17 +280,20 @@ namespace Bambit.TestUtility.DataGeneration
         #endregion Generation Methods
 
         #region Configuration 
-
-        /// <summary>
-        /// Add a string generator for a specified type of name
-        /// </summary>
-        /// <param name="fieldName">The name of the field to match when generating</param>
-        /// <param name="generator">The generator to use</param>
-        public void AddStringFieldNameGenerator(string fieldName, Func<string> generator)
+        
+        /// <inheritdoc />
+        public void AddAutoProperties<T, T2>() where T2 : T, new()
         {
-            FieldNamesToGenerators[fieldName] = generator;
+            Type t = typeof(T);
+            Type t2 = typeof(T2);
+            AutoProperties[t] = t2;
         }
         
+        /// <inheritdoc />
+        public void AddAutoProperties<T>() where T : new()
+        {
+            AddAutoProperties<T, T>();
+        }
         
         /// <inheritdoc />
         public void AddCustomObjectInitialization<T>(Func<IRandomDataGenerator, T> initMethod) where T : notnull
@@ -293,7 +305,6 @@ namespace Bambit.TestUtility.DataGeneration
                 MappedInitializeFunctions[t] = () => initMethod(this);
         }
         
-        
         /// <inheritdoc />
         public void AddCustomObjectInitialization<T>(Func<IRandomDataGenerator, T> initMethod, bool autoProperty)
             where T : notnull, new()
@@ -303,25 +314,40 @@ namespace Bambit.TestUtility.DataGeneration
                 AddAutoProperties<T>();
         }
         
-        
-        /// <inheritdoc />
-        public void AddAutoProperties<T, T2>() where T2 : T, new()
+        /// <summary>
+        /// Add a string generator for a specified type of name
+        /// </summary>
+        /// <param name="fieldName">The name of the field to match when generating</param>
+        /// <param name="generator">The generator to use</param>
+        public void AddStringFieldNameGenerator(string fieldName, Func<string> generator)
         {
-            Type t = typeof(T);
-            Type t2 = typeof(T2);
-            AutoProperties[t] = t2;
-        }
-        
-        
-        /// <inheritdoc />
-        public void AddAutoProperties<T>() where T : new()
-        {
-            AddAutoProperties<T, T>();
+            FieldNamesToGenerators[fieldName] = generator;
         }
 
         #endregion Configuration 
         
         #region Instantiation Methods
+        
+        /// <inheritdoc />
+        public virtual object CreateObject(Type objectType)
+        {
+            object? newObject;
+            if (MappedInitializeFunctions.TryGetValue(objectType, out Func<object>? function))
+                newObject = function();
+            else
+            {
+
+                newObject = Activator.CreateInstance(objectType);
+                if (newObject == null)
+                    throw new InvalidOperationException(
+                        $"Could not create instance of object of type '{objectType}.  Nullable value not allowed");
+
+                InitializeObject(newObject);
+            }
+
+            return newObject;
+        }
+        
         /// <inheritdoc />
         public virtual Dictionary<string, TValue> InitializeDictionary<TValue>(int numberItems)
             where TValue : notnull, new()
@@ -335,15 +361,7 @@ namespace Bambit.TestUtility.DataGeneration
             return results;
         }
         
-        /// <summary>
-        /// Creates and initializes an object of type t
-        /// </summary>
-        /// <typeparam name="TKey">The type of object to generate.  It must have a parameterless constructor</typeparam>
-        /// <typeparam name="TValue">The value of object to generate.  It must have a parameterless constructor</typeparam>
-        /// <returns>A new object of type t</returns>
-        /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
-        /// will not be initialized unless a function has been added with
-        /// <see cref="AddAutoProperties{T,T2}">AddAutoProperties</see></remarks>
+         /// <inheritdoc />
         public virtual Dictionary<TKey, TValue> InitializeDictionary<TKey, TValue>(int numberItems)
             where TKey : notnull, new()
             where TValue : notnull, new()
@@ -356,13 +374,7 @@ namespace Bambit.TestUtility.DataGeneration
 
             return results;
         }
-        
-        /// <inheritdoc />
-        public virtual T InitializeObject<T>() where T : notnull, new()
-        {
-            return InitializeObject<T>(null);
-        }
-        
+       
         /// <inheritdoc />
         public virtual T InitializeObject<T>(Action<T>? modifierFunction) 
             where T :  notnull, new()
@@ -432,86 +444,25 @@ namespace Bambit.TestUtility.DataGeneration
             return list;
         }
         
+         
         /// <inheritdoc />
-        public virtual object CreateObject(Type objectType)
+        public virtual T InitializeObject<T>() where T : notnull, new()
         {
-            object? newObject;
-            if (MappedInitializeFunctions.TryGetValue(objectType, out Func<object>? function))
-                newObject = function();
-            else
-            {
-
-                newObject = Activator.CreateInstance(objectType);
-                if (newObject == null)
-                    throw new InvalidOperationException(
-                        $"Could not create instance of object of type '{objectType}.  Nullable value not allowed");
-
-                InitializeObject(newObject);
-            }
-
-            return newObject;
+            return InitializeObject<T>(null);
         }
+       
         
-        /// <summary>
-        /// Populates the properties of the supplied object.
-        /// </summary>
-        /// <typeparam name="T">The type of object that will be initialized.</typeparam>
-        /// <param name="objectToInitialize">The object which to have its properties initialize</param>
-        /// <returns>The supplied objectToInitialize with properties initialized</returns>
-        /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
-        /// will not be initialized unless a function has been added with
-        /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
+        /// <inheritdoc />
         public virtual T InitializeObject<T>(T objectToInitialize) 
             where T : notnull 
         {
             return InitializeObject(objectToInitialize, MaxRecursion);
         }
         
-        /// <summary>
-        /// Populates the properties of the supplied object.
-        /// </summary>
-        /// <typeparam name="T">The type of object that will be initialized.</typeparam>
-        /// <param name="objectToInitialize">The object which to have its properties initialize</param>
-        /// <param name="maxRecursion">The maximum depth of child objects to create</param>
-        /// <returns>The supplied objectToInitialize with properties initialized</returns>
-        /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
-        /// will not be initialized unless a function has been added with
-        /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
-        protected virtual T InitializeObject<T>(T objectToInitialize, int maxRecursion) where T : notnull
-        {
-            if (--maxRecursion < 1)
-                throw new InvalidOperationException("Maximum recursion level hit");
-            Type objectType = objectToInitialize.GetType();
-            PropertyInfo[] propertyInfos =
-                objectType.GetProperties(BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.Public)
-                    .Where(p => p is { CanRead: true, CanWrite: true }).ToArray();
-
-            foreach (PropertyInfo propertyInfo in propertyInfos)
-            {
-                AssignValueToProperty(objectToInitialize, propertyInfo, maxRecursion);
-
-            }
-
-            return objectToInitialize;
-        }
-
-
-        
-        /// <summary>
-        /// Populates the properties of the supplied object, calling modifierFunction on each populated object
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="objectToInitialize">The object to initialize</param>
-        /// <param name="modifierFunction">An <see cref="Action{T}"> </see></param>
-        /// <returns>The supplied objectToInitialize with fields set randomly.</returns>
-        /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
-        /// will not be initialized unless a function has been added with
-        /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
+        /// <inheritdoc />
         public virtual T InitializeObject<T>(T objectToInitialize, Action<T>? modifierFunction)
-            where T : notnull 
+            where T : notnull
         {
-
-
             Type objectType = objectToInitialize.GetType();
             PropertyInfo[] propertyInfos =
                 objectType.GetProperties(BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.Public)
@@ -526,6 +477,8 @@ namespace Bambit.TestUtility.DataGeneration
             modifierFunction?.Invoke(objectToInitialize);
             return objectToInitialize;
         }
+
+      
         #endregion Instantiation Methods
 
         #region Misc Methods
@@ -586,18 +539,6 @@ namespace Bambit.TestUtility.DataGeneration
         #endregion IRandomDataGenerator Implementation
 
         #region Protected Methods
-        /// <summary>
-        /// Generates a string for a given field name
-        /// </summary>
-        /// <param name="fieldName"></param>
-        /// <returns></returns>
-        protected virtual string? GenerateStringForFieldName(string fieldName)
-        {
-            return
-                FieldNamesToGenerators.TryGetValue(fieldName, out Func<string>? generator)
-                    ? generator.Invoke()
-                    : null;
-        }
         
         /// <summary>
         /// Assigns a value to a property, based on it's type
@@ -608,16 +549,19 @@ namespace Bambit.TestUtility.DataGeneration
         /// <param name="maxRecursion">The maximum depth to descent for children</param>
         protected virtual void AssignValueToProperty<T>(T objectToInitialize, PropertyInfo propertyInfo,
             int maxRecursion)
+        where T : notnull
         {
+            if (propertyInfo.GetCustomAttributes(typeof(ComputedColumnAttribute)).Any())
+                return;
             Type propertyType = propertyInfo.PropertyType;
 
-            var underlyingType = Nullable.GetUnderlyingType(propertyInfo.PropertyType);
+            Type? underlyingType = Nullable.GetUnderlyingType(propertyInfo.PropertyType);
             if (underlyingType != null)
             {
                 propertyType = underlyingType;
             }
 
-            if (AutoProperties.TryGetValue(propertyType, out var mappedType))
+            if (AutoProperties.TryGetValue(propertyType, out Type? mappedType))
             {
                 SetProperty(objectToInitialize, propertyInfo, mappedType, maxRecursion);
             }
@@ -647,7 +591,7 @@ namespace Bambit.TestUtility.DataGeneration
             }
             else if (propertyType == typeof(decimal))
             {
-                var precisionAttribute =
+                DecimalPrecisionAttribute? precisionAttribute =
                     propertyInfo.GetCustomAttribute<DecimalPrecisionAttribute>();
                 propertyInfo.SetValue(objectToInitialize,
                     precisionAttribute == null
@@ -656,7 +600,7 @@ namespace Bambit.TestUtility.DataGeneration
             }
             else if (propertyType == typeof(double))
             {
-                var precisionAttribute =
+                DecimalPrecisionAttribute? precisionAttribute =
                     propertyInfo.GetCustomAttribute<DecimalPrecisionAttribute>();
                 propertyInfo.SetValue(objectToInitialize,
                     precisionAttribute == null
@@ -672,10 +616,61 @@ namespace Bambit.TestUtility.DataGeneration
                 propertyInfo.SetValue(objectToInitialize, GenerateGuid());
             }
         }
+
+        /// <summary>
+        /// Generates a string for a given field name
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        protected virtual string? GenerateStringForFieldName(string fieldName)
+        {
+            return
+                FieldNamesToGenerators.TryGetValue(fieldName, out Func<string>? generator)
+                    ? generator.Invoke()
+                    : null;
+        }
+
+        /// <summary>
+        /// Populates the properties of the supplied object.
+        /// </summary>
+        /// <typeparam name="T">The type of object that will be initialized.</typeparam>
+        /// <param name="objectToInitialize">The object which to have its properties initialize</param>
+        /// <param name="maxRecursion">The maximum depth of child objects to create</param>
+        /// <returns>The supplied objectToInitialize with properties initialized</returns>
+        /// <remarks>By default, simple value type properties (int, decimal, string, etc.) will be initialized with random values.  Object type properties
+        /// will not be initialized unless a function has been added with
+        /// <see cref="AddCustomObjectInitialization{T}(Func{IRandomDataGenerator,T})">AddCustomObjectInitialization</see></remarks>
+        protected virtual T InitializeObject<T>(T objectToInitialize, int maxRecursion) where T : notnull
+        {
+            if (--maxRecursion < 1)
+                throw new InvalidOperationException("Maximum recursion level hit");
+            Type objectType = objectToInitialize.GetType();
+            PropertyInfo[] propertyInfos =
+                objectType.GetProperties(BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.Public)
+                    .Where(p => p is { CanRead: true, CanWrite: true }).ToArray();
+
+            foreach (PropertyInfo propertyInfo in propertyInfos)
+            {
+                AssignValueToProperty(objectToInitialize, propertyInfo, maxRecursion);
+
+            }
+
+            return objectToInitialize;
+        }
+
+
         #endregion Protected Methods
 
         #region private Methods
 
+        /// <summary>
+        /// Sets the property on an object to a mapped type instance.  Used often when the property is an interface of base type and a specific type is desired.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="objectToInitialize">The object that the property belongs to</param>
+        /// <param name="propertyInfo">Information about the property</param>
+        /// <param name="mappedType">The mapped types to use.</param>
+        /// <param name="maxRecursion">The maximum depth of recursion left to initialize child objects.</param>
         private void SetProperty<T>(T objectToInitialize, PropertyInfo propertyInfo, Type mappedType, int maxRecursion)
         {
             
@@ -691,18 +686,27 @@ namespace Bambit.TestUtility.DataGeneration
             propertyInfo.SetValue(objectToInitialize, newObject);
         }
 
-        private void SetStringProperty<T>(T objectToInitialize, PropertyInfo propertyInfo)
+        /// <summary>
+        /// Sets a string property on an object.
+        /// </summary>
+        /// <param name="objectToInitialize">The object with the string property</param>
+        /// <param name="propertyInfo">The information about the property to initialize</param>
+        /// <remarks>
+        /// This method will first try to assign a name if the field name suggests it (calling <see cref="GenerateStringForFieldName"/>.
+        /// If not it will use a random length, unless specified by a <see cref="StringLengthAttribute"/> or <see cref="MaxLengthAttribute"/>
+        /// </remarks>
+        private void SetStringProperty(object objectToInitialize, PropertyInfo propertyInfo)
         {
-            var value = GenerateStringForFieldName(propertyInfo.Name);
+            string? value = GenerateStringForFieldName(propertyInfo.Name);
             if (string.IsNullOrWhiteSpace(value))
             {
                 int maxSize = GenerateInt(30, 50);
 
-                var stringLengthAttribute =
+                StringLengthAttribute? stringLengthAttribute =
                     propertyInfo.GetCustomAttribute<StringLengthAttribute>();
                 if (stringLengthAttribute != null)
                     maxSize = stringLengthAttribute.MaximumLength;
-                var maxLengthAttribute = propertyInfo.GetCustomAttribute<MaxLengthAttribute>();
+                MaxLengthAttribute? maxLengthAttribute = propertyInfo.GetCustomAttribute<MaxLengthAttribute>();
                 if (maxLengthAttribute != null)
                     maxSize = maxLengthAttribute.Length;
                 value = GenerateString(maxSize);

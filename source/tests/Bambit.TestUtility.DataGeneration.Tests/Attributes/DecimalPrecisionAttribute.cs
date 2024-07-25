@@ -1,54 +1,51 @@
-﻿using System;
+﻿using Bambit.TestUtility.DataGeneration.Attributes;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-namespace Bambit.TestUtility.DataGeneration.Attributes
+namespace Bambit.TestUtility.DataGeneration.Tests.Attributes;
+
+[TestClass]
+[TestCategory("Unit")]
+public class DecimalPrecisionAttributeTest
 {
-   
-
-    [TestClass]
-    public class DecimalPrecisionAttributeTest
+    [TestMethod]
+    public void Ctor_SetsPrecisionAsExpected()
     {
-        [TestMethod]
-        public void Ctor_SetsPrecisionAsExpected()
+        for (byte x = 0; x < byte.MaxValue; x++)
         {
-            for (byte x = 0; x < byte.MaxValue; x++)
-            {
-                DecimalPrecisionAttribute attribute = new DecimalPrecisionAttribute(x, 0);
-                attribute.Precision.Should().Be(x);
-            }
+            DecimalPrecisionAttribute attribute = new DecimalPrecisionAttribute(x, 0);
+            attribute.Precision.Should().Be(x);
         }
+    }
         
-        [TestMethod]
-        public void Ctor_SetsScaleAsExpected()
+    [TestMethod]
+    public void Ctor_SetsScaleAsExpected()
+    {
+        for (byte x = 0; x < byte.MaxValue; x++)
         {
-            for (byte x = 0; x < byte.MaxValue; x++)
-            {
-                DecimalPrecisionAttribute attribute = new DecimalPrecisionAttribute(0,x);
-                attribute.Scale.Should().Be(x);
-            }
+            DecimalPrecisionAttribute attribute = new DecimalPrecisionAttribute(0,x);
+            attribute.Scale.Should().Be(x);
         }
+    }
 
 
-        [TestMethod]
-        public void Precision_Setter_Sets()
-        {
-            byte testValue = 23;
-            DecimalPrecisionAttribute attribute = new DecimalPrecisionAttribute(0, 0);
-            attribute.Precision = testValue;
-            attribute.Precision.Should().Be(testValue);
-
-        }
-
-        [TestMethod]
-        public void Scale_Setter_Sets()
-        {
-            byte testValue = 101;
-            DecimalPrecisionAttribute attribute = new DecimalPrecisionAttribute(0, 0);
-            attribute.Scale = testValue;
-            attribute.Scale.Should().Be(testValue);
-
-        }
+    [TestMethod]
+    public void Precision_Setter_Sets()
+    {
+        byte testValue = 23;
+        DecimalPrecisionAttribute attribute = new DecimalPrecisionAttribute(0, 0);
+        attribute.Precision = testValue;
+        attribute.Precision.Should().Be(testValue);
 
     }
+
+    [TestMethod]
+    public void Scale_Setter_Sets()
+    {
+        byte testValue = 101;
+        DecimalPrecisionAttribute attribute = new DecimalPrecisionAttribute(0, 0);
+        attribute.Scale = testValue;
+        attribute.Scale.Should().Be(testValue);
+
+    }
+
 }

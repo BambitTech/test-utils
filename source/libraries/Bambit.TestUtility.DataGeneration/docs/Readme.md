@@ -56,4 +56,4 @@ IList<Person> initializeList = RandomDataGenerator.Instance.InitializeList<Perso
 Coming Soon!
 
 ## Feedback
-  * [Github](https://github.com/bambit/test-utils/issues)
+  * [Github](https://github.com/BambitTech/test-utils/issues)
