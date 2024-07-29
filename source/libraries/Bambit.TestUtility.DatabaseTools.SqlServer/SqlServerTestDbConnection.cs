@@ -12,8 +12,14 @@ namespace Bambit.TestUtility.DatabaseTools.SqlServer;
 /// <param name="connection">The <see cref="IDbConnection"/> that is wrapped</param>
 public class SqlServerTestDbConnection(IDbConnection connection) : TestDbConnection(connection)
 {
+
+    /// <summary>   (Immutable) name of the expected table. </summary>
     protected const string ExpectedTableName = "#__TestingUtilities_expected";
+
+    /// <summary>   (Immutable) name of the existing table. </summary>
     protected const string ExistingTableName = "#__TestingUtilities_existing";
+
+    /// <summary>   (Immutable) name of the results table. </summary>
     protected const string ResultsTableName = "#__TestingUtilities_results";
 
    
