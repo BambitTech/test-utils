@@ -1,5 +1,5 @@
 name: Actions Workflow
-on: [push]
+  workflow_dispatch: # Allow running the workflow manually from the GitHub UI
 jobs:
   run-sql:
     runs-on: ubuntu-latest
@@ -38,7 +38,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4 
       - name: Run tests
-        run: dotnet test source/TestUtilities.sln --configuration Release -p:CollectCoverage=true -p:CoverletOutput=../TestResults/ -p:CoverletOutputFormat=lcov -p:MergeWith=../TestResults/coverlet.json --collect:"XPlat Code Coverage" -p:CoverletOutputFormat=\"cobertura\"
+        run: dotnet test source/TestUtilities.sln --configuration Release -p:CollectCoverage=true -p:CoverletOutput=../TestResults/ -p:CoverletOutputFormat=lcov -p:MergeWith=../TestResults/coverlet.json --collect:"XPlat Code Coverage" -p:CoverletOutputFormat=cobertura
      
       - name: ReportGenerator
         uses: danielpalme/ReportGenerator-GitHub-Action@5.3.8
