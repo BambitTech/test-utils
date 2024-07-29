@@ -67,7 +67,15 @@ public abstract class TestDbConnection(IDbConnection connection) : ITestDbConnec
     /// <inheritdoc />
     public virtual void Open()
     {
-        Connection.Open();
+        try
+        {
+
+            Connection.Open();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error connection to {ConnectionString}", ex);
+        }
     }
         
     /// <inheritdoc />

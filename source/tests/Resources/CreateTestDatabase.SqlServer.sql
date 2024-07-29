@@ -1,5 +1,5 @@
-
-
+SET ANSI_NULLS, QUOTED_IDENTIFIER ON;
+GO
 drop table if exists [test].[testTableNullable];
 drop table if exists [test].[testTableNotNullable];
 drop table if exists [test].[TestTableAlpha];
@@ -15,7 +15,7 @@ create table [test].[testTableNullable] (
    bigIntField bigint,
    TimeStampField timestamp,
    imageField image,
-   binaryField binary,	`
+   binaryField binary,	
    varbinaryField varbinary,
    bitField bit,
    dateField date,

@@ -19,6 +19,7 @@ public class TableToClassBuilderTest
     {   
         Configuration=new ConfigurationBuilder()
             .AddJsonFile("appSettings.json")
+            .AddJsonFile("appSettings.local.json", true)
             .Build();
     }
 

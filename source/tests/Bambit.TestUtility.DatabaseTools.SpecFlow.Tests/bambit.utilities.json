@@ -4,7 +4,7 @@
     "mappedDatabases": {
 
       "sqlTestDb": {
-        "connectionString": "Server=localhost\\MMXXII; Database=IntegrationTests;Trusted_Connection=true",
+        "connectionString": "#{SqlServerDatabaseConnectionString}#",
         "databaseCatalog": "SqlServer"
       }
     },

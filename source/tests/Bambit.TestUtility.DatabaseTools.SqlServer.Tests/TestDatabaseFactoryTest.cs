@@ -15,6 +15,7 @@ public class TestDatabaseFactoryTest
     {   
         Configuration=new ConfigurationBuilder()
         .AddJsonFile("appSettings.json")
+        .AddJsonFile("appSettings.local.json", true)
         .Build();
     }
 

@@ -16,6 +16,7 @@ namespace Bambit.TestUtility.DatabaseTools.SqlServer.Tests
         {
             Configuration=new ConfigurationBuilder()
                 .AddJsonFile("appSettings.json")
+                .AddJsonFile("appSettings.local.json", true)
                 .Build();
         }
         
