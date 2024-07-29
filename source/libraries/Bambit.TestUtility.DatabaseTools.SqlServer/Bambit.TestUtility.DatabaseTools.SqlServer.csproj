@@ -4,6 +4,22 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>Bambit.TestUtility.DatabaseTools.SqlServer</PackageId>
+	  <Authors>Law Metler</Authors>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <Company>Bambit Technologies, Inc.</Company>
+	  <Copyright>2024 Bambit Technologies, Inc</Copyright>
+	  <Description>Provides quick random data generation routines to generate or populate random objects.</Description>
+	  <PackageProjectUrl>https://github.com/BambitTech/test-utils/</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/BambitTech/test-utils/</RepositoryUrl>
+     <PackageReadmeFile>Readme.md</PackageReadmeFile>
+     <PackageTags>Testing;Database;library;Sql Server</PackageTags>
+     <PackageIcon>icon.png</PackageIcon>
+     <IncludeSymbols>true</IncludeSymbols>
+     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+     <EnablePackageValidation>true</EnablePackageValidation>
+     <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +27,28 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="../../../docs/Bambit.TestUtility.DatabaseTools.SqlServer/Readme.md" Pack="true" PackagePath="\" />
+    <None Include="../../../docs/icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Bambit.TestUtility.DatabaseTools\Bambit.TestUtility.DatabaseTools.csproj" />
   </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MinVer" Version="5.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
 
 </Project>
