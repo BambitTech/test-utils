@@ -81,4 +81,4 @@ Then only the following records should exist in the [dbo].[TestTable] table:
    
 	
 ```
-For a full list of available steps and usage, see [Documentation](https://github.com/BambitTech/test-utils/Overview.html)
+For a full list of available steps and usage, see [Documentation](https://bambittech.github.io/test-utils/Bambit.TestUtility.DatabaseTools.SpecFlow/)
