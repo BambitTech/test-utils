@@ -85,18 +85,18 @@ namespace Bambit.TestUtility.DataGeneration
         /// <summary>
         /// A static implementation (lazy backer) for a default generator
         /// </summary>
-        protected static Lazy<RandomDataGenerator> LazyInstance = new(() => new RandomDataGenerator());
+        protected static readonly Lazy<RandomDataGenerator> LazyInstance = new(() => new RandomDataGenerator());
         
         /// <summary>
         /// Static implementation for default functionality
         /// </summary>
-        public static RandomDataGenerator Instance = LazyInstance.Value;
+        public static readonly RandomDataGenerator Instance = LazyInstance.Value;
 
         
         /// <summary>
         /// The Random class is used for all random generators
         /// </summary>
-        protected static Random Random = new();
+        protected static readonly Random Random = new();
 
 
         #endregion Static Fields
@@ -138,8 +138,8 @@ namespace Bambit.TestUtility.DataGeneration
         /// </summary>
         protected RandomDataGenerator()
         {
-            AutoProperties = new Dictionary<Type, Type>();
-            MappedInitializeFunctions = new Dictionary<Type, Func<object>>();
+            AutoProperties = [];
+            MappedInitializeFunctions = [];
             FieldNamesToGenerators = new Dictionary<string, Func<string>>(StringComparer.OrdinalIgnoreCase);
         }
 
@@ -352,7 +352,7 @@ namespace Bambit.TestUtility.DataGeneration
         public virtual Dictionary<string, TValue> InitializeDictionary<TValue>(int numberItems)
             where TValue : notnull, new()
         {
-            Dictionary<string, TValue> results = new();
+            Dictionary<string, TValue> results = [];
             for (int x = 0; x < numberItems; x++)
             {
                 results.Add(GenerateString(12), InitializeObject<TValue>());
@@ -366,7 +366,7 @@ namespace Bambit.TestUtility.DataGeneration
             where TKey : notnull, new()
             where TValue : notnull, new()
         {
-            Dictionary<TKey, TValue> results = new();
+            Dictionary<TKey, TValue> results = [];
             for (int x = 0; x < numberItems; x++)
             {
                 results.Add(InitializeObject<TKey>(), InitializeObject<TValue>());
@@ -513,8 +513,7 @@ namespace Bambit.TestUtility.DataGeneration
         {
            
             string[] names = Enum.GetNames(typeof(T));
-            Enum.TryParse(GetEntry(names), out T result);
-            return result;
+            return (T)Enum.Parse(typeof(T), GetEntry(names)) ;
         }
         
         /// <inheritdoc />

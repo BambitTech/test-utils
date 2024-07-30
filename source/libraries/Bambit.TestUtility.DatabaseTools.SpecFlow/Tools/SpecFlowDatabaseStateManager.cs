@@ -45,7 +45,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow.Tools
         public SpecFlowDatabaseStateManager(ScenarioContext context)
         {
             Context = context;
-            Variables = new();
+            Variables = [];
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

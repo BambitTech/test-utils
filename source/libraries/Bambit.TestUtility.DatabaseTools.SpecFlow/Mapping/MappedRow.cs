@@ -97,7 +97,7 @@ public class MappedRow: IDictionary<string, string?>
 
     public MappedRow(MappedTable owner, TableRow row) : this(owner)
     {
-        Items = row.Values.ToArray();
+        Items = [.. row.Values];
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////

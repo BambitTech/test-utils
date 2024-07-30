@@ -114,10 +114,10 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow.Tests.Mapping
         public void Rows_TableCtor_HasCorrectRows()
         {
 
-            Table table = new Table(StandardColumns);
+            Table table = new(StandardColumns);
             table.AddRow(FirstRow);
             table.AddRow(SecondRow);
-            MappedTable mappedTable = new MappedTable(table);
+            MappedTable mappedTable = new(table);
 
             mappedTable.Rows.Count.Should().Be(2);
             foreach (MappedRow mappedTableRow in mappedTable.Rows)
@@ -192,8 +192,8 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow.Tests.Mapping
         {
 
 
-            Table table = new Table(StandardColumns.Select(a => $"{a} @{type}").ToArray());
-            MappedTable mappedTable = new MappedTable(table);
+            Table table = new(StandardColumns.Select(a => $"{a} @{type}").ToArray());
+            MappedTable mappedTable = new(table);
             ColumnDescription expected = new(columnName.ToLower(), cleanedName.ToLower(), columnType, index);
             mappedTable.GetColumnDescription(name).Should().BeEquivalentTo(expected);
 

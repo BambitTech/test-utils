@@ -67,9 +67,7 @@ namespace Bambit.TestUtility.DatabaseTools
             PropertyInfo[] propertyInfos =
                 objectType.GetProperties(BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.Public)
                     .Where(p => p is { CanRead: true, CanWrite: true }).ToArray();
-            TableSourceAttribute? tableSourceAttribute =
-                objectType.GetCustomAttributes(typeof(TableSourceAttribute)).FirstOrDefault() as TableSourceAttribute;
-            if (tableSourceAttribute == null)
+            if (objectType.GetCustomAttributes(typeof(TableSourceAttribute)).FirstOrDefault() is not TableSourceAttribute tableSourceAttribute)
             {
                 return base.InitializeObject(objectToInitialize);
             }
@@ -80,11 +78,8 @@ namespace Bambit.TestUtility.DatabaseTools
 
             foreach (PropertyInfo propertyInfo in propertyInfos)
             {
-                FieldSourceAttribute? fieldSourceAttribute =
-                    propertyInfo.GetCustomAttributes(typeof(FieldSourceAttribute)).FirstOrDefault() as
-                        FieldSourceAttribute;
-                Func<IRandomDataGenerator,object>? fieldGenerator = null;
-                if (fieldSourceAttribute != null)
+                Func<IRandomDataGenerator, object>? fieldGenerator = null;
+                if (propertyInfo.GetCustomAttributes(typeof(FieldSourceAttribute)).FirstOrDefault() is FieldSourceAttribute fieldSourceAttribute)
 
                     fieldGenerator =
                         GetTableFieldGenerator(connectionName, schema, tableName, fieldSourceAttribute.Name);

@@ -164,7 +164,128 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             command.CommandType = CommandType.Text;
             command.ExecuteNonQuery();
         }
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Executes the 'query' operation. </summary>
+        ///
+        /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+        ///
+        /// <param name="connection">   The connection. </param>
+        /// <param name="query">        The query. </param>
+        /// <param name="parameters">A Table of parameter values</param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        public void ExecuteQuery(IDbConnection connection, string query, Table parameters)
+        {
+            
+            using IDbCommand command = CreateCommand(connection);
+            command.CommandText = query;
+            command.CommandType = CommandType.Text;
+            
+            TableRow tableRow = parameters.Rows.First();
+            string[] headers = [.. parameters.Header];
+            for (int x = 0; x < parameters.Header.Count; x++)
+            {
+                string name = headers[x];
+                if (!name.StartsWith('@'))
+                    name = $"@{name}";
+                string value = tableRow[x];
+                IDbDataParameter parameter = command.CreateParameter();
+                parameter.ParameterName=name;
+                if (value == Configuration.NullStringIdentifier)
+                {
+                    parameter.Value = DBNull.Value;
+                }
+                else
+                {
+                    parameter.Value = value;
+                }
+                command.Parameters.Add(parameter);
+            }
+
+            command.ExecuteNonQuery();
+        }
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Executes the 'query' operation. </summary>
+        ///
+        /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+        ///
+        /// <param name="connection">   The connection. </param>
+        /// <param name="query">        The query. </param>
+        /// <param name="parameters">A Table of parameter values</param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void ExecuteQueryForResults(ITestDbConnection connection, string query, Table parameters)
+        {
+            
+            using IDbCommand command = CreateCommand(connection);
+            command.CommandText = query;
+            command.CommandType = CommandType.Text;
+            
+            TableRow tableRow = parameters.Rows.First();
+            string[] headers = [.. parameters.Header];
+            for (int x = 0; x < parameters.Header.Count; x++)
+            {
+                string name = headers[x];
+                if (!name.StartsWith('@'))
+                    name = $"@{name}";
+                string value = tableRow[x];
+                IDbDataParameter parameter = command.CreateParameter();
+                parameter.ParameterName=name;
+                if (value == Configuration.NullStringIdentifier)
+                {
+                    parameter.Value = DBNull.Value;
+                }
+                else
+                {
+                    parameter.Value = value;
+                }
+                command.Parameters.Add(parameter);
+            }
+
+            using IDataReader reader = command.ExecuteReader();
+            MappedTable table = new(reader);
+            reader.Close();
+
+            LastResultSet = table;
+            
+        }
+
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Executes the 'query' operation. </summary>
+        ///
+        /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+        ///
+        /// <param name="connectionName">   The name of the connection to use. </param>
+        /// <param name="query">        The query. </param>
+        /// <param name="parameters">A Table of parameter values</param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void ExecuteQuery(string connectionName, string query, Table parameters)
+        {
+            
+            using ITestDbConnection connection = OpenConnectionForName(connectionName);
+            ExecuteQuery(connection, query, parameters);
+        }
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Executes the 'query' operation. </summary>
+        ///
+        /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+        ///
+        /// <param name="connectionName">   The name of the connection to use. </param>
+        /// <param name="query">        The query. </param>
+        /// <param name="parameters">A Table of parameter values</param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void ExecuteQueryForResults(string connectionName, string query, Table parameters)
+        {
+            
+            using ITestDbConnection connection = OpenConnectionForName(connectionName);
+            ExecuteQueryForResults(connection, query, parameters);
+        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Compare tables. </summary>
         ///
@@ -203,7 +324,28 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             using IDataReader reader= connection.ExecuteReader(query);
             MappedTable table = new(reader);
             reader.Close();
+
+            LastResultSet = table;
             return table;
+        }  
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Executes the 'query for results' operation. </summary>
+        ///
+        /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+        ///
+        /// <param name="connectionName">   The name of the connection to run against. </param>
+        /// <param name="query">        The query. </param>
+        ///
+        /// <returns>   A MappedTable. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        protected MappedTable ExecuteQueryForResults(string connectionName, string query)
+        {
+
+            using ITestDbConnection connection = OpenConnectionForName(connectionName);
+
+            return ExecuteQueryForResults(connection, query);
         }
 
     }

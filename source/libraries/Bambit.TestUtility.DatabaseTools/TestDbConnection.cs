@@ -15,19 +15,19 @@ public abstract class TestDbConnection(IDbConnection connection) : ITestDbConnec
     protected IDbConnection Connection { get; } = connection;
     /// <inheritdoc />
     public int? CommandTimeout { get; set; }
-    
+
     /// <summary>
     /// Holds the buffer of info messages if <see cref="TrackInfoMessages"/> is activated
     /// </summary>
-    protected List<string> OutputMessagesStore { get; set; } = new();
+    protected List<string> OutputMessagesStore { get; set; } = [];
 
     /// <inheritdoc />
-    public string[] OutputMessages => OutputMessagesStore.ToArray();
+    public string[] OutputMessages => [.. OutputMessagesStore];
 
     /// <inheritdoc />
     public void Dispose()
     {
-        Connection.Dispose();
+        GC.SuppressFinalize(this);
         Connection.Dispose();
     }
 
@@ -126,10 +126,7 @@ public abstract class TestDbConnection(IDbConnection connection) : ITestDbConnec
     protected void AddReceivedMessage(string message)
     {
         EventHandler<string>? handler = MessageReceived;
-        if (handler != null)
-        {
-            handler.Invoke(this, message);
-        }
+        handler?.Invoke(this, message);
     }
 
     /// <inheritdoc />

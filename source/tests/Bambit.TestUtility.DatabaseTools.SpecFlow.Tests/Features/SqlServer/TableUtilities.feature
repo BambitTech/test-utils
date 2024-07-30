@@ -1,13 +1,13 @@
-﻿Feature: TableUtilitiesSqlServer
+﻿@integration
 
-Validates General Table utilities against SqlServer database
+Feature: TableUtilitiesSqlServer
+	Validates General Table utilities against SqlServer database
+
 Background: 
-#Given I am Debugging
-And I am working in the SqlTestDb database
-#And I am using the default null indicator
+	Given I am working in the SqlTestDb database
 
 
-@integration
+
 Scenario: Verify only speficed records exist full table matches full table records
 	Given I am working in the SqlTestDb database
 	And only the following records exist in the [Test].[TestTableAlpha] table:
@@ -18,7 +18,7 @@ Scenario: Verify only speficed records exist full table matches full table recor
 	| 8BFAE7CC-EDEA-4326-B671-334D5FECDAEB | Bob Spelled Backwards | 1979-11-11    | 12    | 4          | 1         | 123.45          | 345.34         | 1             |
 	
 	
-@integration
+
 Scenario: Verify at least speficed records exist full table matches full table records
 
 	Given only the following records exist in the Test.TestTableAlpha table in the SqlTestDb database:
@@ -31,7 +31,7 @@ Scenario: Verify at least speficed records exist full table matches full table r
 | TestTableAlphaId                     | Name          | DateOfBirth | Score |
 | F6CC249B-BC42-46B9-A1CF-8D90690E4210 | John Smith    | 11/07/1975    | 100   |
 
-@integration
+
 Scenario: Verify Records exist, matching only a subset of columns
 	Given only the following records exist in the Test.TestTableAlpha table in the SqlTestDb database:
 | TestTableAlphaId                     | 
@@ -47,7 +47,7 @@ Scenario: Verify Records exist, matching only a subset of columns
 | 474A6CA3-FBEF-4C38-8C59-6E6AA18E9503 | 
 
 
-@integration
+
 Scenario: Ensure if there are duplicate rows, it matches as expected
 	Given only the following records exist in the Test.TestTableAlpha table in the SqlTestDb database:
 | TestTableAlphaId                     | Name          | DateOfBirth | Score |
@@ -63,7 +63,7 @@ Scenario: Ensure if there are duplicate rows, it matches as expected
 | 250   |
 
 
-@integration
+
 Scenario: Ensure extra rows can be ignored
 
 	Given only the following records exist in the Test.TestTableAlpha table in the SqlTestDb database:
@@ -77,7 +77,7 @@ Scenario: Ensure extra rows can be ignored
 | Name          | 
 | John Smith    | 
 
-@integration
+
 Scenario: Ensure Small Int Columns are matched as expected
 	Given only the following records exist in the Test.TestTableAlpha table in the SqlTestDb database:
 | CheckSmall |
@@ -93,7 +93,7 @@ Scenario: Ensure Small Int Columns are matched as expected
 | 5          |
 | -1         |
 
-@integration
+
 Scenario: Ensure Tiny Int Columns are matched as expected
 	Given only the following records exist in the Test.TestTableAlpha table in the SqlTestDb database:
 | CheckTiny |
@@ -108,7 +108,7 @@ Scenario: Ensure Tiny Int Columns are matched as expected
 | 0         |
 | 255       |
 
-@integration
+
 Scenario: Query with bit defined
 	Given only the following records exist in the Test.TestTableAlpha table in the SqlTestDb database:
 | [NullableBit] |
@@ -122,7 +122,7 @@ Scenario: Query with bit defined
 | NULL                   |
 | False                  |
 
-@integration
+
 Scenario: Query with BigInt
 	
 	Given only the following records exist in the Test.TestTableBigInt table in the SqlTestDb database:
@@ -136,7 +136,7 @@ Scenario: Query with BigInt
 	| 200   |
 
 
-@integration
+
 Scenario: Expected exceptions are verified
 	Given only the following records exist in the Test.[TestTableEpsilon] table:
 	| Name  |
@@ -147,7 +147,7 @@ Scenario: Expected exceptions are verified
 	And the last SQL exception will contain the phrase "Violation of UNIQUE KEY constraint"
 
 	
-@integration
+
 Scenario: Expected exceptions are verified - Long Form
 Given only the following records exist in the Test.[TestTableEpsilon] table:
 | Name  |
@@ -159,7 +159,7 @@ And the last SQL exception will contain the phrase "Violation of UNIQUE KEY cons
 
 
 
-@integration
+
 Scenario: Ensure Row Count statement works
 	Given only the following records exist in the Test.TestTableAlpha table in the SqlTestDb database:
 | TestTableAlphaId                     | 
@@ -170,7 +170,7 @@ Scenario: Ensure Row Count statement works
 	Then the Test.TestTableAlpha table in the SqlTestDb database will have 4 rows
 
 	
-@integration
+
 Scenario: Test Row Count statement with no rows, no rows
 	Given only the following records exist in the Test.TestTableAlpha table in the SqlTestDb database:
 | TestTableAlphaId                     | 
@@ -187,7 +187,7 @@ Scenario: Empty strings treated like nulls
 
 
 
-@integration
+
 Scenario: Ensure date transformations are processed as expected
 Given the following records exist in the Test.TestTableAlpha table in the SqlTestDb database:
 | DateOfBirth        @date |
@@ -223,7 +223,7 @@ Given the following records exist in the Test.TestTableAlpha table in the SqlTes
 | today                      |
 
 
-@integration
+
 Scenario: Set a variable from the database
 Given the table Test.TestTableAlpha is empty
 And the following query is run:
@@ -242,26 +242,26 @@ Then only the following records should exist in the Test.TestTableAlpha table:
 | TestTableAlphaId  | DateOfBirth @date|
 | $dbGuid          | $dbDate      |
 
-@integration
+
 Scenario: Query then statement
 Then the query "select 'abc' [Col1], 123 [Col2], cast('2021-06-04' as datetime) [Col3]" returns:
 | Col1 | Col2 | Col3 @date |
 | abc  | 123  | 06/04/2021 |
 
-@integration
+
 Scenario: Results table has quoted values, persists spaces
 Then the query "select '  abc  ' [Col1], 123 [Col2], cast('2021-06-04' as datetime) [Col3]" returns:
 | Col1 @quoted | Col2 | Col3 @date |
 | '  abc  '    | 123  | 06/04/2021 |
 
-@integration
+
 Scenario: Results table has quoted column but no quotes
 Then the query "select 'abc' [Col1], 123 [Col2], cast('2021-06-04' as datetime) [Col3]" returns:
 | Col1 @quoted | Col2 | Col3 @date |
 | abc          | 123  | 06/04/2021 |
 
 
-@integration
+
 Scenario: Allow for timeout, does not throw exception
 Given I have a query timeout of 70 seconds
 When the following query is run in the SqlTestDb database:
@@ -274,7 +274,7 @@ Then the results will be:
 | ok        |
 
 
-@integration
+
 Scenario: Timeouts breached, throws exception
 Given I have a query timeout of 2 seconds
 When the following query run in the SqlTestDb database should timeout:
@@ -283,7 +283,7 @@ waitfor delay '00:01'
 select 'ok' [check]
 """
 
-@integration
+
 Scenario: Negative numbers are handled as expected
 	Given only the following records exist in the Test.TestTableAlpha table in the SqlTestDb database:
 | [TightDecimal] |
@@ -293,7 +293,7 @@ Then only the following records should exist in the Test.TestTableAlpha table in
 | -1             |
 
 
-@integration
+
 Scenario: Expected exception not thrown are verified
 	Given only the following records exist in the Test.[TestTableEpsilon] table:
 	| Name  |
@@ -302,7 +302,7 @@ Scenario: Expected exception not thrown are verified
 	| Name  |
 	| Beta |
 
-@integration
+
 Scenario: Expected is thrown when trying to assign invalid field
 	Given only the following records exist in the Test.[TestTableEpsilon] table (override):
 	| DoNotUse  |

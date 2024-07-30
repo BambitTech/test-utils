@@ -92,10 +92,7 @@ public class TestDatabaseFactory : ITestDatabaseFactory
     protected void OnMessageReceived(ITestDbConnection source,string message)
     {
         EventHandler<TestDbConnectionMessageReceivedEvent>? handler = MessageReceived;
-        if (handler != null)
-        {
-            handler.Invoke(this, new TestDbConnectionMessageReceivedEvent(source, message));
-        }
+        handler?.Invoke(this, new TestDbConnectionMessageReceivedEvent(source, message));
     }
 
     #endregion Protected Methods

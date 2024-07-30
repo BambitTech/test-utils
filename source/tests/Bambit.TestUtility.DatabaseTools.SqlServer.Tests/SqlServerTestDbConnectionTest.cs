@@ -40,7 +40,7 @@ namespace Bambit.TestUtility.DatabaseTools.SqlServer.Tests
         {
             IDbConnection dbConnection = new SqlConnection( Configuration.GetConnectionString("IntegrationTestDatabase")!);
 
-            SqlServerTestDbConnection connection = new SqlServerTestDbConnection(dbConnection );
+            SqlServerTestDbConnection connection = new(dbConnection );
             connection.MessageReceived += (_, s) => Trace.WriteLine(s);
             return connection;
         }
@@ -281,7 +281,7 @@ namespace Bambit.TestUtility.DatabaseTools.SqlServer.Tests
             
             string purgeQuery = "delete from [test].[testTableNullable]";
             testConnection.ExecuteQuery(purgeQuery);
-            testConnection.CompareTableToDataset("test", "testTableNullable", ["bigIntField"], Array.Empty<object[]>()).IsSuccess.Should().BeTrue();
+            testConnection.CompareTableToDataset("test", "testTableNullable", ["bigIntField"], []).IsSuccess.Should().BeTrue();
         }
 
 

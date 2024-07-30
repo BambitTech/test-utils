@@ -112,7 +112,7 @@ public class MappedRowTest
         TableRow row = table.Rows[0];
         MappedTable mappedTable = new(table);
         MappedRow mappedRow = new (mappedTable, row);
-        mappedRow.Invoking(m => m.Add(new KeyValuePair<string, string?>( "a", "b")))
+        mappedRow.Invoking(m => m.Add(new( "a", "b")))
             .Should()
             .Throw<NotImplementedException>();
     }
@@ -211,7 +211,7 @@ public class MappedRowTest
         TableRow row = table.Rows[0];
         MappedTable mappedTable = new(table);
         MappedRow mappedRow = new (mappedTable, row);
-        KeyValuePair<string, string?> searchKeyValuePair = new KeyValuePair<string, string?>(MappedTableTest.StandardColumns[0], "Moo");
+        KeyValuePair<string, string?> searchKeyValuePair = new(MappedTableTest.StandardColumns[0], "Moo");
         mappedRow.Contains(searchKeyValuePair).Should().BeFalse();
     }
 
@@ -254,8 +254,8 @@ public class MappedRowTest
         TableRow row = table.Rows[0];
         MappedTable mappedTable = new(table);
         MappedRow mappedRow = new (mappedTable, row);
-        List<string> matchedColumns = new List<string>();
-        List<string?> matchedFields= new List<string?>();
+        List<string> matchedColumns = [];
+        List<string?> matchedFields= [];
 
         foreach (KeyValuePair<string, string?> keyValuePair in mappedRow)
         { 
@@ -275,8 +275,8 @@ public class MappedRowTest
         TableRow row = table.Rows[0];
         MappedTable mappedTable = new(table);
         MappedRow mappedRow = new (mappedTable, row);
-        List<string> matchedColumns = new List<string>();
-        List<string?> matchedFields= new List<string?>();
+        List<string> matchedColumns = [];
+        List<string?> matchedFields= [];
 
         IEnumerator enumerator = ((IEnumerable)mappedRow).GetEnumerator();
         while (enumerator.MoveNext())
@@ -476,22 +476,22 @@ public class MappedRowTest
 
 
 
-    private static IEnumerable<object[]> GetDbValueData()
+    private static List<object[]> GetDbValueData()
     {
         DateTime randomDate = RandomDataGenerator.Instance.GenerateDate();
         int randomInt = RandomDataGenerator.Instance.GenerateInt();
-        return new List<object[]>
-        {
-            new object[] { "stringField", "Hello", "Hello"},
-            new object[] { "emptyStringField", "", ""},
-            new object[] { "quotedSingle @quoted", "' Hello '", " Hello "},
-            new object[] { "quotedSingle @quoted", " Hello ", " Hello "},
-            new object[] { "dbNullField", "null", DBNull.Value},
-            new object[] { "dateField @date", randomDate.ToString("yyyy-MM-dd"),  randomDate},
-            new object[] { "intField", randomInt.ToString(),  randomInt.ToString()},
-            new object[] { "quotedSingle @quoted", "'", "'"},
+        return
+        [
+            ["stringField", "Hello", "Hello"],
+            ["emptyStringField", "", ""],
+            ["quotedSingle @quoted", "' Hello '", " Hello "],
+            ["quotedSingle @quoted", " Hello ", " Hello "],
+            ["dbNullField", "null", DBNull.Value],
+            ["dateField @date", randomDate.ToString("yyyy-MM-dd"), randomDate],
+            ["intField", randomInt.ToString(), randomInt.ToString()],
+            ["quotedSingle @quoted", "'", "'"]
 
-        };
+        ];
     }
     [DataTestMethod]
     [DynamicData(nameof(GetDbValueData), DynamicDataSourceType.Method)]
@@ -515,7 +515,7 @@ public class MappedRowTest
         Table table = new(headers);
         table.AddRow([cellValue]);
         MappedTable mappedTable = new(table);
-        string fieldName = header.Contains("@") ? header.Substring(0, header.IndexOf("@",StringComparison.CurrentCultureIgnoreCase) - 1).Trim() : header;
+        string fieldName = header.Contains('@') ? header[..(header.IndexOf("@", StringComparison.CurrentCultureIgnoreCase) - 1)].Trim() : header;
         MappedRow mappedRow = new(mappedTable, table.Rows.First());
         mappedRow.GetDbValue(fieldName,"null").Should().BeEquivalentTo(expectedValue);
     }
@@ -546,46 +546,54 @@ public class MappedRowTest
         float randomFloat =
             (float)(RandomDataGenerator.Instance.GenerateDouble(6, 4) * (float.MaxValue - float.MinValue)) +
             float.MinValue;
-        return new List<object[]>
-        {
-            new object[] { "NullableFirstName", null!, (TestClass e)=>e.NullableFirstName},
-            new object[] { "FirstName", firstName, (TestClass e)=>e.FirstName},
-            new object[] { "IntField", RandomDataGenerator.Instance.GenerateInt() , (TestClass e)=>(object)e.IntField},
-            new object[] { "DoubleField", RandomDataGenerator.Instance.GenerateDouble(4,3) , (TestClass e)=>(object)e.DoubleField},
-            new object[] { "FloatField", randomFloat , (TestClass e)=>(object)e.FloatField},
-            new object[] { "ShortField", RandomDataGenerator.Instance.GenerateInt(0,100) , (TestClass e)=>(object)e.ShortField},
-            new object[] { "DateTimeField", randomDate  , (TestClass e)=>(object)e.DateTimeField},
-            new object[] { "LongField", RandomDataGenerator.Instance.GenerateInt() , (TestClass e)=>(object)e.LongField},
-            new object[] { "DecimalField", RandomDataGenerator.Instance.GenerateDecimal() , (TestClass e)=>(object)e.DecimalField},
-            new object[] { "GuidField", RandomDataGenerator.Instance.GenerateGuid() , (TestClass e)=>(object)e.GuidField},
-            new object[] { "BoolField", RandomDataGenerator.Instance.GenerateBoolean() , (TestClass e)=>(object)e.BoolField},
-            new object[] { "ByteField", RandomDataGenerator.Instance.GenerateByte() , (TestClass e)=>(object)e.ByteField},
+        return
+        [
+            ["NullableFirstName", null!, (TestClass e)=>e.NullableFirstName],
+            ["FirstName", firstName, (TestClass e)=>e.FirstName],
+            ["IntField", RandomDataGenerator.Instance.GenerateInt() , (TestClass e)=>(object)e.IntField],
+            ["DoubleField", RandomDataGenerator.Instance.GenerateDouble(4,3) , (TestClass e)=>(object)e.DoubleField],
+            ["FloatField", randomFloat , (TestClass e)=>(object)e.FloatField],
+            ["ShortField", RandomDataGenerator.Instance.GenerateInt(0,100) , (TestClass e)=>(object)e.ShortField],
+            ["DateTimeField", randomDate  , (TestClass e)=>(object)e.DateTimeField],
+            ["LongField", RandomDataGenerator.Instance.GenerateInt() , (TestClass e)=>(object)e.LongField],
+            ["DecimalField", RandomDataGenerator.Instance.GenerateDecimal() , (TestClass e)=>(object)e.DecimalField],
+            ["GuidField", RandomDataGenerator.Instance.GenerateGuid() , (TestClass e)=>(object)e.GuidField],
+            ["BoolField", RandomDataGenerator.Instance.GenerateBoolean() , (TestClass e)=>(object)e.BoolField],
+            ["ByteField", RandomDataGenerator.Instance.GenerateByte() , (TestClass e)=>(object)e.ByteField],
 
 
-            new object[] { "NullableFirstName", firstName, (TestClass e)=>e.NullableFirstName},
-            new object[] { "NullableIntField", RandomDataGenerator.Instance.GenerateInt() , (TestClass e)=>(object?)e.NullableIntField},
-            new object[] { "NullableDoubleField", RandomDataGenerator.Instance.GenerateDouble(4,3) , (TestClass e)=>(object?)e.NullableDoubleField},
-            new object[] { "NullableFloatField", randomFloat , (TestClass e)=>(object?)e.NullableFloatField},
-            new object[] { "NullableShortField", RandomDataGenerator.Instance.GenerateInt(0,100) , (TestClass e)=>(object?)e.NullableShortField},
-            new object[] { "NullableDateTimeField", randomDate  , (TestClass e)=>(object?)e.NullableDateTimeField},
-            new object[] { "NullableLongField", RandomDataGenerator.Instance.GenerateInt() , (TestClass e)=>(object?)e.NullableLongField},
-            new object[] { "NullableDecimalField", RandomDataGenerator.Instance.GenerateDecimal() , (TestClass e)=>(object?)e.NullableDecimalField},
-            new object[] { "NullableGuidField", RandomDataGenerator.Instance.GenerateGuid() , (TestClass e)=>(object?)e.NullableGuidField},
-            new object[] { "NullableBoolField", RandomDataGenerator.Instance.GenerateBoolean() , (TestClass e)=>(object?)e.NullableBoolField},
-            new object[] { "NullableByteField", RandomDataGenerator.Instance.GenerateByte() , (TestClass e)=>(object?)e.NullableByteField},
+            ["NullableFirstName", firstName, (TestClass e)=>e.NullableFirstName],
+            ["NullableIntField", RandomDataGenerator.Instance.GenerateInt() , (TestClass e)=>(object?)e.NullableIntField
+            ],
+            ["NullableDoubleField", RandomDataGenerator.Instance.GenerateDouble(4,3) , (TestClass e)=>(object?)e.NullableDoubleField
+            ],
+            ["NullableFloatField", randomFloat , (TestClass e)=>(object?)e.NullableFloatField],
+            ["NullableShortField", RandomDataGenerator.Instance.GenerateInt(0,100) , (TestClass e)=>(object?)e.NullableShortField
+            ],
+            ["NullableDateTimeField", randomDate  , (TestClass e)=>(object?)e.NullableDateTimeField],
+            ["NullableLongField", RandomDataGenerator.Instance.GenerateInt() , (TestClass e)=>(object?)e.NullableLongField
+            ],
+            ["NullableDecimalField", RandomDataGenerator.Instance.GenerateDecimal() , (TestClass e)=>(object?)e.NullableDecimalField
+            ],
+            ["NullableGuidField", RandomDataGenerator.Instance.GenerateGuid() , (TestClass e)=>(object?)e.NullableGuidField
+            ],
+            ["NullableBoolField", RandomDataGenerator.Instance.GenerateBoolean() , (TestClass e)=>(object?)e.NullableBoolField
+            ],
+            ["NullableByteField", RandomDataGenerator.Instance.GenerateByte() , (TestClass e)=>(object?)e.NullableByteField
+            ],
 
 
-            new object[] { "NullableIntField", null!, (TestClass e)=>(object?)e.NullableIntField},
-            new object[] { "NullableDoubleField", null! , (TestClass e)=>(object?)e.NullableDoubleField},
-            new object[] { "NullableShortField", null!, (TestClass e)=>(object?)e.NullableShortField},
-            new object[] { "NullableFloatField", null!, (TestClass e)=>(object?)e.NullableFloatField},
-            new object[] { "NullableDateTimeField", null!, (TestClass e)=>(object?)e.NullableDateTimeField},
-            new object[] { "NullableLongField", null!, (TestClass e)=>(object?)e.NullableLongField},
-            new object[] { "NullableDecimalField", null!, (TestClass e)=>(object?)e.NullableDecimalField},
-            new object[] { "NullableGuidField", null!, (TestClass e)=>(object?)e.NullableGuidField},
-            new object[] { "NullableBoolField", null! , (TestClass e)=>(object?)e.NullableBoolField},
-            new object[] { "NullableByteField", null! , (TestClass e)=>(object?)e.NullableByteField},
-        };
+            ["NullableIntField", null!, (TestClass e)=>(object?)e.NullableIntField],
+            ["NullableDoubleField", null! , (TestClass e)=>(object?)e.NullableDoubleField],
+            ["NullableShortField", null!, (TestClass e)=>(object?)e.NullableShortField],
+            ["NullableFloatField", null!, (TestClass e)=>(object?)e.NullableFloatField],
+            ["NullableDateTimeField", null!, (TestClass e)=>(object?)e.NullableDateTimeField],
+            ["NullableLongField", null!, (TestClass e)=>(object?)e.NullableLongField],
+            ["NullableDecimalField", null!, (TestClass e)=>(object?)e.NullableDecimalField],
+            ["NullableGuidField", null!, (TestClass e)=>(object?)e.NullableGuidField],
+            ["NullableBoolField", null! , (TestClass e)=>(object?)e.NullableBoolField],
+            ["NullableByteField", null! , (TestClass e)=>(object?)e.NullableByteField],
+        ];
     }
 
     [DataTestMethod]

@@ -11,11 +11,11 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow.Mapping;
 /// <remarks>   Law Metzler, 7/25/2024. </remarks>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-public class MappedTable
+public partial class MappedTable
 {
     #region Static and private props
     /// <summary>   The clean RegEx. </summary>
-    public static Regex CleanRegex = new("[^a-zA-Z@]");
+    public static readonly Regex CleanRegex = AlphaRegEx();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   Gets the table rows. </summary>
@@ -51,13 +51,13 @@ public class MappedTable
             ColumnDescription cd = new(columnName, cleanedName, columnType, c);
             return cd;
         }).ToArray();
-        List<MappedRow> row = new List<MappedRow>();
+        List<MappedRow> row = [];
         while (dataReader.Read())
         {
             row.Add(new MappedRow(this, dataReader));
         }
 
-        TableRows = row.ToArray();
+        TableRows = [.. row];
 
     }
 
@@ -78,7 +78,7 @@ public class MappedTable
             string? columnType = ParseType(c);
             if (columnType != null)
             {
-                c = c.Substring(0, c.IndexOf("@", StringComparison.Ordinal));
+                c = c[..c.IndexOf('@', StringComparison.Ordinal)];
 
                 c = c.Trim();
             }
@@ -177,7 +177,7 @@ public class MappedTable
     /// <returns>   A string. </returns>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private string NormalizeName(string input)
+    private static string NormalizeName(string input)
     {
         return CleanRegex.Replace(input.ToLower(), "");
     }
@@ -192,10 +192,10 @@ public class MappedTable
     /// <returns>   A string? </returns>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private string? ParseType(string input)
+    private static string? ParseType(string input)
     {
-        int indexOf = input.IndexOf("@", StringComparison.Ordinal);
-        return indexOf > 0 ? input.Substring(indexOf + 1).Trim().ToLower() : null;
+        int indexOf = input.IndexOf('@', StringComparison.Ordinal);
+        return indexOf > 0 ? input[(indexOf + 1)..].Trim().ToLower() : null;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,20 +208,18 @@ public class MappedTable
     /// <returns>   A string? </returns>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private string? ParseDatabaseType(string input)
+    private static string? ParseDatabaseType(string input)
     {
-        switch (input)
+        return input switch
         {
-            case "datetime":
-            case "date":
-                return "date";
-            case "bit":
-            case "boolean":
-                return "boolean";
-        }
-
-        return null;
+            "datetime" or "date" => "date",
+            "bit" or "boolean" => "boolean",
+            _ => null
+        };
     }
+
+    [GeneratedRegex("[^a-zA-Z@]")]
+    private static partial Regex AlphaRegEx();
 
     #endregion Private Methods
 

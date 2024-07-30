@@ -157,7 +157,7 @@ select
     private void InsertRecords(string tableName, string[] columns, IEnumerable<object?[]> rows)
     {
         string columnList = string.Join(",", columns);
-        List<string> cleanedColumnList = new List<string>();
+        List<string> cleanedColumnList = [];
         for (int x = 0; x < columns.Length; x++)
             cleanedColumnList.Add($"p{x}");
         string variableList = $"@{string.Join(",@", cleanedColumnList)}";
@@ -167,8 +167,8 @@ select
         foreach (object?[] row in rows)
         {
             if (row.Length < columns.Length)
-                throw new ArgumentOutOfRangeException(
-                    $"Row is missing columns (Expected {columns.Length}, actual {row.Length} ", nameof(rows));
+                throw new ArgumentOutOfRangeException( nameof(rows),
+                    $"Row is missing columns (Expected {columns.Length}, actual {row.Length} ");
             using IDbCommand insertCommand = CreateCommand();
             
 
@@ -194,7 +194,7 @@ select
     /// <returns></returns>
     protected static string GeneratePrintableResults(DataTable dataTable)
     {
-        List<string> formats = new List<string>();
+        List<string> formats = [];
         StringBuilder results = new("\r\n");
         for (int colIndex = 0; colIndex < dataTable.Columns.Count; colIndex++)
         {
@@ -251,33 +251,24 @@ select
     /// <returns></returns>
     protected static SqlDbType? GetDbType(PropertyInfo propertyInfo)
     {
-        FieldSourceAttribute? attribute =
-            propertyInfo.GetCustomAttributes(typeof(FieldSourceAttribute)).FirstOrDefault() as FieldSourceAttribute;
-        if (attribute == null)
+        if (propertyInfo.GetCustomAttributes(typeof(FieldSourceAttribute)).FirstOrDefault() is not FieldSourceAttribute attribute)
         {
             return null;
         }
 
-        switch (attribute.SourceType.ToLower())
+        return attribute.SourceType.ToLower() switch
         {
-            case "image":
-                return  SqlDbType.Image;
-            case "binary":
-                return  SqlDbType.Binary;
-            case "varbinary":
-                return  SqlDbType.VarBinary;
-            default:
-                return null;
-        }
+            "image" => SqlDbType.Image,
+            "binary" => SqlDbType.Binary,
+            "varbinary" => SqlDbType.VarBinary,
+            _ => null
+        };
     }
     /// <inheritdoc />
     public override void Persist(DatabaseMappedClass mappedClass)
     {
         Type generatedType = mappedClass.GetType();
-        TableSourceAttribute? tableSourceAttribute =
-            Attribute.GetCustomAttribute(generatedType, typeof(TableSourceAttribute)) as
-                TableSourceAttribute;
-        if (tableSourceAttribute == null)
+        if (Attribute.GetCustomAttribute(generatedType, typeof(TableSourceAttribute)) is not TableSourceAttribute tableSourceAttribute)
         {
             throw new ArgumentException("Supplied argument is not a table generated class", nameof(mappedClass));
         }
@@ -300,10 +291,7 @@ select
         {
             foreach (PropertyInfo propertyInfo in propertyInfos)
             {
-                FieldSourceAttribute? fieldSource =
-                    propertyInfo.GetCustomAttributes(typeof(FieldSourceAttribute)).FirstOrDefault() as
-                        FieldSourceAttribute;
-                if (fieldSource == null)
+                if (propertyInfo.GetCustomAttributes(typeof(FieldSourceAttribute)).FirstOrDefault() is not FieldSourceAttribute fieldSource)
                     continue;
                 if (propertyInfo.GetCustomAttributes(typeof(ComputedColumnAttribute)).Any())
                     continue;

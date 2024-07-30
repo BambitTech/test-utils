@@ -22,7 +22,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
         /// <remarks>   Law Metzler, 7/25/2024. </remarks>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        [BeforeTestRun]
+        [BeforeTestRun(Order = 50)]
         public static void BeforeTestRun()
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
@@ -49,11 +49,11 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
         public void BeforeScenarioRegisterContextVariables(ScenarioContext context, ISpecFlowOutputHelper outputHelper)
         {
             Config.RegisterContextVariables(context);
-            EventHandler<TestDbConnectionMessageReceivedEvent> handler = (source, packet) =>
+            void Handler(object? _, TestDbConnectionMessageReceivedEvent packet) =>
                 outputHelper.WriteLine(packet.Message);
 
-            Config.Configuration.TestDatabaseFactory.MessageReceived += handler;
-            context.Set( handler, HandlerKey);
+            Config.Configuration.TestDatabaseFactory.MessageReceived += Handler;
+            context.Set((EventHandler<TestDbConnectionMessageReceivedEvent>)Handler, HandlerKey);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,11 +62,12 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
         /// <remarks>   Law Metzler, 7/25/2024. </remarks>
         ///
         /// <param name="context">      The context. </param>
-        /// <param name="outputHelper"> The output helper. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [AfterScenario]
-        public void AfterScenarioUnregisterMessageHandler(ScenarioContext context, ISpecFlowOutputHelper outputHelper)
+#pragma warning disable CA1822 // Mark members as static
+        public void AfterScenarioUnregisterMessageHandler(ScenarioContext context)
+#pragma warning restore CA1822 // Mark members as static
         {
             EventHandler<TestDbConnectionMessageReceivedEvent> handler =
                 context.Get<EventHandler<TestDbConnectionMessageReceivedEvent>>(HandlerKey);

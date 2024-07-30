@@ -7,7 +7,7 @@ namespace Bambit.TestUtility.DatabaseTools
     /// <summary>
     /// Provides methods to help assign properties on objects
     /// </summary>
-    public static class AutoAssigner
+    public static partial class AutoAssigner
     {
         /// <summary>
         /// Used to determine if a property is null
@@ -78,7 +78,7 @@ namespace Bambit.TestUtility.DatabaseTools
                     return new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddDays(-1);
             }
 
-            Regex patternMatch = new(@"(.*)([+-])(\d{1,})(.*)?");
+            Regex patternMatch = DatePatternMatch();
             Match match = patternMatch.Match(dateValue);
             if (!match.Success)
                 throw new ArgumentException($"unable to parse date value '{stringValue}'", nameof(stringValue));
@@ -124,7 +124,7 @@ namespace Bambit.TestUtility.DatabaseTools
                 t.GetProperties(BindingFlags.Instance | BindingFlags.GetField | BindingFlags.SetField |
                                 BindingFlags.Public);
 
-            List<string> assignedColumns = new List<string>();
+            List<string> assignedColumns = [];
             foreach (PropertyInfo propertyInfo in propertyInfos)
             {
 
@@ -133,7 +133,7 @@ namespace Bambit.TestUtility.DatabaseTools
                     assignedColumns.AddRange(propertyName.Split("|".ToCharArray()));
             }
 
-            return assignedColumns.ToArray();
+            return [.. assignedColumns];
         }
 
         #region Private Methods
@@ -191,6 +191,9 @@ namespace Bambit.TestUtility.DatabaseTools
 
             return true;
         }
+
+        [GeneratedRegex(@"(.*)([+-])(\d{1,})(.*)?")]
+        private static partial Regex DatePatternMatch();
 
         #endregion Private Methods
 

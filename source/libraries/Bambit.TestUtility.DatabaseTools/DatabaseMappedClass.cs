@@ -39,11 +39,10 @@ namespace Bambit.TestUtility.DatabaseTools
         /// <returns>The value of the field</returns>
         /// <exception cref="ArgumentException">The specified property name does not exist on the class</exception>
         /// <remarks>Used if not implementing class as a dynamic</remarks>
-        public T?  GetValue<T>(string propertyName) 
+        public T?  GetValue<T>(string propertyName)
         {
-            PropertyInfo? propertyInfo = GetType().GetProperties().FirstOrDefault(p => p.Name == propertyName);
-            if (propertyInfo == null)
-                throw new ArgumentException("No such property exists", nameof(propertyName));
+            PropertyInfo propertyInfo = GetType().GetProperties().FirstOrDefault(p => p.Name == propertyName) ??
+                                         throw new ArgumentException("No such property exists", nameof(propertyName));
             object? value = propertyInfo.GetValue(this);
             return value == null ? default : (T)value;
         }

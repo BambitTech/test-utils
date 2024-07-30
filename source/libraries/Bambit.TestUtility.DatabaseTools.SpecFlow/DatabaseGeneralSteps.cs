@@ -39,24 +39,32 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
         /// <param name="query">        The query. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        [Given(@"I have a (string|date) variable named '(\$.*)' defined from:")]
-        public void DefineVariable(string variableType, string variableName, string query)
+        [Given(@"I have a (?<variableType>string|date) variable named '(?<variableName>\$.*)' defined from:")]
+        public void SetVariableFromQuery(string variableType, string variableName, string query)
         {
             using ITestDbConnection connection= StateManager.OpenConnectionForName(LastDatabaseConnectionName);
 
-            switch (variableType.ToLower())
+            Variables[variableName] = variableType.ToLower() switch
             {
-                case "date":
-                    Variables[variableName] = connection.ExecuteScalar<DateTime>(query);
-                    break;
-                default:
-                    Variables[variableName] = connection.ExecuteScalar<string>(query);
-                    break;
-
-            }
-            
+                "date" => connection.ExecuteScalar<DateTime>(query),
+                _ => connection.ExecuteScalar<string>(query)
+            };
         }
 
-        
+        /// <summary>
+        /// Sets a variable with a value
+        /// </summary>
+        /// <param name="variableType"> Type of the variable. Either "date" or "string" </param>
+        /// <param name="variableName"> Name of the variable. </param>
+        /// <param name="value">        The value. </param>
+        [Given(@"I have a (?<variableType>string|date) variable named '(?<variableName>\$.*)' with a value of '(?<value>.*)'")]
+        public void SetVariable(string variableType, string variableName, string value) {
+            Variables[variableName] = variableType.ToLower() switch
+            {
+                "date" =>DateTime.Parse(value),
+                _ => value
+            };
+        }
     }
+        
 }
