@@ -116,16 +116,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
            
             using ITestDbConnection connection = OpenConnectionForName(connectionName);
             MappedTable existingTable = ExecuteQueryForResults(connectionName, query);
-            object?[][] expectedValue = table.Rows.Select(
-                r => r.ApplyTransformValues(ReplaceVariable).GetDbValues(StateManager.Configuration.NullStringIdentifier)
-            ).ToArray();
-            object?[][] existingValues = existingTable.Rows.Select(
-                r => r.ApplyTransformValues(ReplaceVariable).GetDbValues(StateManager.Configuration.NullStringIdentifier)
-            ).ToArray();
             CompareTables(table, existingTable);
-            connection.CompareResults(table.Columns, table.TableColumns.Select(a => a.ColumnType).ToArray(),
-                expectedValue, existingValues, true);
-
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

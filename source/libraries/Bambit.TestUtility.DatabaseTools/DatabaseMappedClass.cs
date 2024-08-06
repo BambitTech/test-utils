@@ -41,7 +41,11 @@ namespace Bambit.TestUtility.DatabaseTools
         /// <remarks>Used if not implementing class as a dynamic</remarks>
         public T?  GetValue<T>(string propertyName)
         {
-            PropertyInfo propertyInfo = GetType().GetProperties().FirstOrDefault(p => p.Name == propertyName) ??
+            PropertyInfo propertyInfo = GetType().GetProperties().FirstOrDefault(p =>
+                                            string.Compare(
+                                            p.Name ,propertyName, StringComparison.CurrentCultureIgnoreCase)==0
+
+                                            ) ??
                                          throw new ArgumentException("No such property exists", nameof(propertyName));
             object? value = propertyInfo.GetValue(this);
             return value == null ? default : (T)value;

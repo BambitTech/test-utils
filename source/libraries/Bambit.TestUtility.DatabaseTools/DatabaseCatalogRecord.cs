@@ -7,8 +7,6 @@ public abstract class DatabaseCatalogRecord : IDatabaseCatalogRecord
 {
     #region Properties
 
-    /// <inheritdoc />
-    public abstract string TableDefinitionQuery { get; }
 
     /// <inheritdoc />
     public abstract char[] Qualifiers { get;  }

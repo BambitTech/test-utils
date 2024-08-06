@@ -175,6 +175,11 @@ public class MappedRow: IDictionary<string, string?>
                     value[0] == '"' && value[length - 1] == '"')
                     return value.Substring(1, length - 2);
                 break;
+            case "bit":
+            case "boolean":
+                string lowerValue = value.ToLower();
+                return lowerValue.Length > 0 &&
+                       (lowerValue[0] == 'y' || lowerValue == "true" || lowerValue[0] == '1');
         }
 
         return value;

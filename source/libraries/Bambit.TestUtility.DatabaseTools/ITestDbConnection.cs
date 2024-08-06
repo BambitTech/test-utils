@@ -81,7 +81,15 @@ namespace Bambit.TestUtility.DatabaseTools
         /// <returns>A <see cref="IDataReader"/></returns>
         IDataReader ExecuteReader(string query);
 
-
+        /// <summary>
+        /// Retrieves the list of DatabaseMappedClassPropertyDefinitions for the supplied table
+        /// </summary>
+        /// <param name="schema">       The schema of the table to get the properties for. </param>
+        /// <param name="tableName">    The name of the table to get the properties for </param>
+        /// <returns>
+        /// The properties for the supplied table.
+        /// </returns>
+        IList<DatabaseMappedClassPropertyDefinition> GetProperties(string schema, string tableName);
         /// <summary>
         /// The command timeout to use for executed commands.  If null, default value for the connection will be used
         /// </summary>

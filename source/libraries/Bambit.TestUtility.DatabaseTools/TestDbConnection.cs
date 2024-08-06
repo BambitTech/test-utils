@@ -13,6 +13,10 @@ public abstract class TestDbConnection(IDbConnection connection) : ITestDbConnec
     /// The <see cref="IDbConnection"/> that is wrapped
     /// </summary>
     protected IDbConnection Connection { get; } = connection;
+
+    /// <inheritdoc />
+    public abstract IList<DatabaseMappedClassPropertyDefinition> GetProperties(string schema, string tableName);
+
     /// <inheritdoc />
     public int? CommandTimeout { get; set; }
 

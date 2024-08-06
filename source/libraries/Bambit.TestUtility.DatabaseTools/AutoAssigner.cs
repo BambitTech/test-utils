@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Security.AccessControl;
 using System.Text.RegularExpressions;
 using Bambit.TestUtility.DatabaseTools.Attributes;
 
@@ -18,8 +19,8 @@ namespace Bambit.TestUtility.DatabaseTools
         /// A dictionary with conversion from string to other types
         /// </summary>
 
-        private static readonly Dictionary<Type, Func<string, object>> Converters =
-            new()
+        public static readonly IReadOnlyDictionary<Type, Func<string, object>> Converters =
+            new Dictionary<Type, Func<string, object>>
             {
                 { typeof(int), (s) => int.Parse(s) },
                 { typeof(long), (s) => long.Parse(s) },
@@ -41,7 +42,7 @@ namespace Bambit.TestUtility.DatabaseTools
                     }
                 }
             };
-    
+
         /// <summary>
         /// Parses our a string, allowing custom day types (e.g., today, yesterday) along with adding time spans (hours, days, etc.)
         /// </summary>
