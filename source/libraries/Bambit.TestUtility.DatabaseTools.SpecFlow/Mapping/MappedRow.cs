@@ -154,35 +154,12 @@ public class MappedRow: IDictionary<string, string?>
     /// <returns>   The database value. </returns>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public object GetDbValue(int index, string nullStringIdentifier)
+    public object GetDbValue(int index, string nullStringIdentifier, ITestDbConnection dbConnection)
     {
 
-        ColumnDescription columnDescription = Owner.TableColumns[index];
-        string? value = Items[columnDescription.ColumnIndex];
+        ColumnDescription columnDescription = Owner.TableColumns[index];   
+        return GetDbValue(columnDescription, nullStringIdentifier, dbConnection);
 
-        if (value==null|| string.Compare(value, nullStringIdentifier,StringComparison.CurrentCultureIgnoreCase) == 0)
-            return DBNull.Value;
-
-        switch (columnDescription.ColumnType)
-        {
-            case "date":
-                return AutoAssigner.ParseDateExtended(value);
-            case "quoted":
-                int length = value.Length;
-                if (length < 2)
-                    break;
-                if (value[0] == '\'' && value[length - 1] == '\'' ||
-                    value[0] == '"' && value[length - 1] == '"')
-                    return value.Substring(1, length - 2);
-                break;
-            case "bit":
-            case "boolean":
-                string lowerValue = value.ToLower();
-                return lowerValue.Length > 0 &&
-                       (lowerValue[0] == 'y' || lowerValue == "true" || lowerValue[0] == '1');
-        }
-
-        return value;
 
     }
 
@@ -193,33 +170,41 @@ public class MappedRow: IDictionary<string, string?>
     ///
     /// <param name="name">                 The name. </param>
     /// <param name="nullStringIdentifier"> Identifier for the null string. </param>
+    /// <param name="dbConnection">         The <see cref="ITestDbConnection"/> to get the db value for</param>
     ///
     /// <returns>   The database value. </returns>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public object GetDbValue(string name, string nullStringIdentifier)
+    public object GetDbValue(string name, string nullStringIdentifier, ITestDbConnection dbConnection)
     {
         ColumnDescription? columnDescription = Owner.GetColumnDescription(name);
         if (columnDescription == null)
             return DBNull.Value;
+        return GetDbValue(columnDescription, nullStringIdentifier, dbConnection);
+
+
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>   Gets database value. </summary>
+    ///
+    /// <remarks>   Law Metzler, 7/25/2024. </remarks>
+    ///
+    /// <param name="columnDescription">    The <see cref="ColumnDescription"/> of the column to get the values for. </param>
+    /// <param name="nullStringIdentifier"> Identifier for the null string. </param>
+    /// <param name="dbConnection">         The <see cref="ITestDbConnection"/> to get the db value for</param>
+    ///
+    /// <returns>   The database value. </returns>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    protected object GetDbValue(ColumnDescription columnDescription , string nullStringIdentifier, ITestDbConnection dbConnection)
+    {
         string? value = Items[columnDescription.ColumnIndex];
         if (value==null|| string.Compare(value, nullStringIdentifier,StringComparison.CurrentCultureIgnoreCase) == 0)
             return DBNull.Value;
-        switch (columnDescription.ColumnType)
-        {
-            case "date":
-                return AutoAssigner.ParseDateExtended(value);
-            case "quoted":
-                int length = value.Length;
-                if (length < 2)
-                    break;
-                if (value[0] == '\'' && value[length - 1] == '\'' ||
-                    value[0] == '"' && value[length - 1] == '"')
-                    return value.Substring(1, length - 2);
-                break;
-        }
-
+        if(!string.IsNullOrEmpty( columnDescription.ColumnType))
+            return dbConnection.ConvertValue( value,columnDescription.ColumnType);
         return value;
+       
 
     }
 
@@ -233,12 +218,12 @@ public class MappedRow: IDictionary<string, string?>
     /// <returns>   An array of object? </returns>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public object?[] GetDbValues(string nullStringIdentifier)
+    public object?[] GetDbValues(string nullStringIdentifier, ITestDbConnection dbConnection)
     {
         object?[] results = new object? [Values.Count];
         for (int x = 0; x < Values.Count; x++)
         {
-            results[x]= GetDbValue(x, nullStringIdentifier);
+            results[x]= GetDbValue(x, nullStringIdentifier,dbConnection);
         }
         return results;
 

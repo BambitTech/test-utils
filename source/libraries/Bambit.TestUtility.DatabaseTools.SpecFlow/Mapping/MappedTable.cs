@@ -214,7 +214,8 @@ public partial class MappedTable
         {
             "datetime" or "date" => "date",
             "bit" or "boolean" => "boolean",
-            _ => null
+            "char" or "byte"=>"byte",
+            _ => input
         };
     }
 

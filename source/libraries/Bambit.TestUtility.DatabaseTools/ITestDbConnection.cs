@@ -110,5 +110,7 @@ namespace Bambit.TestUtility.DatabaseTools
             IEnumerable<object?[]> expectedRows,
             IEnumerable<object?[]> compareRows,
             bool allowUnexpectedRows = false);
+
+        object ConvertValue( string value, string targetType);
     }
 }

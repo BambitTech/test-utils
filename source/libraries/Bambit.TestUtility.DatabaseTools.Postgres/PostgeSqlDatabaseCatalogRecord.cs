@@ -19,7 +19,7 @@ public class PostgeSqlDatabaseCatalogRecord : DatabaseCatalogRecord
     /// <inheritdoc />
     public override string EscapeToken(string token)
     {
-        return $"[{token}]";
+        return $"{token}";
     }
 
     

@@ -120,6 +120,40 @@ public abstract class TestDbConnection(IDbConnection connection) : ITestDbConnec
         IEnumerable<object?[]> expectedRows,
         IEnumerable<object?[]> compareRows,
         bool allowUnexpectedRows = false);
+
+    public object ConvertValue(string value, string targetType)
+    {
+        switch (targetType)
+        {
+            case "date":
+                return AutoAssigner.ParseDateExtended(value);
+            case "quoted":
+                int length = value.Length;
+                if (length < 2)
+                    break;
+                if (value[0] == '\'' && value[length - 1] == '\'' ||
+                    value[0] == '"' && value[length - 1] == '"')
+                    return value.Substring(1, length - 2);
+                break;
+            case "byte":
+                return byte.Parse(value);
+            case "bit":
+            case "boolean":
+                string lowerValue = value.ToLower();
+                return lowerValue.Length > 0 &&
+                       (lowerValue[0] == 'y' || lowerValue == "true" || lowerValue[0] == '1');
+            
+        }
+
+        return ConvertForDatabaseValue(value, targetType);
+    }
+
+    protected virtual object ConvertForDatabaseValue(string value, string targetType)
+    {
+        return value;
+    }
+   
+
     /// <inheritdoc />
     public abstract void Persist(DatabaseMappedClass mappedClass);
 

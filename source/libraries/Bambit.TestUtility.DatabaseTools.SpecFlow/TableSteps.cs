@@ -201,7 +201,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
                 IDatabaseCatalogRecord databaseCatalogRecord = GetCurrentConnector();
                 int results =
                     connection.ExecuteScalar<int>(
-                        $"select count(1) from {databaseCatalogRecord.CleanAndEscapeToken(schema)}.{databaseCatalogRecord .CleanAndEscapeToken(tableName)}");
+                        $"select cast(count(1) as integer) from {databaseCatalogRecord.CleanAndEscapeToken(schema)}.{databaseCatalogRecord .CleanAndEscapeToken(tableName)}");
                 Assert.AreEqual(expectedRows, results);
             }
         }

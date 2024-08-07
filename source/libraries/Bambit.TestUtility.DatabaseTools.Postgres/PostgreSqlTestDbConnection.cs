@@ -30,7 +30,7 @@ public class PostgreSqlTestDbConnection(IDbConnection connection) : TestDbConnec
                                                                      coalesce(numeric_precision, 0) numeric_scale,
                                                                     coalesce(numeric_scale, 0) numeric_scale,
                                                                     case
-                                                                       when IS_GENERATED = 'YES' then 1
+                                                                       when IS_GENERATED = 'ALWAYS' then 1
                                                                --        when is_computed =1 then 1
                                                                        --when enerated_always_type <> 0 then 1
                                                                         when is_identity = 'YES' then 1
@@ -612,13 +612,24 @@ SELECT
         return properties;
 
     }
+    
+
+    protected override object ConvertForDatabaseValue(string value, string targetType)
+    {
+        return ConverterToType(targetType, value);
+    }
 
     
     public static object ConverterToType(string typeName, string input)
     {
+        Type converterType = GetPropertyType(typeName, false, -1);
+        if(converterType!=null && AutoAssigner.Converters.TryGetValue(converterType, out var converter))
+            return converter(input);
         return typeName.ToLower() switch
         {
             "int" or "integer" => AutoAssigner.Converters[typeof(int)](input),
+            "smallint"  => AutoAssigner.Converters[typeof(short)](input),
+            "bigint"  => AutoAssigner.Converters[typeof(long)](input),
             "long" => AutoAssigner.Converters[typeof(long)](input),
             "decimal" => AutoAssigner.Converters[typeof(decimal)](input),
             "double" => AutoAssigner.Converters[typeof(double)](input),
@@ -628,7 +639,7 @@ SELECT
             "string" => AutoAssigner.Converters[typeof(string)](input),
             "Guid" => AutoAssigner.Converters[typeof(Guid)](input),
             "DateTime" => AutoAssigner.Converters[typeof(DateTime)](input),
-            "bool" => AutoAssigner.Converters[typeof(bool)](input),
+            "bool" or  "boolean" => AutoAssigner.Converters[typeof(bool)](input),
             _ =>  input
         };
         
