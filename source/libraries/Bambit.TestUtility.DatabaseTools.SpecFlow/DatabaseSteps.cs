@@ -83,11 +83,23 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             string connectionName, MappedTable data, bool allowUnexpectedRows)
         {
             
-            using ITestDbConnection connection = OpenConnectionForName(connectionName);
-            object?[][] values = data.Rows.Select(
+            DatabaseClassFactory databaseClassFactory = StateManager.DatabaseClassFactory;
+            ITestDbConnection testDbConnection= StateManager.OpenConnectionForName(connectionName);
+
+            List<object?[]> values = new(data.Rows.Count);
+            foreach (MappedRow tableRow in data.Rows)
+            {
+                DatabaseMappedClass instance = databaseClassFactory.GenerateObjectFromTable(connectionName, schema, tableName);
+                tableRow.ApplyTransformValues(ReplaceVariable).TransformForNull(StateManager.Configuration.NullStringIdentifier);
+                string[] assignedValues = tableRow.AssignValuesIfDefined(instance);
+                object?[] objects = assignedValues.Select(a => instance.GetValue(a)).ToArray();
+                values.Add(objects);
+            }
+
+            /*object?[][] values = data.Rows.Select(
                 r => r.ApplyTransformValues(ReplaceVariable).GetDbValues(StateManager.Configuration.NullStringIdentifier)
-            ).ToArray();
-            VerifyCompareResults(connection.CompareTableToDataset(schema, tableName, data.Columns, values,
+            ).ToArray();*/
+            VerifyCompareResults(testDbConnection.CompareTableToDataset(schema, tableName, data.Columns, values,
                 allowUnexpectedRows));
 
             StateManager.LastDatabaseConnectionName = connectionName;
@@ -299,12 +311,12 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
         {
             using ITestDbConnection connection = OpenConnectionForName(LastDatabaseConnectionName);
             object?[][] expectedValue = expected.Rows.Select(
-                r => r.ApplyTransformValues(ReplaceVariable).GetDbValues(StateManager.Configuration.NullStringIdentifier)
+                r => r.ApplyTransformValues(ReplaceVariable).GetDbValues(StateManager.Configuration.NullStringIdentifier,connection)
             ).ToArray();
             object?[][] existingValues = actual.Rows.Select(
-                r => r.ApplyTransformValues(ReplaceVariable).GetDbValues(StateManager.Configuration.NullStringIdentifier)
+                r => r.ApplyTransformValues(ReplaceVariable).GetDbValues(StateManager.Configuration.NullStringIdentifier,connection)
             ).ToArray();
-            connection.CompareResults(expected.Columns, expected.TableColumns.Select(a => a.ColumnType).ToArray(),
+            connection.CompareResults(expected.Columns, actual.TableColumns.Select(a => a.ColumnType).ToArray(),
                 expectedValue, existingValues, true);
         }
 

@@ -145,9 +145,9 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             {
                 AddRecordsToDatabase(schema, tableName, StateManager.LastDatabaseConnectionName, data);
             }
-            catch (SqlException exc)
+            catch (Exception exc)
             {
-                OutputHelper.WriteLine($"Sql Exception caught: {exc.Message}");
+                OutputHelper.WriteLine($"Exception caught: {exc.Message}");
                 Context.Set(exc);
                 return;
             }
@@ -176,11 +176,11 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
         [Then(@"[Tt]he last SQL exception will contain the phrase ""(?<expectedPhrase>.*)""")]
         public void VerifyLastExceptionPhrase(string expectedPhrase)
         {
-            SqlException sqlException = Context.Get<SqlException>();
+            Exception sqlException = Context.Get<Exception>();
             Assert.IsNotNull(sqlException, "No Sql Exception found");
             string phrase = sqlException.Message;
             
-            Assert.IsTrue(phrase.IndexOf(expectedPhrase, StringComparison.CurrentCultureIgnoreCase) >= 0, 
+            Assert.IsTrue(phrase.Contains(expectedPhrase, StringComparison.CurrentCultureIgnoreCase), 
                 $"Exception '{sqlException.Message}' did not contain string '{expectedPhrase}");
         }
         
@@ -201,7 +201,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
                 IDatabaseCatalogRecord databaseCatalogRecord = GetCurrentConnector();
                 int results =
                     connection.ExecuteScalar<int>(
-                        $"select count(1) from {databaseCatalogRecord.CleanAndEscapeToken(schema)}.{databaseCatalogRecord .CleanAndEscapeToken(tableName)}");
+                        $"select cast(count(1) as integer) from {databaseCatalogRecord.CleanAndEscapeToken(schema)}.{databaseCatalogRecord .CleanAndEscapeToken(tableName)}");
                 Assert.AreEqual(expectedRows, results);
             }
         }

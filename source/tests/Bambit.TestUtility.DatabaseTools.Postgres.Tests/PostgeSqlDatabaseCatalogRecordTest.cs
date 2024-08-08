@@ -3,11 +3,11 @@ using Bambit.TestUtility.DataGeneration;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 
-namespace Bambit.TestUtility.DatabaseTools.SqlServer.Tests
+namespace Bambit.TestUtility.DatabaseTools.Postgres.Tests
 {
     [TestClass]
     [TestCategory("Integration")]
-    public class SqlServerDatabaseCatalogRecordTest
+    public class PostgeSqlDatabaseCatalogRecordTest
     {
         protected IConfiguration Configuration { get; set; } = null!;
 
@@ -23,8 +23,8 @@ namespace Bambit.TestUtility.DatabaseTools.SqlServer.Tests
         [TestMethod]
         public void GetConnection_ReturnsConnection()
         {
-            SqlServerDatabaseCatalogRecord catalogRecord = new();
-            TestDbConnection dbConnection = catalogRecord.GetConnection(Configuration.GetConnectionString("IntegrationTestDatabase")!);
+            PostgeSqlDatabaseCatalogRecord catalogRecord = new();
+            IDbConnection dbConnection = catalogRecord.GetConnection(Configuration.GetConnectionString("IntegrationTestDatabase")!);
             dbConnection.Should().NotBeNull();
             dbConnection.Open();
             IDbCommand dbCommand = dbConnection.CreateCommand();
@@ -34,12 +34,12 @@ namespace Bambit.TestUtility.DatabaseTools.SqlServer.Tests
         }
 
         [TestMethod]
-        public void EscapeToken_WrapsToken()
+        public void EscapeToken_NoWrapping()
         {
             
-            SqlServerDatabaseCatalogRecord catalogRecord = new();
+            PostgeSqlDatabaseCatalogRecord catalogRecord = new();
             string token = RandomDataGenerator.Instance.GenerateString(10);
-            catalogRecord.EscapeToken(token).Should().Be($"[{token}]");
+            catalogRecord.EscapeToken(token).Should().Be($"{token}");
         }
     }
 }

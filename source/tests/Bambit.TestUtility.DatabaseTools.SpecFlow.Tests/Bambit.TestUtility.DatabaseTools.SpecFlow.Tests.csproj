@@ -14,6 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Postgres\TableUtilities.feature.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Scripts\EmbeddedScript.sql" />
   </ItemGroup>
 
@@ -37,6 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\libraries\Bambit.TestUtility.DatabaseTools.Postgres\Bambit.TestUtility.DatabaseTools.Postgres.csproj" />
     <ProjectReference Include="..\..\libraries\Bambit.TestUtility.DatabaseTools.SpecFlow\Bambit.TestUtility.DatabaseTools.SpecFlow.csproj" />
     <ProjectReference Include="..\..\libraries\Bambit.TestUtility.DatabaseTools.SqlServer\Bambit.TestUtility.DatabaseTools.SqlServer.csproj" />
     <ProjectReference Include="..\..\libraries\Bambit.TestUtility.DatabaseTools\Bambit.TestUtility.DatabaseTools.csproj" />
@@ -53,6 +58,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\Postgres\TableUtilities.feature.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="bambit.utilities.local.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -65,6 +76,13 @@
     <None Update="bambit.utilities.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\Postgres\TableUtilities.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
   </ItemGroup>
 
 </Project>

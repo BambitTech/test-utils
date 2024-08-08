@@ -12,7 +12,55 @@ namespace Bambit.TestUtility.DatabaseTools.SqlServer;
 /// <param name="connection">The <see cref="IDbConnection"/> that is wrapped</param>
 public class SqlServerTestDbConnection(IDbConnection connection) : TestDbConnection(connection)
 {
-
+      
+        private const string SqlServerTableDefinitionQuery = """
+                                                                      select
+                                                                              col.name,
+                                                                              typ.name,
+                                                                              case
+                                                                                  when col.is_nullable = 1 and typ.name in ('bigint', 'bit', 'date', 'datetime', 'datetime2', 'datetimeoffset', 'decimal', 'float', 'int', 'money', 'numeric', 'real', 'smalldatetime', 'smallint', 'smallmoney', 'time', 'tinyint', 'uniqueidentifier')
+                                                                                  then 1
+                                                                                  else 0
+                                                                              end NullableSign,
+                                                                              case
+                                                                                     when typ.name in ('nchar', 'ntext', 'nvarchar') then cast(col.max_length/2 as smallint)
+                                                                                  else col.max_length
+                                                                                  end max_length,
+                                                                              case
+                                                                                     when typ.name  = 'smallmoney' then cast(5  as tinyint)
+                                                                                     else col.precision end,
+                                                                              case
+                                                                                 when typ.name  = 'smallmoney' or typ.name='money' then cast(2  as tinyint)
+                                                                                 else col.scale end,
+                                                                              case
+                                                                                 when typ.name = 'timestamp' then 1
+                                                                                 when col.is_computed =1 then 1
+                                                                                 when col.generated_always_type <> 0 then 1
+                                                                                 else cast(col.is_identity as int) end [Is_Computed]
+                                                                          from
+                                                                              sys.columns col
+                                                                              join sys.types typ
+                                                                                  on col.system_type_id = typ.system_type_id
+                                                                                      AND col.user_type_id = typ.user_type_id
+                                                                              where
+                                                                              object_id = object_id(@tableName)
+                                                                      """;
+    /// <summary>
+    /// Query string that will be used to map a table to the C# classes
+    /// </summary>
+    /// <remarks>
+    /// The query will have a variable "@tableName" supplied when it is run.
+    /// The query must have the following fields returned in order:
+    /// 1: String field with the name of the column
+    /// 2: The column type.  Must be any of the following: bigint, binary, bit, bool, boolean, byte, bytearray, char, date, datetime, datetime2, datetimeoffset, decimal, double, float, guid, image, int, long, money, nchar, ntext, numeric, nvarchar, real, short, smalldatetime, smallint, smallmoney, text, time, timespan, timestamp, tinyint, uniqueidentifier, varbinary, varchar, xml
+    /// 3: An integer indicating nullablilty of the field.  0 is non-null, anything else is nullable
+    /// 4: An integer representing the max size (numeric, byte, string)
+    /// 5: A small int (byte) representing the precision for floating types
+    /// 6: A small int(byte) representing the scale for floating types
+    /// 7: An integer indicating if the column is computed. 0 is not computed, anything else is computed
+    /// </remarks>
+    protected virtual string TableDefinitionQuery => SqlServerTableDefinitionQuery;
+        
     /// <summary>   (Immutable) name of the expected table. </summary>
     protected const string ExpectedTableName = "#__TestingUtilities_expected";
 
@@ -403,4 +451,124 @@ from  {ResultsTableName}
 
 
     }
+
+    /// <inheritdoc />
+    public override IList<DatabaseMappedClassPropertyDefinition> GetProperties( string schema, string tableName)
+    {
+
+        List<DatabaseMappedClassPropertyDefinition> properties = [];
+        Connection.Open();
+        using IDbCommand command = Connection.CreateCommand();
+
+        command.CommandText = TableDefinitionQuery;
+        IDbDataParameter parameter = command.CreateParameter();
+        parameter.ParameterName = "@tableName";
+        parameter.Value = $"{schema}.{tableName}";
+        command.Parameters.Add(parameter);
+        {
+            using IDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                DatabaseMappedClassPropertyDefinition definition = new()
+                {
+                    Name = reader.GetString(0),
+                    SourceType=reader.GetString(1),
+                    IsNullable = reader.GetInt32(2) == 1,
+                    MaxSize = reader.GetInt16(3),
+                    Precision = reader.GetByte(4),
+                    Scale = reader.GetByte(5),
+                    IsComputed = reader.GetInt32(6) > 0
+                };
+                definition.MappedType = GetPropertyType(definition.SourceType, definition.IsNullable);
+                properties.Add(
+                    definition
+                );
+            }
+        }
+
+
+
+        return properties;
+
+    }
+
+    
+
+    private static Type? GetPropertyType(string sourceType, bool isNullable)
+    {
+        Type? type;
+        switch (sourceType)
+        {
+            case "bigint":
+            case "timestamp":
+            case "long":
+                type = isNullable ? typeof(long?) : typeof(long);
+                break;
+            case "image":
+            case "binary":
+            case "varbinary":
+            case "bytearray":
+                type = typeof(byte[]);
+                break;
+            case "bit":
+            case "boolean":
+            case "bool":
+                type = isNullable ? typeof(bool?) : typeof(bool);
+                break;
+            case "date":
+            case "datetime":
+            case "datetime2":
+            case "smalldatetime":
+                type = isNullable ? typeof(DateTime?) : typeof(DateTime);
+                break;
+            case "datetimeoffset":
+                type = isNullable ? typeof(DateTimeOffset?) : typeof(DateTimeOffset);
+                break;
+            case "money":
+            case "numeric":
+            case "smallmoney":
+            case "decimal":
+                type = isNullable ? typeof(decimal?) : typeof(decimal);
+                break;
+            case "real":
+            case "float":
+            case "double":
+                type = isNullable ? typeof(double?) : typeof(double);
+                break;
+            case "int":
+                type = isNullable ? typeof(int?) : typeof(int);
+                break;
+            case "nchar":
+            case "ntext":
+            case "nvarchar":
+            case "varchar":
+            case "text":
+            case "char":
+            case "xml":
+                type = typeof(string);
+                break;
+            case "smallint":
+            case "short":
+                type = isNullable ? typeof(short?) : typeof(short);
+                break;
+            case "time":
+            case "timespan":
+                type = isNullable ? typeof(TimeSpan?) : typeof(TimeSpan);
+                break;
+            case "tinyint":
+            case "byte":
+                type = isNullable ? typeof(byte?) : typeof(byte);
+                break;
+            case "uniqueidentifier":
+            case "guid":
+                type = isNullable ? typeof(Guid?) : typeof(Guid);
+                break;
+            default:
+                type = null;
+                break;
+        }
+
+        return type;
+    }
+
 }

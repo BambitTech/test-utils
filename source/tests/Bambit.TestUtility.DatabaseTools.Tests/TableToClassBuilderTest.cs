@@ -13,6 +13,7 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
     public class TableToClassBuilderTest
     {
         readonly ITestDatabaseFactory MockTestDatabaseFactory = Substitute.For<ITestDatabaseFactory>();
+        readonly ITestDbConnection MockTestConnection = Substitute.For<ITestDbConnection >();
         readonly IDbCommand MockCommand = Substitute.For<IDbCommand>();
         readonly IDataReader MockReader = Substitute.For<IDataReader>();
         readonly IDatabaseCatalogRecord MockCatalogRecord = Substitute.For<IDatabaseCatalogRecord>();
@@ -20,12 +21,11 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
         public void InitializeStandardSetup(string connectionName)
         {
             string connectionString = RandomDataGenerator.Instance.GenerateString(10);
-            string tableGenerationString = RandomDataGenerator.Instance.GenerateString(50);
 
             MockTestDatabaseFactory.GetGenerator(Arg.Any<string>()).Returns(MockCatalogRecord);
             MockTestDatabaseFactory.GetConnectionString(connectionName).Returns(connectionString);
+            MockTestDatabaseFactory.GetConnection(connectionName).Returns(MockTestConnection);
             MockCatalogRecord.GetConnection(connectionString).CreateCommand().Returns(MockCommand);
-            MockCatalogRecord.TableDefinitionQuery.Returns(tableGenerationString);
             MockCommand.ExecuteReader().Returns(MockReader);
 
         }
@@ -46,87 +46,87 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
 
         
         [DataTestMethod]
-        [DataRow("float", 0, (short)16,default(byte), default(byte),typeof(double))]
-        [DataRow("real", 0, (short)16,default(byte), default(byte),typeof(double))]
-        [DataRow("double", 0, (short)16,default(byte), default(byte),typeof(double))]
-        [DataRow("bigint", 0, (short)16,default(byte), default(byte),typeof(long))]
-        [DataRow("timestamp", 0, (short)16,default(byte), default(byte),typeof(long))]
-        [DataRow("long", 0, (short)16,default(byte), default(byte),typeof(long))]
-        [DataRow("varbinary", 0, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("image", 0, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("binary", 0, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("bytearray", 0, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("boolean", 0, (short)16,default(byte), default(byte),typeof(bool))]
-        [DataRow("bool", 0, (short)16,default(byte), default(byte),typeof(bool))]
-        [DataRow("bit", 0, (short)16,default(byte), default(byte),typeof(bool))]
-        [DataRow("date", 0, (short)16,default(byte), default(byte),typeof(DateTime))]
-        [DataRow("datetime", 0, (short)16,default(byte), default(byte),typeof(DateTime))]
-        [DataRow("smalldatetime", 0, (short)16,default(byte), default(byte),typeof(DateTime))]
-        [DataRow("datetime2", 0, (short)16,default(byte), default(byte),typeof(DateTime))]
-        [DataRow("datetimeoffset", 0, (short)16,default(byte), default(byte),typeof(DateTimeOffset))]
-        [DataRow("money", 0, (short)16,default(byte), default(byte),typeof(decimal))]
-        [DataRow("numeric", 0, (short)16,default(byte), default(byte),typeof(decimal))]
-        [DataRow("decimal", 0, (short)16,default(byte), default(byte),typeof(decimal))]
-        [DataRow("smallmoney", 0, (short)16,default(byte), default(byte),typeof(decimal))]
-        [DataRow("int", 0, (short)16,default(byte), default(byte),typeof(int))]
-        [DataRow("nchar", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("ntext", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("nvarchar", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("varchar", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("text", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("char", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("xml", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("smallint", 0, (short)16,default(byte), default(byte),typeof(short))]
-        [DataRow("short", 0, (short)16,default(byte), default(byte),typeof(short))]
-        [DataRow("time", 0, (short)16,default(byte), default(byte),typeof(TimeSpan))]
-        [DataRow("timespan", 0, (short)16,default(byte), default(byte),typeof(TimeSpan))]
-        [DataRow("tinyint", 0, (short)16,default(byte), default(byte),typeof(byte))]
-        [DataRow("byte", 0, (short)16,default(byte), default(byte),typeof(byte))]
-        [DataRow("uniqueidentifier", 0, (short)16,default(byte), default(byte),typeof(Guid))]
+        [DataRow("float", false, (short)16,default(byte), default(byte),typeof(double))]
+        [DataRow("real", false, (short)16,default(byte), default(byte),typeof(double))]
+        [DataRow("double", false, (short)16,default(byte), default(byte),typeof(double))]
+        [DataRow("bigint", false, (short)16,default(byte), default(byte),typeof(long))]
+        [DataRow("timestamp", false, (short)16,default(byte), default(byte),typeof(long))]
+        [DataRow("long", false, (short)16,default(byte), default(byte),typeof(long))]
+        [DataRow("varbinary", false, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("image", false, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("binary", false, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("bytearray", false, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("boolean", false, (short)16,default(byte), default(byte),typeof(bool))]
+        [DataRow("bool", false, (short)16,default(byte), default(byte),typeof(bool))]
+        [DataRow("bit", false, (short)16,default(byte), default(byte),typeof(bool))]
+        [DataRow("date", false, (short)16,default(byte), default(byte),typeof(DateTime))]
+        [DataRow("datetime", false, (short)16,default(byte), default(byte),typeof(DateTime))]
+        [DataRow("smalldatetime", false, (short)16,default(byte), default(byte),typeof(DateTime))]
+        [DataRow("datetime2", false, (short)16,default(byte), default(byte),typeof(DateTime))]
+        [DataRow("datetimeoffset", false, (short)16,default(byte), default(byte),typeof(DateTimeOffset))]
+        [DataRow("money", false, (short)16,default(byte), default(byte),typeof(decimal))]
+        [DataRow("numeric", false, (short)16,default(byte), default(byte),typeof(decimal))]
+        [DataRow("decimal", false, (short)16,default(byte), default(byte),typeof(decimal))]
+        [DataRow("smallmoney", false, (short)16,default(byte), default(byte),typeof(decimal))]
+        [DataRow("int", false, (short)16,default(byte), default(byte),typeof(int))]
+        [DataRow("nchar", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("ntext", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("nvarchar", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("varchar", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("text", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("char", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("xml", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("smallint", false, (short)16,default(byte), default(byte),typeof(short))]
+        [DataRow("short", false, (short)16,default(byte), default(byte),typeof(short))]
+        [DataRow("time", false, (short)16,default(byte), default(byte),typeof(TimeSpan))]
+        [DataRow("timespan", false, (short)16,default(byte), default(byte),typeof(TimeSpan))]
+        [DataRow("tinyint", false, (short)16,default(byte), default(byte),typeof(byte))]
+        [DataRow("byte", false, (short)16,default(byte), default(byte),typeof(byte))]
+        [DataRow("uniqueidentifier", false, (short)16,default(byte), default(byte),typeof(Guid))]
 
         
-        [DataRow("float", 1, (short)16,default(byte), default(byte),typeof(double?))]
-        [DataRow("real", 1, (short)16,default(byte), default(byte),typeof(double?))]
-        [DataRow("double", 1, (short)16,default(byte), default(byte),typeof(double?))]
-        [DataRow("bigint", 1, (short)16,default(byte), default(byte),typeof(long?))]
-        [DataRow("timestamp", 1, (short)16,default(byte), default(byte),typeof(long?))]
-        [DataRow("long", 1, (short)16,default(byte), default(byte),typeof(long?))]
+        [DataRow("float", true, (short)16,default(byte), default(byte),typeof(double?))]
+        [DataRow("real", true, (short)16,default(byte), default(byte),typeof(double?))]
+        [DataRow("double", true, (short)16,default(byte), default(byte),typeof(double?))]
+        [DataRow("bigint", true, (short)16,default(byte), default(byte),typeof(long?))]
+        [DataRow("timestamp", true, (short)16,default(byte), default(byte),typeof(long?))]
+        [DataRow("long", true, (short)16,default(byte), default(byte),typeof(long?))]
 
-        [DataRow("varbinary", 1, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("image", 1, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("binary", 1, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("bytearray", 1, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("varbinary", true, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("image", true, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("binary", true, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("bytearray", true, (short)16,default(byte), default(byte),typeof(byte[]))]
 
-        [DataRow("boolean", 1, (short)16,default(byte), default(byte),typeof(bool?))]
-        [DataRow("bool", 1, (short)16,default(byte), default(byte),typeof(bool?))]
-        [DataRow("bit", 1, (short)16,default(byte), default(byte),typeof(bool?))]
-        [DataRow("date", 1, (short)16,default(byte), default(byte),typeof(DateTime?))]
-        [DataRow("datetime", 1, (short)16,default(byte), default(byte),typeof(DateTime?))]
-        [DataRow("smalldatetime", 1, (short)16,default(byte), default(byte),typeof(DateTime?))]
-        [DataRow("datetime2", 1, (short)16,default(byte), default(byte),typeof(DateTime?))]
-        [DataRow("datetimeoffset", 1, (short)16,default(byte), default(byte),typeof(DateTimeOffset?))]
-        [DataRow("money", 1, (short)16,default(byte), default(byte),typeof(decimal?))]
-        [DataRow("numeric", 1, (short)16,default(byte), default(byte),typeof(decimal?))]
-        [DataRow("decimal", 1, (short)16,default(byte), default(byte),typeof(decimal?))]
-        [DataRow("smallmoney", 1, (short)16,default(byte), default(byte),typeof(decimal?))]
-        [DataRow("int", 1, (short)16,default(byte), default(byte),typeof(int?))]
+        [DataRow("boolean", true, (short)16,default(byte), default(byte),typeof(bool?))]
+        [DataRow("bool", true, (short)16,default(byte), default(byte),typeof(bool?))]
+        [DataRow("bit", true, (short)16,default(byte), default(byte),typeof(bool?))]
+        [DataRow("date", true, (short)16,default(byte), default(byte),typeof(DateTime?))]
+        [DataRow("datetime", true, (short)16,default(byte), default(byte),typeof(DateTime?))]
+        [DataRow("smalldatetime", true, (short)16,default(byte), default(byte),typeof(DateTime?))]
+        [DataRow("datetime2", true, (short)16,default(byte), default(byte),typeof(DateTime?))]
+        [DataRow("datetimeoffset", true, (short)16,default(byte), default(byte),typeof(DateTimeOffset?))]
+        [DataRow("money", true, (short)16,default(byte), default(byte),typeof(decimal?))]
+        [DataRow("numeric", true, (short)16,default(byte), default(byte),typeof(decimal?))]
+        [DataRow("decimal", true, (short)16,default(byte), default(byte),typeof(decimal?))]
+        [DataRow("smallmoney", true, (short)16,default(byte), default(byte),typeof(decimal?))]
+        [DataRow("int", true, (short)16,default(byte), default(byte),typeof(int?))]
 
-        [DataRow("nchar", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("ntext", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("nvarchar", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("varchar", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("text", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("char", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("xml", 1, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("nchar", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("ntext", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("nvarchar", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("varchar", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("text", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("char", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("xml", true, (short)16,default(byte), default(byte),typeof(string))]
 
-        [DataRow("smallint", 1, (short)16,default(byte), default(byte),typeof(short?))]
-        [DataRow("short", 1, (short)16,default(byte), default(byte),typeof(short?))]
-        [DataRow("time", 1, (short)16,default(byte), default(byte),typeof(TimeSpan?))]
-        [DataRow("timespan", 1, (short)16,default(byte), default(byte),typeof(TimeSpan?))]
-        [DataRow("tinyint", 1, (short)16,default(byte), default(byte),typeof(byte?))]
-        [DataRow("byte", 1, (short)16,default(byte), default(byte),typeof(byte?))]
-        [DataRow("uniqueidentifier", 1, (short)16,default(byte), default(byte),typeof(Guid?))]
-        public void GenerateClassTypeFromTable_NonGeneratedFields_CreatesProperty(string fieldName, int isNullable, short maxSize,
+        [DataRow("smallint", true, (short)16,default(byte), default(byte),typeof(short?))]
+        [DataRow("short", true, (short)16,default(byte), default(byte),typeof(short?))]
+        [DataRow("time", true, (short)16,default(byte), default(byte),typeof(TimeSpan?))]
+        [DataRow("timespan", true, (short)16,default(byte), default(byte),typeof(TimeSpan?))]
+        [DataRow("tinyint", true, (short)16,default(byte), default(byte),typeof(byte?))]
+        [DataRow("byte", true, (short)16,default(byte), default(byte),typeof(byte?))]
+        [DataRow("uniqueidentifier", true, (short)16,default(byte), default(byte),typeof(Guid?))]
+        public void GenerateClassTypeFromTable_NonGeneratedFields_CreatesProperty(string fieldName, bool isNullable, short maxSize,
             byte precision,byte scale, Type expectedType)
         {
             string connectionName=RandomDataGenerator.Instance.GenerateString(10);
@@ -137,18 +137,15 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
 
 
             InitializeStandardSetup(connectionName);
-            MockReader.Read().Returns(true, false);
-
-            MockReader.GetString(0).Returns(stringFieldName);
-            MockReader.GetString(1).Returns(fieldName);
-            MockReader.GetInt32(2).Returns(isNullable);
-            MockReader.GetInt16(3).Returns(maxSize);
-            MockReader.GetByte(4).Returns(precision);
-            MockReader.GetByte(5).Returns(scale);
-
-            MockReader.GetBoolean(6).Returns(false);
-            MockReader.GetInt32(7).Returns(0);
-            MockReader.GetBoolean(88).Returns(false);
+            IList<DatabaseMappedClassPropertyDefinition> fieldList =
+            [
+                new DatabaseMappedClassPropertyDefinition
+                {
+                    IsComputed = true, IsNullable = isNullable, MappedType = expectedType, MaxSize = maxSize,
+                    Name = stringFieldName, Scale = scale, Precision = precision, SourceType = fieldName
+                }
+            ];
+            MockTestConnection.GetProperties(schemaName, tableName).Returns(fieldList);
             TableToClassBuilder testClass = new(MockTestDatabaseFactory);
 
             Type generateClassType= testClass.GenerateClassTypeFromTable(connectionName, schemaName, tableName);
@@ -192,87 +189,87 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
         }
 
         [DataTestMethod]
-        [DataRow("float", 0, (short)16,default(byte), default(byte),typeof(double))]
-        [DataRow("real", 0, (short)16,default(byte), default(byte),typeof(double))]
-        [DataRow("double", 0, (short)16,default(byte), default(byte),typeof(double))]
-        [DataRow("bigint", 0, (short)16,default(byte), default(byte),typeof(long))]
-        [DataRow("timestamp", 0, (short)16,default(byte), default(byte),typeof(long))]
-        [DataRow("long", 0, (short)16,default(byte), default(byte),typeof(long))]
-        [DataRow("varbinary", 0, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("image", 0, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("binary", 0, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("bytearray", 0, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("boolean", 0, (short)16,default(byte), default(byte),typeof(bool))]
-        [DataRow("bool", 0, (short)16,default(byte), default(byte),typeof(bool))]
-        [DataRow("bit", 0, (short)16,default(byte), default(byte),typeof(bool))]
-        [DataRow("date", 0, (short)16,default(byte), default(byte),typeof(DateTime))]
-        [DataRow("datetime", 0, (short)16,default(byte), default(byte),typeof(DateTime))]
-        [DataRow("smalldatetime", 0, (short)16,default(byte), default(byte),typeof(DateTime))]
-        [DataRow("datetime2", 0, (short)16,default(byte), default(byte),typeof(DateTime))]
-        [DataRow("datetimeoffset", 0, (short)16,default(byte), default(byte),typeof(DateTimeOffset))]
-        [DataRow("money", 0, (short)16,default(byte), default(byte),typeof(decimal))]
-        [DataRow("numeric", 0, (short)16,default(byte), default(byte),typeof(decimal))]
-        [DataRow("decimal", 0, (short)16,default(byte), default(byte),typeof(decimal))]
-        [DataRow("smallmoney", 0, (short)16,default(byte), default(byte),typeof(decimal))]
-        [DataRow("int", 0, (short)16,default(byte), default(byte),typeof(int))]
-        [DataRow("nchar", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("ntext", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("nvarchar", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("varchar", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("text", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("char", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("xml", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("smallint", 0, (short)16,default(byte), default(byte),typeof(short))]
-        [DataRow("short", 0, (short)16,default(byte), default(byte),typeof(short))]
-        [DataRow("time", 0, (short)16,default(byte), default(byte),typeof(TimeSpan))]
-        [DataRow("timespan", 0, (short)16,default(byte), default(byte),typeof(TimeSpan))]
-        [DataRow("tinyint", 0, (short)16,default(byte), default(byte),typeof(byte))]
-        [DataRow("byte", 0, (short)16,default(byte), default(byte),typeof(byte))]
-        [DataRow("uniqueidentifier", 0, (short)16,default(byte), default(byte),typeof(Guid))]
+        [DataRow("float", false, (short)16,default(byte), default(byte),typeof(double))]
+        [DataRow("real", false, (short)16,default(byte), default(byte),typeof(double))]
+        [DataRow("double", false, (short)16,default(byte), default(byte),typeof(double))]
+        [DataRow("bigint", false, (short)16,default(byte), default(byte),typeof(long))]
+        [DataRow("timestamp", false, (short)16,default(byte), default(byte),typeof(long))]
+        [DataRow("long", false, (short)16,default(byte), default(byte),typeof(long))]
+        [DataRow("varbinary", false, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("image", false, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("binary", false, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("bytearray", false, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("boolean", false, (short)16,default(byte), default(byte),typeof(bool))]
+        [DataRow("bool", false, (short)16,default(byte), default(byte),typeof(bool))]
+        [DataRow("bit", false, (short)16,default(byte), default(byte),typeof(bool))]
+        [DataRow("date", false, (short)16,default(byte), default(byte),typeof(DateTime))]
+        [DataRow("datetime", false, (short)16,default(byte), default(byte),typeof(DateTime))]
+        [DataRow("smalldatetime", false, (short)16,default(byte), default(byte),typeof(DateTime))]
+        [DataRow("datetime2", false, (short)16,default(byte), default(byte),typeof(DateTime))]
+        [DataRow("datetimeoffset", false, (short)16,default(byte), default(byte),typeof(DateTimeOffset))]
+        [DataRow("money", false, (short)16,default(byte), default(byte),typeof(decimal))]
+        [DataRow("numeric", false, (short)16,default(byte), default(byte),typeof(decimal))]
+        [DataRow("decimal", false, (short)16,default(byte), default(byte),typeof(decimal))]
+        [DataRow("smallmoney", false, (short)16,default(byte), default(byte),typeof(decimal))]
+        [DataRow("int", false, (short)16,default(byte), default(byte),typeof(int))]
+        [DataRow("nchar", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("ntext", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("nvarchar", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("varchar", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("text", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("char", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("xml", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("smallint", false, (short)16,default(byte), default(byte),typeof(short))]
+        [DataRow("short", false, (short)16,default(byte), default(byte),typeof(short))]
+        [DataRow("time", false, (short)16,default(byte), default(byte),typeof(TimeSpan))]
+        [DataRow("timespan", false, (short)16,default(byte), default(byte),typeof(TimeSpan))]
+        [DataRow("tinyint", false, (short)16,default(byte), default(byte),typeof(byte))]
+        [DataRow("byte", false, (short)16,default(byte), default(byte),typeof(byte))]
+        [DataRow("uniqueidentifier", false, (short)16,default(byte), default(byte),typeof(Guid))]
 
         
-        [DataRow("float", 1, (short)16,default(byte), default(byte),typeof(double?))]
-        [DataRow("real", 1, (short)16,default(byte), default(byte),typeof(double?))]
-        [DataRow("double", 1, (short)16,default(byte), default(byte),typeof(double?))]
-        [DataRow("bigint", 1, (short)16,default(byte), default(byte),typeof(long?))]
-        [DataRow("timestamp", 1, (short)16,default(byte), default(byte),typeof(long?))]
-        [DataRow("long", 1, (short)16,default(byte), default(byte),typeof(long?))]
+        [DataRow("float", true, (short)16,default(byte), default(byte),typeof(double?))]
+        [DataRow("real", true, (short)16,default(byte), default(byte),typeof(double?))]
+        [DataRow("double", true, (short)16,default(byte), default(byte),typeof(double?))]
+        [DataRow("bigint", true, (short)16,default(byte), default(byte),typeof(long?))]
+        [DataRow("timestamp", true, (short)16,default(byte), default(byte),typeof(long?))]
+        [DataRow("long", true, (short)16,default(byte), default(byte),typeof(long?))]
 
-        [DataRow("varbinary", 1, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("image", 1, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("binary", 1, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("bytearray", 1, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("varbinary", true, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("image", true, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("binary", true, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("bytearray", true, (short)16,default(byte), default(byte),typeof(byte[]))]
 
-        [DataRow("boolean", 1, (short)16,default(byte), default(byte),typeof(bool?))]
-        [DataRow("bool", 1, (short)16,default(byte), default(byte),typeof(bool?))]
-        [DataRow("bit", 1, (short)16,default(byte), default(byte),typeof(bool?))]
-        [DataRow("date", 1, (short)16,default(byte), default(byte),typeof(DateTime?))]
-        [DataRow("datetime", 1, (short)16,default(byte), default(byte),typeof(DateTime?))]
-        [DataRow("smalldatetime", 1, (short)16,default(byte), default(byte),typeof(DateTime?))]
-        [DataRow("datetime2", 1, (short)16,default(byte), default(byte),typeof(DateTime?))]
-        [DataRow("datetimeoffset", 1, (short)16,default(byte), default(byte),typeof(DateTimeOffset?))]
-        [DataRow("money", 1, (short)16,default(byte), default(byte),typeof(decimal?))]
-        [DataRow("numeric", 1, (short)16,default(byte), default(byte),typeof(decimal?))]
-        [DataRow("decimal", 1, (short)16,default(byte), default(byte),typeof(decimal?))]
-        [DataRow("smallmoney", 1, (short)16,default(byte), default(byte),typeof(decimal?))]
-        [DataRow("int", 1, (short)16,default(byte), default(byte),typeof(int?))]
+        [DataRow("boolean", true, (short)16,default(byte), default(byte),typeof(bool?))]
+        [DataRow("bool", true, (short)16,default(byte), default(byte),typeof(bool?))]
+        [DataRow("bit", true, (short)16,default(byte), default(byte),typeof(bool?))]
+        [DataRow("date", true, (short)16,default(byte), default(byte),typeof(DateTime?))]
+        [DataRow("datetime", true, (short)16,default(byte), default(byte),typeof(DateTime?))]
+        [DataRow("smalldatetime", true, (short)16,default(byte), default(byte),typeof(DateTime?))]
+        [DataRow("datetime2", true, (short)16,default(byte), default(byte),typeof(DateTime?))]
+        [DataRow("datetimeoffset", true, (short)16,default(byte), default(byte),typeof(DateTimeOffset?))]
+        [DataRow("money", true, (short)16,default(byte), default(byte),typeof(decimal?))]
+        [DataRow("numeric", true, (short)16,default(byte), default(byte),typeof(decimal?))]
+        [DataRow("decimal", true, (short)16,default(byte), default(byte),typeof(decimal?))]
+        [DataRow("smallmoney", true, (short)16,default(byte), default(byte),typeof(decimal?))]
+        [DataRow("int", true, (short)16,default(byte), default(byte),typeof(int?))]
 
-        [DataRow("nchar", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("ntext", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("nvarchar", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("varchar", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("text", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("char", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("xml", 1, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("nchar", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("ntext", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("nvarchar", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("varchar", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("text", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("char", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("xml", true, (short)16,default(byte), default(byte),typeof(string))]
 
-        [DataRow("smallint", 1, (short)16,default(byte), default(byte),typeof(short?))]
-        [DataRow("short", 1, (short)16,default(byte), default(byte),typeof(short?))]
-        [DataRow("time", 1, (short)16,default(byte), default(byte),typeof(TimeSpan?))]
-        [DataRow("timespan", 1, (short)16,default(byte), default(byte),typeof(TimeSpan?))]
-        [DataRow("tinyint", 1, (short)16,default(byte), default(byte),typeof(byte?))]
-        [DataRow("byte", 1, (short)16,default(byte), default(byte),typeof(byte?))]
-        [DataRow("uniqueidentifier", 1, (short)16,default(byte), default(byte),typeof(Guid?))]
-        public void GenerateClassTypeFromTable_FieldIsGenerated_AddsComputedColumnAttribute(string fieldName, int isNullable, short maxSize,
+        [DataRow("smallint", true, (short)16,default(byte), default(byte),typeof(short?))]
+        [DataRow("short", true, (short)16,default(byte), default(byte),typeof(short?))]
+        [DataRow("time", true, (short)16,default(byte), default(byte),typeof(TimeSpan?))]
+        [DataRow("timespan", true, (short)16,default(byte), default(byte),typeof(TimeSpan?))]
+        [DataRow("tinyint", true, (short)16,default(byte), default(byte),typeof(byte?))]
+        [DataRow("byte", true, (short)16,default(byte), default(byte),typeof(byte?))]
+        [DataRow("uniqueidentifier", true, (short)16,default(byte), default(byte),typeof(Guid?))]
+        public void GenerateClassTypeFromTable_FieldIsGenerated_AddsComputedColumnAttribute(string fieldName, bool isNullable, short maxSize,
             byte precision,byte scale, Type expectedType)
         {
             string connectionName=RandomDataGenerator.Instance.GenerateString(10);
@@ -283,6 +280,16 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
 
 
             InitializeStandardSetup(connectionName);
+            IList<DatabaseMappedClassPropertyDefinition> fieldList =
+            [
+                new()
+                {
+                    IsComputed = true, IsNullable = isNullable, MappedType = expectedType, MaxSize = maxSize,
+                    Name = stringFieldName, Scale = scale, Precision = precision, SourceType = fieldName
+                }
+            ];
+            MockTestConnection.GetProperties(schemaName, tableName).Returns(fieldList);
+            /*
             MockReader.Read().Returns(true, false);
 
             MockReader.GetString(0).Returns(stringFieldName);
@@ -295,6 +302,7 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
             MockReader.GetInt32(6).Returns(1);
             MockReader.GetInt32(7).Returns(0);
             MockReader.GetBoolean(8).Returns(false);
+            */
             TableToClassBuilder testClass = new(MockTestDatabaseFactory);
 
             Type generateClassType= testClass.GenerateClassTypeFromTable(connectionName, schemaName, tableName);
@@ -308,87 +316,87 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
 
         
         [DataTestMethod]
-        [DataRow("float", 0, (short)16,default(byte), default(byte),typeof(double))]
-        [DataRow("real", 0, (short)16,default(byte), default(byte),typeof(double))]
-        [DataRow("double", 0, (short)16,default(byte), default(byte),typeof(double))]
-        [DataRow("bigint", 0, (short)16,default(byte), default(byte),typeof(long))]
-        [DataRow("timestamp", 0, (short)16,default(byte), default(byte),typeof(long))]
-        [DataRow("long", 0, (short)16,default(byte), default(byte),typeof(long))]
-        [DataRow("varbinary", 0, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("image", 0, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("binary", 0, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("bytearray", 0, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("boolean", 0, (short)16,default(byte), default(byte),typeof(bool))]
-        [DataRow("bool", 0, (short)16,default(byte), default(byte),typeof(bool))]
-        [DataRow("bit", 0, (short)16,default(byte), default(byte),typeof(bool))]
-        [DataRow("date", 0, (short)16,default(byte), default(byte),typeof(DateTime))]
-        [DataRow("datetime", 0, (short)16,default(byte), default(byte),typeof(DateTime))]
-        [DataRow("smalldatetime", 0, (short)16,default(byte), default(byte),typeof(DateTime))]
-        [DataRow("datetime2", 0, (short)16,default(byte), default(byte),typeof(DateTime))]
-        [DataRow("datetimeoffset", 0, (short)16,default(byte), default(byte),typeof(DateTimeOffset))]
-        [DataRow("money", 0, (short)16,default(byte), default(byte),typeof(decimal))]
-        [DataRow("numeric", 0, (short)16,default(byte), default(byte),typeof(decimal))]
-        [DataRow("decimal", 0, (short)16,default(byte), default(byte),typeof(decimal))]
-        [DataRow("smallmoney", 0, (short)16,default(byte), default(byte),typeof(decimal))]
-        [DataRow("int", 0, (short)16,default(byte), default(byte),typeof(int))]
-        [DataRow("nchar", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("ntext", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("nvarchar", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("varchar", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("text", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("char", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("xml", 0, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("smallint", 0, (short)16,default(byte), default(byte),typeof(short))]
-        [DataRow("short", 0, (short)16,default(byte), default(byte),typeof(short))]
-        [DataRow("time", 0, (short)16,default(byte), default(byte),typeof(TimeSpan))]
-        [DataRow("timespan", 0, (short)16,default(byte), default(byte),typeof(TimeSpan))]
-        [DataRow("tinyint", 0, (short)16,default(byte), default(byte),typeof(byte))]
-        [DataRow("byte", 0, (short)16,default(byte), default(byte),typeof(byte))]
-        [DataRow("uniqueidentifier", 0, (short)16,default(byte), default(byte),typeof(Guid))]
+        [DataRow("float", false, (short)16,default(byte), default(byte),typeof(double))]
+        [DataRow("real", false, (short)16,default(byte), default(byte),typeof(double))]
+        [DataRow("double", false, (short)16,default(byte), default(byte),typeof(double))]
+        [DataRow("bigint", false, (short)16,default(byte), default(byte),typeof(long))]
+        [DataRow("timestamp", false, (short)16,default(byte), default(byte),typeof(long))]
+        [DataRow("long", false, (short)16,default(byte), default(byte),typeof(long))]
+        [DataRow("varbinary", false, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("image", false, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("binary", false, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("bytearray", false, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("boolean", false, (short)16,default(byte), default(byte),typeof(bool))]
+        [DataRow("bool", false, (short)16,default(byte), default(byte),typeof(bool))]
+        [DataRow("bit", false, (short)16,default(byte), default(byte),typeof(bool))]
+        [DataRow("date", false, (short)16,default(byte), default(byte),typeof(DateTime))]
+        [DataRow("datetime", false, (short)16,default(byte), default(byte),typeof(DateTime))]
+        [DataRow("smalldatetime", false, (short)16,default(byte), default(byte),typeof(DateTime))]
+        [DataRow("datetime2", false, (short)16,default(byte), default(byte),typeof(DateTime))]
+        [DataRow("datetimeoffset", false, (short)16,default(byte), default(byte),typeof(DateTimeOffset))]
+        [DataRow("money", false, (short)16,default(byte), default(byte),typeof(decimal))]
+        [DataRow("numeric", false, (short)16,default(byte), default(byte),typeof(decimal))]
+        [DataRow("decimal", false, (short)16,default(byte), default(byte),typeof(decimal))]
+        [DataRow("smallmoney", false, (short)16,default(byte), default(byte),typeof(decimal))]
+        [DataRow("int", false, (short)16,default(byte), default(byte),typeof(int))]
+        [DataRow("nchar", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("ntext", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("nvarchar", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("varchar", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("text", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("char", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("xml", false, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("smallint", false, (short)16,default(byte), default(byte),typeof(short))]
+        [DataRow("short", false, (short)16,default(byte), default(byte),typeof(short))]
+        [DataRow("time", false, (short)16,default(byte), default(byte),typeof(TimeSpan))]
+        [DataRow("timespan", false, (short)16,default(byte), default(byte),typeof(TimeSpan))]
+        [DataRow("tinyint", false, (short)16,default(byte), default(byte),typeof(byte))]
+        [DataRow("byte", false, (short)16,default(byte), default(byte),typeof(byte))]
+        [DataRow("uniqueidentifier", false, (short)16,default(byte), default(byte),typeof(Guid))]
 
         
-        [DataRow("float", 1, (short)16,default(byte), default(byte),typeof(double?))]
-        [DataRow("real", 1, (short)16,default(byte), default(byte),typeof(double?))]
-        [DataRow("double", 1, (short)16,default(byte), default(byte),typeof(double?))]
-        [DataRow("bigint", 1, (short)16,default(byte), default(byte),typeof(long?))]
-        [DataRow("timestamp", 1, (short)16,default(byte), default(byte),typeof(long?))]
-        [DataRow("long", 1, (short)16,default(byte), default(byte),typeof(long?))]
+        [DataRow("float", true, (short)16,default(byte), default(byte),typeof(double?))]
+        [DataRow("real", true, (short)16,default(byte), default(byte),typeof(double?))]
+        [DataRow("double", true, (short)16,default(byte), default(byte),typeof(double?))]
+        [DataRow("bigint", true, (short)16,default(byte), default(byte),typeof(long?))]
+        [DataRow("timestamp", true, (short)16,default(byte), default(byte),typeof(long?))]
+        [DataRow("long", true, (short)16,default(byte), default(byte),typeof(long?))]
 
-        [DataRow("varbinary", 1, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("image", 1, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("binary", 1, (short)16,default(byte), default(byte),typeof(byte[]))]
-        [DataRow("bytearray", 1, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("varbinary", true, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("image", true, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("binary", true, (short)16,default(byte), default(byte),typeof(byte[]))]
+        [DataRow("bytearray", true, (short)16,default(byte), default(byte),typeof(byte[]))]
 
-        [DataRow("boolean", 1, (short)16,default(byte), default(byte),typeof(bool?))]
-        [DataRow("bool", 1, (short)16,default(byte), default(byte),typeof(bool?))]
-        [DataRow("bit", 1, (short)16,default(byte), default(byte),typeof(bool?))]
-        [DataRow("date", 1, (short)16,default(byte), default(byte),typeof(DateTime?))]
-        [DataRow("datetime", 1, (short)16,default(byte), default(byte),typeof(DateTime?))]
-        [DataRow("smalldatetime", 1, (short)16,default(byte), default(byte),typeof(DateTime?))]
-        [DataRow("datetime2", 1, (short)16,default(byte), default(byte),typeof(DateTime?))]
-        [DataRow("datetimeoffset", 1, (short)16,default(byte), default(byte),typeof(DateTimeOffset?))]
-        [DataRow("money", 1, (short)16,default(byte), default(byte),typeof(decimal?))]
-        [DataRow("numeric", 1, (short)16,default(byte), default(byte),typeof(decimal?))]
-        [DataRow("decimal", 1, (short)16,default(byte), default(byte),typeof(decimal?))]
-        [DataRow("smallmoney", 1, (short)16,default(byte), default(byte),typeof(decimal?))]
-        [DataRow("int", 1, (short)16,default(byte), default(byte),typeof(int?))]
+        [DataRow("boolean", true, (short)16,default(byte), default(byte),typeof(bool?))]
+        [DataRow("bool", true, (short)16,default(byte), default(byte),typeof(bool?))]
+        [DataRow("bit", true, (short)16,default(byte), default(byte),typeof(bool?))]
+        [DataRow("date", true, (short)16,default(byte), default(byte),typeof(DateTime?))]
+        [DataRow("datetime", true, (short)16,default(byte), default(byte),typeof(DateTime?))]
+        [DataRow("smalldatetime", true, (short)16,default(byte), default(byte),typeof(DateTime?))]
+        [DataRow("datetime2", true, (short)16,default(byte), default(byte),typeof(DateTime?))]
+        [DataRow("datetimeoffset", true, (short)16,default(byte), default(byte),typeof(DateTimeOffset?))]
+        [DataRow("money", true, (short)16,default(byte), default(byte),typeof(decimal?))]
+        [DataRow("numeric", true, (short)16,default(byte), default(byte),typeof(decimal?))]
+        [DataRow("decimal", true, (short)16,default(byte), default(byte),typeof(decimal?))]
+        [DataRow("smallmoney", true, (short)16,default(byte), default(byte),typeof(decimal?))]
+        [DataRow("int", true, (short)16,default(byte), default(byte),typeof(int?))]
 
-        [DataRow("nchar", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("ntext", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("nvarchar", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("varchar", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("text", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("char", 1, (short)16,default(byte), default(byte),typeof(string))]
-        [DataRow("xml", 1, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("nchar", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("ntext", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("nvarchar", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("varchar", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("text", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("char", true, (short)16,default(byte), default(byte),typeof(string))]
+        [DataRow("xml", true, (short)16,default(byte), default(byte),typeof(string))]
 
-        [DataRow("smallint", 1, (short)16,default(byte), default(byte),typeof(short?))]
-        [DataRow("short", 1, (short)16,default(byte), default(byte),typeof(short?))]
-        [DataRow("time", 1, (short)16,default(byte), default(byte),typeof(TimeSpan?))]
-        [DataRow("timespan", 1, (short)16,default(byte), default(byte),typeof(TimeSpan?))]
-        [DataRow("tinyint", 1, (short)16,default(byte), default(byte),typeof(byte?))]
-        [DataRow("byte", 1, (short)16,default(byte), default(byte),typeof(byte?))]
-        [DataRow("uniqueidentifier", 1, (short)16,default(byte), default(byte),typeof(Guid?))]
-        public void GenerateObjectFromTable_NonGeneratedFields_CreatesProperty(string fieldName, int isNullable, short maxSize,
+        [DataRow("smallint", true, (short)16,default(byte), default(byte),typeof(short?))]
+        [DataRow("short", true, (short)16,default(byte), default(byte),typeof(short?))]
+        [DataRow("time", true, (short)16,default(byte), default(byte),typeof(TimeSpan?))]
+        [DataRow("timespan", true, (short)16,default(byte), default(byte),typeof(TimeSpan?))]
+        [DataRow("tinyint", true, (short)16,default(byte), default(byte),typeof(byte?))]
+        [DataRow("byte", true, (short)16,default(byte), default(byte),typeof(byte?))]
+        [DataRow("uniqueidentifier", true, (short)16,default(byte), default(byte),typeof(Guid?))]
+        public void GenerateObjectFromTable_NonGeneratedFields_CreatesProperty(string fieldName, bool isNullable,  short maxSize,
             byte precision,byte scale, Type expectedType)
         {
             string connectionName=RandomDataGenerator.Instance.GenerateString(10);
@@ -399,18 +407,15 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
 
 
             InitializeStandardSetup(connectionName);
-            MockReader.Read().Returns(true, false);
-
-            MockReader.GetString(0).Returns(stringFieldName);
-            MockReader.GetString(1).Returns(fieldName);
-            MockReader.GetInt32(2).Returns(isNullable);
-            MockReader.GetInt16(3).Returns(maxSize);
-            MockReader.GetByte(4).Returns(precision);
-            MockReader.GetByte(5).Returns(scale);
-
-            MockReader.GetBoolean(6).Returns(false);
-            MockReader.GetInt32(7).Returns(0);
-            MockReader.GetBoolean(8).Returns(false);
+            IList<DatabaseMappedClassPropertyDefinition> fieldList =
+            [
+                new DatabaseMappedClassPropertyDefinition
+                {
+                    IsComputed = false, IsNullable = isNullable, MappedType = expectedType, MaxSize = maxSize,
+                    Name = stringFieldName, Scale = scale, Precision = precision, SourceType = fieldName
+                }
+            ];
+            MockTestConnection.GetProperties(schemaName, tableName).Returns(fieldList);
             TableToClassBuilder testClass = new(MockTestDatabaseFactory);
 
             dynamic generateClass = testClass.GenerateObjectFromTable(connectionName, schemaName, tableName)!;
@@ -449,10 +454,19 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
             MockReader.GetInt32(7).Returns(0);
             MockReader.GetBoolean(8).Returns(false);
             TableToClassBuilder testClass = new(MockTestDatabaseFactory);
-
+            MockTestConnection.GetProperties(schemaName, tableName).Returns(
+                [
+                    new()
+                    {
+                        IsComputed = false, IsNullable = false, Name = stringFieldName, SourceType = fieldtype,
+                        MappedType = typeof(int), Scale = scale, Precision = precision, MaxSize = maxSize
+                    }
+                ]);
             dynamic generateClass = testClass.GenerateObjectFromTable(connectionName, schemaName, tableName)!;
             Type generateClassType= generateClass.GetType();
-            PropertyInfo? info = generateClassType.GetProperties().FirstOrDefault(p=>p.Name==stringFieldName);
+            PropertyInfo? info = generateClassType.GetProperties().FirstOrDefault(p=>
+                string.Compare( p.Name,stringFieldName, StringComparison.CurrentCultureIgnoreCase)==0
+                );
             info.Should().NotBeNull();
             ((int)generateClass.MyInt).Should().Be(0);
             generateClass.MyInt = testValue;

@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Data;
+using System.Data.SqlClient;
 using System.Globalization;
 using Bambit.TestUtility.DatabaseTools.SpecFlow.Mapping;
+using Bambit.TestUtility.DatabaseTools.SqlServer;
 using Bambit.TestUtility.DataGeneration;
 using Bambit.TestUtility.TestHelper;
 using FluentAssertions;
@@ -503,7 +505,9 @@ public class MappedRowTest
         MappedTable mappedTable = new(table);
 
         MappedRow mappedRow = new(mappedTable, table.Rows.First());
-        mappedRow.GetDbValue(0,"null").Should().BeEquivalentTo(expectedValue);
+        mappedRow.GetDbValue(0,"null",
+            new SqlServerTestDbConnection(new SqlConnection())
+            ).Should().BeEquivalentTo(expectedValue);
     }
 
 
@@ -517,7 +521,7 @@ public class MappedRowTest
         MappedTable mappedTable = new(table);
         string fieldName = header.Contains('@') ? header[..(header.IndexOf("@", StringComparison.CurrentCultureIgnoreCase) - 1)].Trim() : header;
         MappedRow mappedRow = new(mappedTable, table.Rows.First());
-        mappedRow.GetDbValue(fieldName,"null").Should().BeEquivalentTo(expectedValue);
+        mappedRow.GetDbValue(fieldName,"null",new SqlServerTestDbConnection(new SqlConnection())).Should().BeEquivalentTo(expectedValue);
     }
 
 
@@ -530,7 +534,7 @@ public class MappedRowTest
         MappedTable mappedTable = new(table);
         string fieldName = "MissingField";
         MappedRow mappedRow = new(mappedTable, table.Rows.First());
-        mappedRow.GetDbValue(fieldName,"null").Should().Be(DBNull.Value);
+        mappedRow.GetDbValue(fieldName,"null",new SqlServerTestDbConnection(new SqlConnection())).Should().Be(DBNull.Value);
     }
 
     #endregion GetDbValue

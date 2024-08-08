@@ -56,7 +56,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             if (!string.IsNullOrWhiteSpace(token) && StateManager.Variables.TryGetValue(token, out object? value))
             {
                 return (value is DateTime dateTime
-                    ? dateTime.ToString("yyyy-MM-dd HH:mm:ss.FFF")
+                    ? dateTime.ToString("yyyy-MM-dd HH:mm:ss.FFFFFF")
                     : value as string);
             }
 
@@ -67,7 +67,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
         /// Provides assertions and readable results from a <see cref="DataComparisonResults"/>
         /// </summary>
         /// <param name="results">The results to compare</param>
-        protected void VerifyCompareResults(DataComparisonResults results)
+        protected static void VerifyCompareResults(DataComparisonResults results)
         {
             if (results.IsSuccess)
                 return;

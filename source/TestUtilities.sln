@@ -15,15 +15,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.Database
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.DatabaseTools.Tests", "tests\Bambit.TestUtility.DatabaseTools.Tests\Bambit.TestUtility.DatabaseTools.Tests.csproj", "{44B00C2A-25D8-4C17-B251-48BE6748126B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.DatabaseTools.SqlServer", "libraries\Bambit.TestUtility.DatabaseTools.SqlServer\Bambit.TestUtility.DatabaseTools.SqlServer.csproj", "{2A725EAE-25EF-44A1-9DF8-1D7596035182}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.DatabaseTools.SqlServer", "libraries\Bambit.TestUtility.DatabaseTools.SqlServer\Bambit.TestUtility.DatabaseTools.SqlServer.csproj", "{2A725EAE-25EF-44A1-9DF8-1D7596035182}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.DatabaseTools.SqlServer.Tests", "tests\Bambit.TestUtility.DatabaseTools.SqlServer.Tests\Bambit.TestUtility.DatabaseTools.SqlServer.Tests.csproj", "{A2C24BD6-958B-40C7-8E9D-7BF6FF92782B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.DatabaseTools.SqlServer.Tests", "tests\Bambit.TestUtility.DatabaseTools.SqlServer.Tests\Bambit.TestUtility.DatabaseTools.SqlServer.Tests.csproj", "{A2C24BD6-958B-40C7-8E9D-7BF6FF92782B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.DatabaseTools.SpecFlow", "libraries\Bambit.TestUtility.DatabaseTools.SpecFlow\Bambit.TestUtility.DatabaseTools.SpecFlow.csproj", "{45BA9317-2525-448E-A92C-CFDF028B4493}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.DatabaseTools.SpecFlow", "libraries\Bambit.TestUtility.DatabaseTools.SpecFlow\Bambit.TestUtility.DatabaseTools.SpecFlow.csproj", "{45BA9317-2525-448E-A92C-CFDF028B4493}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.DatabaseTools.SpecFlow.Tests", "tests\Bambit.TestUtility.DatabaseTools.SpecFlow.Tests\Bambit.TestUtility.DatabaseTools.SpecFlow.Tests.csproj", "{B1F31086-2698-4AFE-A558-7AA6B9D03B7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.DatabaseTools.SpecFlow.Tests", "tests\Bambit.TestUtility.DatabaseTools.SpecFlow.Tests\Bambit.TestUtility.DatabaseTools.SpecFlow.Tests.csproj", "{B1F31086-2698-4AFE-A558-7AA6B9D03B7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bambit.TestUtility.TestHelper", "tests\Bambit.TestUtility.TestHelper\Bambit.TestUtility.TestHelper.csproj", "{6F771A44-FC3F-4ED3-BB47-56B32ED1EDDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.TestHelper", "tests\Bambit.TestUtility.TestHelper\Bambit.TestUtility.TestHelper.csproj", "{6F771A44-FC3F-4ED3-BB47-56B32ED1EDDB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.DatabaseTools.Postgres", "libraries\Bambit.TestUtility.DatabaseTools.Postgres\Bambit.TestUtility.DatabaseTools.Postgres.csproj", "{F5C4447F-86EF-40BE-8C34-14086FD594D9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bambit.TestUtility.DatabaseTools.Postgres.Tests", "tests\Bambit.TestUtility.DatabaseTools.Postgres.Tests\Bambit.TestUtility.DatabaseTools.Postgres.Tests.csproj", "{A8A9F7EF-B734-445D-A69A-3AB3DEBED430}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +71,14 @@ Global
 		{6F771A44-FC3F-4ED3-BB47-56B32ED1EDDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F771A44-FC3F-4ED3-BB47-56B32ED1EDDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F771A44-FC3F-4ED3-BB47-56B32ED1EDDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5C4447F-86EF-40BE-8C34-14086FD594D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5C4447F-86EF-40BE-8C34-14086FD594D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5C4447F-86EF-40BE-8C34-14086FD594D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5C4447F-86EF-40BE-8C34-14086FD594D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8A9F7EF-B734-445D-A69A-3AB3DEBED430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8A9F7EF-B734-445D-A69A-3AB3DEBED430}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8A9F7EF-B734-445D-A69A-3AB3DEBED430}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8A9F7EF-B734-445D-A69A-3AB3DEBED430}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,6 +93,8 @@ Global
 		{45BA9317-2525-448E-A92C-CFDF028B4493} = {AE3CBE26-A480-4AFF-AAEA-2B1F5D36F49F}
 		{B1F31086-2698-4AFE-A558-7AA6B9D03B7F} = {6881F3C9-BCA5-4654-B19D-8BE33E29DF3A}
 		{6F771A44-FC3F-4ED3-BB47-56B32ED1EDDB} = {6881F3C9-BCA5-4654-B19D-8BE33E29DF3A}
+		{F5C4447F-86EF-40BE-8C34-14086FD594D9} = {AE3CBE26-A480-4AFF-AAEA-2B1F5D36F49F}
+		{A8A9F7EF-B734-445D-A69A-3AB3DEBED430} = {6881F3C9-BCA5-4654-B19D-8BE33E29DF3A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {72AB2818-10DE-41CE-AA3D-7AB2CC3ED1FB}

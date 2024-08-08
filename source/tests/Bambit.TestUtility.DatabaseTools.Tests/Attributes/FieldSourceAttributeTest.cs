@@ -12,8 +12,9 @@ public class FieldSourceAttributeTest
     public void Ctor_SetsNameAsExpected()
     {
         string testName = RandomDataGenerator.Instance.GenerateString(10);
+        Type testType = typeof(string);
         string sourceType = RandomDataGenerator.Instance.GenerateString(10);
-        FieldSourceAttribute attribute = new(testName,sourceType);
+        FieldSourceAttribute attribute = new(testName,testType, sourceType);
         attribute.Name.Should().Be(testName);
     }
     
@@ -22,9 +23,23 @@ public class FieldSourceAttributeTest
     {
         string testName = RandomDataGenerator.Instance.GenerateString(10);
         string sourceType = RandomDataGenerator.Instance.GenerateString(10);
-        FieldSourceAttribute attribute = new(testName,sourceType);
+        Type testType = typeof(string);
+        FieldSourceAttribute attribute = new(testName,testType, sourceType);
         attribute.SourceType.Should().Be(sourceType);
     }
     
+    
+    [TestMethod]
+    public void Ctor_SetsMappedTypeAsExpected()
+    {
+        string testName = RandomDataGenerator.Instance.GenerateString(10);
+        string sourceType = RandomDataGenerator.Instance.GenerateString(10);
+        Type testType = typeof(string);
+        FieldSourceAttribute attribute = new(testName,testType, sourceType);
+        attribute.MappedType.Should().Be(testType);
+        Type testType2 = typeof(DateTime);
+         attribute = new(testName,testType2, sourceType);
+        attribute.MappedType.Should().Be(testType2);
+    }
 
 }

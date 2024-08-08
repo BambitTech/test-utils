@@ -1,5 +1,6 @@
 ﻿using System.Data.SqlClient;
 using Bambit.TestUtility.DatabaseTools.SpecFlow.Mapping;
+using Npgsql;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Infrastructure;
 
@@ -16,6 +17,12 @@ public class LocalSteps(ScenarioContext context, ISpecFlowOutputHelper outputHel
         try
         {
             connection.ExecuteQuery(query);
+        }
+        catch (NpgsqlException npgsqlException )
+        {
+            if(npgsqlException.InnerException is TimeoutException)
+                return;
+            throw;
         }
         catch (SqlException sqlException)
         {

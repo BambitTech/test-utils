@@ -15,7 +15,7 @@ public class DatabaseRandomizerTest
     [TableSource(ConnectionName, Schema,TableName)]
     public class RegisteredTestClass
     {
-        [FieldSource(FieldName, "string")] public string TestField { get; set; } = null!;
+        [FieldSource(FieldName,typeof(string), "string")] public string TestField { get; set; } = null!;
     }
 
     public class UnregisteredTestClass

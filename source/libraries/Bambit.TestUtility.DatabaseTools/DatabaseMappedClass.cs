@@ -41,12 +41,34 @@ namespace Bambit.TestUtility.DatabaseTools
         /// <remarks>Used if not implementing class as a dynamic</remarks>
         public T?  GetValue<T>(string propertyName)
         {
-            PropertyInfo propertyInfo = GetType().GetProperties().FirstOrDefault(p => p.Name == propertyName) ??
+            PropertyInfo propertyInfo = GetType().GetProperties().FirstOrDefault(p =>
+                                            string.Compare(
+                                            p.Name ,propertyName, StringComparison.CurrentCultureIgnoreCase)==0
+
+                                            ) ??
                                          throw new ArgumentException("No such property exists", nameof(propertyName));
             object? value = propertyInfo.GetValue(this);
             return value == null ? default : (T)value;
         }
+        
+        /// <summary>
+        /// Retrieves the property on the class with the specified name
+        /// </summary>
+        /// <typeparam name="T">The data type of the property</typeparam>
+        /// <param name="propertyName">The name of the property to retrieve</param>
+        /// <returns>The value of the field</returns>
+        /// <exception cref="ArgumentException">The specified property name does not exist on the class</exception>
+        /// <remarks>Used if not implementing class as a dynamic</remarks>
+        public object?  GetValue(string propertyName)
+        {
+            PropertyInfo propertyInfo = GetType().GetProperties().FirstOrDefault(p =>
+                                            string.Compare(
+                                                p.Name ,propertyName, StringComparison.CurrentCultureIgnoreCase)==0
 
+                                        ) ??
+                                        throw new ArgumentException("No such property exists", nameof(propertyName));
+            return propertyInfo.GetValue(this);
+        }
         /// <summary>
         /// Assigns the supplied value against the property info
         /// </summary>

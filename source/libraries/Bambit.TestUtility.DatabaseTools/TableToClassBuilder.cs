@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Data;
 using System.Reflection.Emit;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -8,7 +7,6 @@ using Bambit.TestUtility.DatabaseTools.Exceptions;
 using Bambit.TestUtility.DataGeneration.Attributes;
 
 namespace Bambit.TestUtility.DatabaseTools;
-
 
 /// <summary>
 /// Provides methods to dynamically generate a class from a table definition
@@ -24,22 +22,6 @@ public class TableToClassBuilder(ITestDatabaseFactory testDatabaseFactory) : ITa
     /// </summary>
     protected ITestDatabaseFactory TestDatabaseFactory { get; } = testDatabaseFactory;
 
-    /// <summary>
-    /// Internal structure used when generating classes
-    /// </summary>
-    struct PropertyDefinition
-    {
-        public string Name { get; init; }
-        public string Type { get; init; }
-        public bool IsNullable { get; init; }
-        public int MaxSize { get; init; }
-        public byte Precision { get; init; }
-        public byte Scale { get; init; }
-        public bool IsComputed { get; init; }
-
-
-    }
-
     #region ITableToClassBuilder implementatioon
 
     /// <inheritdoc />
@@ -53,7 +35,7 @@ public class TableToClassBuilder(ITestDatabaseFactory testDatabaseFactory) : ITa
     public Type GenerateClassTypeFromTable(string catalogRecordName, string schemaName, string tableName)
     {
 
-        IList<PropertyDefinition> propertyDefinitions = GetProperties(catalogRecordName, schemaName, tableName);
+        IList<DatabaseMappedClassPropertyDefinition> propertyDefinitions = GetProperties(catalogRecordName, schemaName, tableName);
 
         IDatabaseCatalogRecord databaseCatalogRecord = TestDatabaseFactory.GetGenerator(catalogRecordName);
         TypeBuilder builder =
@@ -70,7 +52,7 @@ public class TableToClassBuilder(ITestDatabaseFactory testDatabaseFactory) : ITa
                                          MethodAttributes.RTSpecialName);
 
         // NOTE: assuming your list contains Field objects with fields FieldName(string) and FieldType(Type)
-        foreach (PropertyDefinition propertyDefinition in propertyDefinitions)
+        foreach (DatabaseMappedClassPropertyDefinition propertyDefinition in propertyDefinitions)
             try
             {
                 CreateProperty(builder, propertyDefinition);
@@ -95,22 +77,22 @@ public class TableToClassBuilder(ITestDatabaseFactory testDatabaseFactory) : ITa
         return RemoveNonAlphaNumericRegex.Replace(input, string.Empty);
     }
 
-    private static void CreateProperty(TypeBuilder builder, PropertyDefinition propertyDefinition)
+    private static void CreateProperty(TypeBuilder builder, DatabaseMappedClassPropertyDefinition propertyDefinition)
     {
-        Type? propertyType = GetPropertyType(propertyDefinition);
-        if (propertyType == null)
+        if (propertyDefinition.MappedType==null)
         {
             return;
         }
+      
 
-        Type? underlyingType = Nullable.GetUnderlyingType(propertyType);
+        Type? underlyingType = Nullable.GetUnderlyingType(propertyDefinition.MappedType);
         string safeName = Clean(propertyDefinition.Name);
-        FieldBuilder fieldBuilder = builder.DefineField($"_{safeName}", propertyType, FieldAttributes.Private);
+        FieldBuilder fieldBuilder = builder.DefineField($"_{safeName}", propertyDefinition.MappedType, FieldAttributes.Private);
 
         PropertyBuilder propertyBuilder = builder.DefineProperty(safeName, PropertyAttributes.HasDefault,
-            propertyType, null);
+            propertyDefinition.MappedType, null);
         MethodBuilder getBuilder = builder.DefineMethod($"get_{safeName}",
-            MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig, propertyType,
+            MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig, propertyDefinition.MappedType,
             Type.EmptyTypes);
         ILGenerator getIl = getBuilder.GetILGenerator();
 
@@ -123,7 +105,7 @@ public class TableToClassBuilder(ITestDatabaseFactory testDatabaseFactory) : ITa
                 MethodAttributes.Public |
                 MethodAttributes.SpecialName |
                 MethodAttributes.HideBySig,
-                null, new[] { propertyType });
+                null, [propertyDefinition.MappedType]);
 
         ILGenerator setIl = setBuilder.GetILGenerator();
         Label modifyProperty = setIl.DefineLabel();
@@ -142,11 +124,11 @@ public class TableToClassBuilder(ITestDatabaseFactory testDatabaseFactory) : ITa
         propertyBuilder.SetSetMethod(setBuilder);
 
         Type fieldSourceAttributeType = typeof(FieldSourceAttribute);
-        ConstructorInfo ci = fieldSourceAttributeType.GetConstructor([typeof(string), typeof(string)])!;
-        CustomAttributeBuilder cab = new(ci, [propertyDefinition.Name, propertyDefinition.Type]);
+        ConstructorInfo ci = fieldSourceAttributeType.GetConstructor([typeof(string),typeof(Type), typeof(string)])!;
+        CustomAttributeBuilder cab = new(ci, [propertyDefinition.Name, propertyDefinition.MappedType, propertyDefinition.SourceType]);
         propertyBuilder.SetCustomAttribute(cab);
 
-        if (propertyType == typeof(string) && propertyDefinition.MaxSize > 0)
+        if (propertyDefinition.MappedType == typeof(string) && propertyDefinition.MaxSize > 0)
         {
 
             Type maxLengthType = typeof(MaxLengthAttribute);
@@ -154,13 +136,13 @@ public class TableToClassBuilder(ITestDatabaseFactory testDatabaseFactory) : ITa
             cab = new CustomAttributeBuilder(ci, [propertyDefinition.MaxSize]);
             propertyBuilder.SetCustomAttribute(cab);
         }
-        else if (propertyType == typeof(float) || propertyType == typeof(decimal)
-                                               || propertyType == typeof(double)
-                                               || (
-                                                   underlyingType != null &&
-                                                   (underlyingType == typeof(float) || underlyingType == typeof(decimal)
-                                                       || underlyingType == typeof(double)
-                                                   )))
+        else if (propertyDefinition.MappedType == typeof(float) || propertyDefinition.MappedType == typeof(decimal)
+                                                                || propertyDefinition.MappedType == typeof(double)
+                                                                || (
+                                                                    underlyingType != null &&
+                                                                    (underlyingType == typeof(float) || underlyingType == typeof(decimal)
+                                                                        || underlyingType == typeof(double)
+                                                                    )))
         {
             Type precisionAttribute = typeof(DecimalPrecisionAttribute);
             ci = precisionAttribute.GetConstructor([typeof(byte), typeof(byte)])!;
@@ -178,84 +160,6 @@ public class TableToClassBuilder(ITestDatabaseFactory testDatabaseFactory) : ITa
         }
     }
 
-    private static Type? GetPropertyType(PropertyDefinition propertyDefinition)
-    {
-        Type? type;
-        switch (propertyDefinition.Type)
-        {
-            case "bigint":
-            case "timestamp":
-            case "long":
-                type = propertyDefinition.IsNullable ? typeof(long?) : typeof(long);
-                break;
-            case "image":
-            case "binary":
-            case "varbinary":
-            case "bytearray":
-                type = typeof(byte[]);
-                break;
-            case "bit":
-            case "boolean":
-            case "bool":
-                type = propertyDefinition.IsNullable ? typeof(bool?) : typeof(bool);
-                break;
-            case "date":
-            case "datetime":
-            case "datetime2":
-            case "smalldatetime":
-                type = propertyDefinition.IsNullable ? typeof(DateTime?) : typeof(DateTime);
-                break;
-            case "datetimeoffset":
-                type = propertyDefinition.IsNullable ? typeof(DateTimeOffset?) : typeof(DateTimeOffset);
-                break;
-            case "money":
-            case "numeric":
-            case "smallmoney":
-            case "decimal":
-                type = propertyDefinition.IsNullable ? typeof(decimal?) : typeof(decimal);
-                break;
-            case "real":
-            case "float":
-            case "double":
-                type = propertyDefinition.IsNullable ? typeof(double?) : typeof(double);
-                break;
-            case "int":
-                type = propertyDefinition.IsNullable ? typeof(int?) : typeof(int);
-                break;
-            case "nchar":
-            case "ntext":
-            case "nvarchar":
-            case "varchar":
-            case "text":
-            case "char":
-            case "xml":
-                type = typeof(string);
-                break;
-            case "smallint":
-            case "short":
-                type = propertyDefinition.IsNullable ? typeof(short?) : typeof(short);
-                break;
-            case "time":
-            case "timespan":
-                type = propertyDefinition.IsNullable ? typeof(TimeSpan?) : typeof(TimeSpan);
-                break;
-            case "tinyint":
-            case "byte":
-                type = propertyDefinition.IsNullable ? typeof(byte?) : typeof(byte);
-                break;
-            case "uniqueidentifier":
-            case "guid":
-                type = propertyDefinition.IsNullable ? typeof(Guid?) : typeof(Guid);
-                break;
-            default:
-                type = null;
-                break;
-        }
-
-        return type;
-    }
-
-
     private static TypeBuilder CreateTypeBuilder(string signature)
     {
         AssemblyName assemblyName = new($"Bambit.Generated.{signature}");
@@ -271,45 +175,10 @@ public class TableToClassBuilder(ITestDatabaseFactory testDatabaseFactory) : ITa
             typeof(DatabaseMappedClass));
     }
 
-    private IList<PropertyDefinition> GetProperties(string connectionName, string schema, string tableName)
+    private IList<DatabaseMappedClassPropertyDefinition> GetProperties(string connectionName, string schema, string tableName)
     {
-
-        IDatabaseCatalogRecord databaseCatalogRecord = TestDatabaseFactory.GetGenerator(connectionName);
-
-        List<PropertyDefinition> properties = new List<PropertyDefinition>();
-        using IDbConnection connection =
-            databaseCatalogRecord.GetConnection(TestDatabaseFactory.GetConnectionString(connectionName));
-
-        connection.Open();
-        using IDbCommand command = connection.CreateCommand();
-
-        command.CommandText = databaseCatalogRecord.TableDefinitionQuery;
-        IDbDataParameter parameter = command.CreateParameter();
-        parameter.ParameterName = "@tableName";
-        parameter.Value = $"{schema}.{tableName}";
-        command.Parameters.Add(parameter);
-        {
-            using IDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                properties.Add(
-                    new PropertyDefinition
-                    {
-                        Name = reader.GetString(0),
-                        Type = reader.GetString(1),
-                        IsNullable = reader.GetInt32(2) == 1,
-                        MaxSize = reader.GetInt16(3),
-                        Precision = reader.GetByte(4),
-                        Scale = reader.GetByte(5),
-                        IsComputed = reader.GetInt32(6) > 0
-                    }
-                );
-            }
-        }
-
-
-
-        return properties;
+        using ITestDbConnection connection =TestDatabaseFactory.GetConnection(connectionName);
+        return connection.GetProperties(schema, tableName);
 
     }
 

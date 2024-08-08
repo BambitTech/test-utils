@@ -76,18 +76,14 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0 # Get all history to allow automatic versioning using MinVer
-    - name: Startup Container
+    - name: 🐋 Startup Container
       shell: bash
       run: |
         # In this scenario with a fresh container used for testing,
         # it is acceptable to use a plain-text password
         docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Admin123" \
         -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
-    - name: 🚀 Install required PowerShell module
-      uses: potatoqualitee/psmodulecache@v4.5
-      with:
-        modules-to-cache: dbatools
-    - name: 🛢️ Get all databases, create new database, execute query
+    - name: 🛢️ Create test databases
       run: |
         # Give the container a moment to startup
         sleep 5
