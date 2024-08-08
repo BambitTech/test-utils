@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace Bambit.TestUtility.DatabaseTools.Postgre.Tests
+namespace Bambit.TestUtility.DatabaseTools.Postgres.Tests
 {
     [TestClass]
     public class DatabaseClassFactoryTest
