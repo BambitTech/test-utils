@@ -2,13 +2,12 @@
 using System.Diagnostics;
 using System.Reflection;
 using Bambit.TestUtility.DatabaseTools.Attributes;
-using Bambit.TestUtility.DatabaseTools.Postgres;
 using Bambit.TestUtility.DataGeneration;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 
-namespace Bambit.TestUtility.DatabaseTools.Postgre.Tests;
+namespace Bambit.TestUtility.DatabaseTools.Postgres.Tests;
 
 [TestClass]
 public class PostgreSqlTestDbConnectionTest

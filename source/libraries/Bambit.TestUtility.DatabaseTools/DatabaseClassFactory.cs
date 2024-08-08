@@ -55,21 +55,20 @@ public class DatabaseClassFactory( ITableToClassBuilder tableToClassBuilder )
     {
         lock (TableDefinitions)
         {
-            if (!TableDefinitions.ContainsKey(connectionName))
+            if (!TableDefinitions.TryGetValue(connectionName, out Dictionary<string, TableDefinition>? value))
             {
-                TableDefinitions.Add(connectionName,
-                    new Dictionary<string, TableDefinition>(StringComparer.CurrentCultureIgnoreCase));
+                value = new Dictionary<string, TableDefinition>(StringComparer.CurrentCultureIgnoreCase);
+                TableDefinitions.Add(connectionName,  value);
             }
-        }
+            Dictionary<string, TableDefinition> dbDictionary = value;
+            string tableKey = $"{schemaName}.{tableName}";
+            if (!dbDictionary.ContainsKey(tableKey))
+            {
+                dbDictionary.Add(tableKey, CreateTableDefinition(connectionName, schemaName, tableName));
+            }
 
-        Dictionary<string, TableDefinition> dbDictionary = TableDefinitions[connectionName];
-        string tableKey = $"{schemaName}.{tableName}";
-        if (!dbDictionary.ContainsKey(tableKey))
-        {
-            dbDictionary.Add(tableKey, CreateTableDefinition(connectionName, schemaName, tableName));
+            return dbDictionary[tableKey].ObjectTypeDefinition;
         }
-
-        return dbDictionary[tableKey].ObjectTypeDefinition;
 
     }
 

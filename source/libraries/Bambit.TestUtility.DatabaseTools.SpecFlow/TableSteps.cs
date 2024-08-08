@@ -180,7 +180,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             Assert.IsNotNull(sqlException, "No Sql Exception found");
             string phrase = sqlException.Message;
             
-            Assert.IsTrue(phrase.IndexOf(expectedPhrase, StringComparison.CurrentCultureIgnoreCase) >= 0, 
+            Assert.IsTrue(phrase.Contains(expectedPhrase, StringComparison.CurrentCultureIgnoreCase), 
                 $"Exception '{sqlException.Message}' did not contain string '{expectedPhrase}");
         }
         

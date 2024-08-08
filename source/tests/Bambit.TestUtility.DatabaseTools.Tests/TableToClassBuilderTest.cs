@@ -455,14 +455,13 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
             MockReader.GetBoolean(8).Returns(false);
             TableToClassBuilder testClass = new(MockTestDatabaseFactory);
             MockTestConnection.GetProperties(schemaName, tableName).Returns(
-                new List<DatabaseMappedClassPropertyDefinition>()
-                {
-                    new DatabaseMappedClassPropertyDefinition
+                [
+                    new()
                     {
                         IsComputed = false, IsNullable = false, Name = stringFieldName, SourceType = fieldtype,
                         MappedType = typeof(int), Scale = scale, Precision = precision, MaxSize = maxSize
                     }
-                });
+                ]);
             dynamic generateClass = testClass.GenerateObjectFromTable(connectionName, schemaName, tableName)!;
             Type generateClassType= generateClass.GetType();
             PropertyInfo? info = generateClassType.GetProperties().FirstOrDefault(p=>

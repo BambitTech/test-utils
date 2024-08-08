@@ -1,10 +1,9 @@
 ﻿using System.Data;
-using Bambit.TestUtility.DatabaseTools.Postgres;
 using Bambit.TestUtility.DataGeneration;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 
-namespace Bambit.TestUtility.DatabaseTools.Postgre.Tests
+namespace Bambit.TestUtility.DatabaseTools.Postgres.Tests
 {
     [TestClass]
     [TestCategory("Integration")]

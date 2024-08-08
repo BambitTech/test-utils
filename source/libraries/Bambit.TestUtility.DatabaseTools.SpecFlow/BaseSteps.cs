@@ -67,7 +67,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
         /// Provides assertions and readable results from a <see cref="DataComparisonResults"/>
         /// </summary>
         /// <param name="results">The results to compare</param>
-        protected void VerifyCompareResults(DataComparisonResults results)
+        protected static void VerifyCompareResults(DataComparisonResults results)
         {
             if (results.IsSuccess)
                 return;

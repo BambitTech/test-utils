@@ -24,7 +24,7 @@ namespace Bambit.TestUtility.DatabaseTools.SqlServer.Tests
         public void GetConnection_ReturnsConnection()
         {
             SqlServerDatabaseCatalogRecord catalogRecord = new();
-            IDbConnection dbConnection = catalogRecord.GetConnection(Configuration.GetConnectionString("IntegrationTestDatabase")!);
+            TestDbConnection dbConnection = catalogRecord.GetConnection(Configuration.GetConnectionString("IntegrationTestDatabase")!);
             dbConnection.Should().NotBeNull();
             dbConnection.Open();
             IDbCommand dbCommand = dbConnection.CreateCommand();
