@@ -1,9 +1,10 @@
 ﻿using System.Data;
+using Bambit.TestUtility.DatabaseTools.Postgres;
 using Bambit.TestUtility.DataGeneration;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 
-namespace Bambit.TestUtility.DatabaseTools.Postgres.Tests
+namespace Bambit.TestUtility.DatabaseTools.Postgre.Tests
 {
     [TestClass]
     [TestCategory("Integration")]
@@ -34,12 +35,12 @@ namespace Bambit.TestUtility.DatabaseTools.Postgres.Tests
         }
 
         [TestMethod]
-        public void EscapeToken_WrapsToken()
+        public void EscapeToken_NoWrapping()
         {
             
             PostgeSqlDatabaseCatalogRecord catalogRecord = new();
             string token = RandomDataGenerator.Instance.GenerateString(10);
-            catalogRecord.EscapeToken(token).Should().Be($"[{token}]");
+            catalogRecord.EscapeToken(token).Should().Be($"{token}");
         }
     }
 }

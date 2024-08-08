@@ -56,7 +56,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             if (!string.IsNullOrWhiteSpace(token) && StateManager.Variables.TryGetValue(token, out object? value))
             {
                 return (value is DateTime dateTime
-                    ? dateTime.ToString("yyyy-MM-dd HH:mm:ss.FFF")
+                    ? dateTime.ToString("yyyy-MM-dd HH:mm:ss.FFFFFF")
                     : value as string);
             }
 

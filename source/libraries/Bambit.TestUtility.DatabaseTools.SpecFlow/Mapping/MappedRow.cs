@@ -114,8 +114,8 @@ public class MappedRow: IDictionary<string, string?>
         Items = Enumerable.Range(0, reader.FieldCount).Select(c =>
   
         {
-            object value = reader.GetValue(c);
-            return value == DBNull.Value
+            object? value = reader.GetValue(c);
+            return  (value ==null! || value == DBNull.Value)
                 ? null
                 : value.ToString();
         }).ToArray();

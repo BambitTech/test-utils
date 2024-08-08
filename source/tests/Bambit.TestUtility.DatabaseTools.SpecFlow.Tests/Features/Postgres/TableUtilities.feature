@@ -11,11 +11,11 @@ Background:
 Scenario: Verify only speficed records exist full table matches full table records
 	Given I am working in the postgresDb database
 	And only the following records exist in the Test.TestTableAlpha table:
-	| TestTableAlphaId                     | Name                | DateOfBirth | Score | CheckSmall | CheckTiny | MadMummyMoney | TightDecimal | NullableBit |
-	| 8BFAE7CC-EDEA-4326-B671-334D5FECDAEB | Bob Spelled Backwards | 1979-11-11    | 12    | 4          | 1         | 123.45          | 345.34         | 1             |
+	| TestTableAlphaId                     | Name                  | DateOfBirth | Score | CheckSmall | CheckTiny | MadMummyMoney | TightDecimal | NullableBit |
+	| 8BFAE7CC-EDEA-4326-B671-334D5FECDAEB | Bob Spelled Backwards | 1979-11-11  | 12    | 4          | 1         | 123.45        | 345.34       | 1           |
 	Then only the following records should exist in the Test.TestTableAlpha table:
-	| TestTableAlphaId                     | Name                | DateOfBirth | Score | CheckSmall | CheckTiny | MadMummyMoney | TightDecimal | NullableBit |
-	| 8BFAE7CC-EDEA-4326-B671-334D5FECDAEB | Bob Spelled Backwards | 1979-11-11    | 12    | 4          | 1         | 123.45          | 345.34         | 1             |
+	| TestTableAlphaId                     | Name                  | DateOfBirth | Score | CheckSmall | CheckTiny | MadMummyMoney | TightDecimal | NullableBit |
+	| 8BFAE7CC-EDEA-4326-B671-334D5FECDAEB | Bob Spelled Backwards | 1979-11-11  | 12    | 4          | 1         | 123.45        | 345.34       | 1           |
 	
 	
 
@@ -130,7 +130,7 @@ Scenario: Expected exceptions are verified
 	Then Inserting the following records in the Test.TestTableEpsilon table will throw an error:
 	| Name  |
 	| ALpha |
-	And the last SQL exception will contain the phrase "Violation of UNIQUE KEY constraint"
+	And the last SQL exception will contain the phrase "duplicate key value violates unique constraint"
 
 	
 
@@ -141,7 +141,7 @@ Given only the following records exist in the Test.TestTableEpsilon table:
 Then Inserting the following records in the Test.TestTableEpsilon table in the postgresDb database will throw an error:
 | Name  |
 | ALpha |
-And the last SQL exception will contain the phrase "Violation of UNIQUE KEY constraint"
+And the last SQL exception will contain the phrase "duplicate key value violates unique constraint"
 
 
 
@@ -214,19 +214,19 @@ Scenario: Set a variable from the database
 Given the table Test.TestTableAlpha is empty
 And the following query is run:
 """
-insert into  Test.TestTableAlpha (TestTableAlphaId, DateOfBirth) values (gen_random_uuid(), getdate())
+insert into  Test.TestTableAlpha (TestTableAlphaId, DateOfBirth) values (gen_random_uuid(), now())
 """
 And I have a string variable named '$dbGuid' defined from:
 """
-select top 1 cast( TestTableAlphaId as varchar(128)) from Test.TestTableAlpha
+select  cast( TestTableAlphaId as varchar(128)) from Test.TestTableAlpha limit 1
 """
 And I have a date variable named '$dbDate' defined from:
 """
-select top 1 DateOfBirth from Test.TestTableAlpha
+select DateOfBirth from Test.TestTableAlpha limit 1
 """
 Then only the following records should exist in the Test.TestTableAlpha table:
-| TestTableAlphaId  | DateOfBirth @date|
-| $dbGuid          | $dbDate      |
+| TestTableAlphaId | DateOfBirth @date |
+| $dbGuid          | $dbDate           |
 
 
 Scenario: Query then statement
@@ -252,8 +252,9 @@ Scenario: Allow for timeout, does not throw exception
 Given I have a query timeout of 70 seconds
 When the following query is run in the postgresDb database:
 """
-waitfor delay '00:01'
-select 'ok' as c1
+
+select pg_sleep(60);
+select 'ok' as c1;
 """
 Then the results will be:
 | c1        |
@@ -265,8 +266,8 @@ Scenario: Timeouts breached, throws exception
 Given I have a query timeout of 2 seconds
 When the following query run in the postgresDb database should timeout:
 """
-waitfor delay '00:01'
-select 'ok' check
+select pg_sleep(60);
+select 'ok' check;
 """
 
 

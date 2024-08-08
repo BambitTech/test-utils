@@ -137,7 +137,7 @@ public class PostgreSqlTestDbConnectionTest
         PostgreSqlTestDbConnection testConnection = GetConnection();
         testConnection.Open();
         object?[][] rows = [];
-        testConnection.CompareResults(["A", "B"], ["string", "string"],
+        testConnection.CompareResults(["A", "B"], ["varchar", "varchar"],
             rows, rows).IsSuccess.Should().BeTrue();
     }
 
@@ -147,7 +147,7 @@ public class PostgreSqlTestDbConnectionTest
         PostgreSqlTestDbConnection testConnection = GetConnection();
         testConnection.Open();
         string?[][] rows = [["Alpha", "Beta"], ["Alpha1", "Beta2"], ["Alpha2", "Beta1"]];
-        testConnection.CompareResults(["A", "B"], ["string", "string"],
+        testConnection.CompareResults(["A", "B"], ["varchar", "varchar"],
             rows, rows).IsSuccess.Should().BeTrue();
     }
 
@@ -159,7 +159,7 @@ public class PostgreSqlTestDbConnectionTest
         testConnection.Open();
         object?[][] expected = [["Alpha", null]];
         object?[][] actual = [["Alpha", null]];
-        testConnection.CompareResults(["A", "B"], ["string", "date"],
+        testConnection.CompareResults(["A", "B"], ["varchar", "date"],
             expected, actual).IsSuccess.Should().BeTrue();
     }
 
@@ -172,7 +172,7 @@ public class PostgreSqlTestDbConnectionTest
         DateTime date = RandomDataGenerator.Instance.GenerateDate();
         object?[][] expected = [["Alpha", date]];
         object?[][] actual = [["Alpha", date]];
-        testConnection.CompareResults(["A", "B"], ["string", "date"],
+        testConnection.CompareResults(["A", "B"], ["varchar", "date"],
             expected, actual).IsSuccess.Should().BeTrue();
     }
 
@@ -183,7 +183,7 @@ public class PostgreSqlTestDbConnectionTest
         testConnection.Open();
         object?[][] expected = [["Alpha", true], ["Beta", false]];
         object?[][] actual = [["Alpha", true], ["Beta", false]];
-        testConnection.CompareResults(["A", "B"], ["string", "bit"],
+        testConnection.CompareResults(["A", "B"], ["varchar", "bit"],
             expected, actual).IsSuccess.Should().BeTrue();
     }
 
@@ -195,7 +195,7 @@ public class PostgreSqlTestDbConnectionTest
         string?[][] expected = [["Alpha", "Beta"], ["Alpha1", "Beta2"], ["Alpha2", "Beta1"]];
         string?[][] actual= [["Alpha", "Beta"], ["Alpha1", "Beta2"]];
         (bool isSuccess, int numberRowsMissing, int numberRowsNotExpected) = testConnection.CompareResults(
-            ["A", "B"], ["string", "string"],
+            ["A", "B"], ["varchar", "varchar"],
             expected, actual);
         isSuccess.Should().BeFalse();
         numberRowsMissing.Should().Be(1);
@@ -210,7 +210,7 @@ public class PostgreSqlTestDbConnectionTest
         testConnection.Open();
         string?[][] expected = [["Alpha", "Beta"], ["Alpha2", "Beta2"], ["Alpha1", "Beta1"]];
         string?[][] actual= [["Alpha", "Beta"], ["Alpha1", "Beta2"], ["Alpha2", "Beta1"]];
-        (bool isSuccess, int numberRowsMissing, int numberRowsNotExpected) = testConnection.CompareResults(["A", "B"], ["string", "string"],
+        (bool isSuccess, int numberRowsMissing, int numberRowsNotExpected) = testConnection.CompareResults(["A", "B"], ["varchar", "varchar"],
             expected, actual);
         isSuccess.Should().BeFalse();
         numberRowsMissing.Should().Be(2);
@@ -231,7 +231,7 @@ public class PostgreSqlTestDbConnectionTest
             ["Alpha2", "Beta1"]
         ];
         (bool isSuccess, int numberRowsMissing, int numberRowsNotExpected) = testConnection.CompareResults(
-            ["A", "B"], ["string", "string"],
+            ["A", "B"], ["varchar", "varchar"],
             expected, actual);
         isSuccess.Should().BeFalse();
         numberRowsMissing.Should().Be(0);
@@ -251,7 +251,7 @@ public class PostgreSqlTestDbConnectionTest
             ["Alpha1", "Beta2"], 
             ["Alpha2", "Beta1"]
         ];
-        testConnection.CompareResults(["A", "B"], ["string", "string"],
+        testConnection.CompareResults(["A", "B"], ["varchar", "varchar"],
             expected, actual, true).IsSuccess.Should().BeTrue();
     }
 
@@ -270,7 +270,7 @@ public class PostgreSqlTestDbConnectionTest
             ["Alpha1"], 
             ["Alpha2", "Beta1"]
         ];
-        testConnection.Invoking(t => t.CompareResults(["A", "B"], ["string", "string"],
+        testConnection.Invoking(t => t.CompareResults(["A", "B"], ["varchar", "varchar"],
             expected, actual, true)).Should().Throw<ArgumentOutOfRangeException>();
     }
 

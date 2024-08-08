@@ -145,9 +145,9 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             {
                 AddRecordsToDatabase(schema, tableName, StateManager.LastDatabaseConnectionName, data);
             }
-            catch (SqlException exc)
+            catch (Exception exc)
             {
-                OutputHelper.WriteLine($"Sql Exception caught: {exc.Message}");
+                OutputHelper.WriteLine($"Exception caught: {exc.Message}");
                 Context.Set(exc);
                 return;
             }
@@ -176,7 +176,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
         [Then(@"[Tt]he last SQL exception will contain the phrase ""(?<expectedPhrase>.*)""")]
         public void VerifyLastExceptionPhrase(string expectedPhrase)
         {
-            SqlException sqlException = Context.Get<SqlException>();
+            Exception sqlException = Context.Get<Exception>();
             Assert.IsNotNull(sqlException, "No Sql Exception found");
             string phrase = sqlException.Message;
             

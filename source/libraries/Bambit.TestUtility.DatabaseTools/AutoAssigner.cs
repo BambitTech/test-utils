@@ -180,7 +180,7 @@ namespace Bambit.TestUtility.DatabaseTools
             {
                 if (!allowNull)
                     throw new NullReferenceException(
-                        $"Column '{columnName}' has a null value, but the field is marked as non-null guid");
+                        $"Column '{columnName}' has a null value, but the field is marked as non-null field");
                 propertyInfo.SetValue(assignee, null);
             }
             else

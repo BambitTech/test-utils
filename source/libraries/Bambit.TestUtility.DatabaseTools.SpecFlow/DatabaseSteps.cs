@@ -316,7 +316,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             object?[][] existingValues = actual.Rows.Select(
                 r => r.ApplyTransformValues(ReplaceVariable).GetDbValues(StateManager.Configuration.NullStringIdentifier,connection)
             ).ToArray();
-            connection.CompareResults(expected.Columns, expected.TableColumns.Select(a => a.ColumnType).ToArray(),
+            connection.CompareResults(expected.Columns, actual.TableColumns.Select(a => a.ColumnType).ToArray(),
                 expectedValue, existingValues, true);
         }
 

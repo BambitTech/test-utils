@@ -22,7 +22,7 @@ public class PostgreSqlTestDbConnection(IDbConnection connection) : TestDbConnec
                                                                     column_name,
                                                                     data_type,
                                                                     case
-                                                                        when is_nullable = 'YES' and data_type in ('bigint', 'bit', 'date', 'datetime', 'datetime2', 'datetimeoffset', 'decimal', 'float', 'int', 'money', 'numeric', 'real', 'smalldatetime', 'smallint', 'smallmoney', 'time', 'tinyint', 'uniqueidentifier')
+                                                                        when is_nullable = 'YES' -- and data_type in ('bigint', 'bit', 'date', 'datetime', 'datetime2', 'datetimeoffset', 'decimal', 'float', 'int', 'money', 'numeric', 'real', 'smalldatetime', 'smallint', 'smallmoney', 'time', 'tinyint', 'uniqueidentifier')
                                                                         then 1
                                                                         else 0
                                                                     end NullableSign,
@@ -114,15 +114,15 @@ public class PostgreSqlTestDbConnection(IDbConnection connection) : TestDbConnec
             for (int x = 0; x < columns.Length; x++)
             {
                 string? columnType = expectedColumnTypes[x];
-                string sqlType = "varchar";
+                string sqlType = columnType??"varchar";
                 switch (columnType)
                 {
-                    case "date":
-                        sqlType = "timestamp";
+                    case "date": sqlType = "timestamp";
                         break;
                     case "boolean":
-                    case "bit":
-                        sqlType = "boolean";
+                    case "bit": sqlType = "boolean";
+                        break;
+                    case "void":     sqlType = "varchar";
                         break;
                 }
 
@@ -182,7 +182,7 @@ CREATE  AGGREGATE pg_temp.__testingutilities_agg (ORDER BY anyelement)
 );
 
 -- Existing
-select * 
+select {columnList} 
     into {ExistingTableName} 
    from    {CleanIdentifier(schema)}.{CleanIdentifier(tableName)}
 /*    from (
@@ -217,14 +217,22 @@ select
         return CompareExistingAndExpected(columnList, allowUnexpectedRows);
     }
 
-    private void InsertRecords(string tableName, string[] columns, IEnumerable<object?[]> rows,string?[]? expectedColumnTypes =null)
+    private string[] GetDatabaseFieldTypes(string tableName, string[] columns)
+    {
+        IList<DatabaseMappedClassPropertyDefinition> properties = GetProperties("public", tableName);
+        return columns.Select(c => properties.First(p =>
+            string.Compare(p.Name, c, StringComparison.CurrentCultureIgnoreCase) == 0
+        ).SourceType).ToArray();
+    }
+
+    private void InsertRecords(string tableName, string[] columns, IEnumerable<object?[]> rows)
     {
         string columnList = string.Join(",", columns);
         List<string> cleanedColumnList = [];
         for (int x = 0; x < columns.Length; x++)
             cleanedColumnList.Add($"p{x}");
         string variableList = $"@{string.Join(",@", cleanedColumnList)}";
-
+        string[] expectedColumnTypes =GetDatabaseFieldTypes(tableName, columns);
         
 
         string query = $"""
@@ -424,7 +432,7 @@ select
 
         string matchQuery = $@"
 -- Create the temp table
-select '=' AS __IndicatorColumn__ , {columnList} into TEMPORARY {ResultsTableName}
+select '=' AS __IndicatorColumn__ , {columnList} into   {ResultsTableName}
     from {ExistingTableName}  where 1 = 0;
 
 -- drop collapsed rows if they exist (shouldn't this is a temp table)
@@ -434,7 +442,7 @@ SELECT
 		SUM( _ExpectedSource_ ) AS  _ExpectedSource_ , 
 		SUM( _ActualSource_ ) AS  _ActualSource_ , 
 		{columnList}
-	into TEMPORARY CollapsedRows
+	into   CollapsedRows
     FROM (
 		SELECT 
 				1 AS  _ExpectedSource_ , 
@@ -574,7 +582,8 @@ SELECT
     {
 
         List<DatabaseMappedClassPropertyDefinition> properties = [];
-        Connection.Open();
+        if(Connection.State!= ConnectionState.Open)
+            Connection.Open();
         using IDbCommand command = Connection.CreateCommand();
 
         command.CommandText = TableDefinitionQuery;
@@ -715,6 +724,7 @@ SELECT
             "tsquery" => typeof(NpgsqlTsQuery),
             "tsvector" => typeof(NpgsqlTsVector),
             "bit"=> maxLength== 1?( isNullable ? typeof(bool?) : typeof(bool)) :   isNullable ? typeof(bool?) : typeof(bool),
+            "bit(1)"=> isNullable ? typeof(bool?) : typeof(bool),
             "bit varying" => typeof(BitArray),
             "point" => isNullable ? typeof(NpgsqlPoint?) : typeof(NpgsqlPoint),
             "lseg" => isNullable ? typeof(NpgsqlLSeg?) : typeof(NpgsqlLSeg),
