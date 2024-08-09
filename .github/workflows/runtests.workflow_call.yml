@@ -1,6 +1,7 @@
+name: Run Test Suite
 on:
+  push:
   workflow_call:
-    inputs:
   runs-on: ubuntu-latest
     services:
       # Postgres service
@@ -17,6 +18,9 @@ on:
           --health-retries 5
         ports:
           - 5432:5432
+jobs:
+  run_tests_job:
+    name: Run Tests
     steps:
     - uses: actions/checkout@v4
       with:
