@@ -631,7 +631,7 @@ SELECT
     
     public static object ConverterToType(string typeName, string input)
     {
-        Type converterType = GetPropertyType(typeName, false, -1);
+        Type? converterType = GetPropertyType(typeName, false, -1);
         if(converterType!=null && AutoAssigner.Converters.TryGetValue(converterType, out var converter))
             return converter(input);
         return typeName.ToLower() switch

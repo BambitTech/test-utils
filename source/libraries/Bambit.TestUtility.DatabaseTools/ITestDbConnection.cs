@@ -111,6 +111,14 @@ namespace Bambit.TestUtility.DatabaseTools
             IEnumerable<object?[]> compareRows,
             bool allowUnexpectedRows = false);
 
+        /// <summary>
+        /// Converts a string value to a target type
+        /// </summary>
+        /// <param name="value">        The value. </param>
+        /// <param name="targetType">   Type of the target. </param>
+        /// <returns>
+        /// The value converted.
+        /// </returns>
         object ConvertValue( string value, string targetType);
     }
 }

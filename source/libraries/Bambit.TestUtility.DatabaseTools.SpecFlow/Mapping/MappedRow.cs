@@ -150,6 +150,7 @@ public class MappedRow: IDictionary<string, string?>
     ///
     /// <param name="index">                Zero-based index of the. </param>
     /// <param name="nullStringIdentifier"> Identifier for the null string. </param>
+    /// <param name="dbConnection"></param> The DB connection to get the value for
     ///
     /// <returns>   The database value. </returns>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -214,6 +215,7 @@ public class MappedRow: IDictionary<string, string?>
     /// <remarks>   Law Metzler, 7/25/2024. </remarks>
     ///
     /// <param name="nullStringIdentifier"> Identifier for the null string. </param>
+    /// <param name="dbConnection"></param> The DB connection to get the value for
     ///
     /// <returns>   An array of object? </returns>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
