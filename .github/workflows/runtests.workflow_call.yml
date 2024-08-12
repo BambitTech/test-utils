@@ -49,7 +49,7 @@ jobs:
         # Deploy test database
         /opt/mssql-tools/bin/sqlcmd -S localhost -d IntegrationTests -U sa -P Admin123 -i "./source/tests/Resources/CreateTestDatabase.SqlServer.sql"
         # Add the postgres database
-        psql -d  postgresql://postgres@localhost/TestUtilities -f "./source/tests/Resources/CreateTestDatabase.PostreSQL.sql"
+        psql -d  postgresql://postgres@localhost/TestUtilities -f "./source/tests/Resources/CreateTestDatabase.PostgreSQL.sql"
     - uses: cschleiden/replace-tokens@v1
       with:
         files: '["**/*.json"]'
