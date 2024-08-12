@@ -6,6 +6,7 @@ on:
   
 jobs:
   run_tests_job:
+    name: Run Tests
     runs-on: ubuntu-latest
     services:
       # Postgres service
@@ -22,7 +23,6 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-    name: Run Tests
     steps:
     - uses: actions/checkout@v4
       with:
