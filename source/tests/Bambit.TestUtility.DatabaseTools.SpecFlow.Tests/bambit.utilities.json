@@ -6,10 +6,15 @@
       "sqlTestDb": {
         "connectionString": "#{SqlServerDatabaseConnectionString}#",
         "databaseCatalog": "SqlServer"
+      },
+      "postgresDb": {
+        "connectionString": "User ID=testuser;Password=moocow123!;Host=localhost;Port=5432;Database=TestUtilities;Pooling=true;MinPoolSize=0;MaxPoolSize=100;Connection Lifetime=0;IncludeErrorDetail=true;Timeout=30",
+        "databaseCatalog": "postgres"
       }
     },
     "databaseCatalogRecordMap": {
-      "sqlServer": "Bambit.TestUtility.DatabaseTools.SqlServer.SqlServerDatabaseCatalogRecord,  Bambit.TestUtility.DatabaseTools.SqlServer"
+      "sqlServer": "Bambit.TestUtility.DatabaseTools.SqlServer.SqlServerDatabaseCatalogRecord,  Bambit.TestUtility.DatabaseTools.SqlServer",
+      "postgres": "Bambit.TestUtility.DatabaseTools.Postgres.PostgeSqlDatabaseCatalogRecord,  Bambit.TestUtility.DatabaseTools.Postgres"
     }
   },
   "specFlow": {
