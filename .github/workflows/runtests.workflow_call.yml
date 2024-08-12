@@ -36,6 +36,8 @@ jobs:
         docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Admin123" \
         -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
     - name: 🛢️ Create test databases
+      env: 
+        PGPASSWORD: postgres
       run: |
         # Give the container a moment to startup
         sleep 5
