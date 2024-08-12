@@ -7,21 +7,21 @@ on:
 jobs:
   run_tests_job:
     runs-on: ubuntu-latest
-      services:
-        # Postgres service
-        postgres: 
-          # Docker image
-          image: postgres
-          env:
-            POSTGRES_PASSWORD: postgres
-          # Set health checks to wait until postgres has started
-          options: >-
-            --health-cmd pg_isready
-            --health-interval 10s
-            --health-timeout 5s
-            --health-retries 5
-          ports:
-            - 5432:5432
+    services:
+      # Postgres service
+      postgres: 
+        # Docker image
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     name: Run Tests
     steps:
     - uses: actions/checkout@v4
