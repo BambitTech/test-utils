@@ -8,7 +8,7 @@
         "databaseCatalog": "SqlServer"
       },
       "postgresDb": {
-        "connectionString": "User ID=testuser;Password=moocow123!;Host=localhost;Port=5432;Database=TestUtilities;Pooling=true;MinPoolSize=0;MaxPoolSize=100;Connection Lifetime=0;IncludeErrorDetail=true;Timeout=30",
+        "connectionString": "#{PostgresDatabaseConnectionString}#",
         "databaseCatalog": "postgres"
       }
     },
