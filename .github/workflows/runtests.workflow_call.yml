@@ -15,6 +15,7 @@ jobs:
         image: postgres
         env:
           POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: TestUtilities
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -45,12 +46,15 @@ jobs:
         /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Admin123 -d IntegrationTests -q "ALTER ROLE [db_owner] ADD MEMBER [TestUser]"
         # Deploy test database
         /opt/mssql-tools/bin/sqlcmd -S localhost -d IntegrationTests -U sa -P Admin123 -i "./source/tests/Resources/CreateTestDatabase.SqlServer.sql"
+        # Add the postgres database
+        psql -d  postgresql://postgres@localhost/TestUtilities -f "./source/tests/Resources/CreateTestDatabase.PostreSQL.sql"
     - uses: cschleiden/replace-tokens@v1
       with:
         files: '["**/*.json"]'
       env:
         SqlServerDatabaseConnectionString: Server=localhost; Database=IntegrationTests;User ID=TestUser;Password=Test1234!;Connection Timeout=30
         SqlServerPrimaryDatabaseName: IntegrationTests
+        PostgresDatabaseConnectionString: User ID=postgres;Password=postgres!;Host=localhost;Port=5432;Database=TestUtilities;Pooling=true;MinPoolSize=0;MaxPoolSize=100;Connection Lifetime=0;IncludeErrorDetail=true;Timeout=30
     - name: Setup .NET
       uses: actions/setup-dotnet@v4 
     - name: Run tests
