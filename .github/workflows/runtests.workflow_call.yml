@@ -56,7 +56,7 @@ jobs:
       env:
         SqlServerDatabaseConnectionString: Server=localhost; Database=IntegrationTests;User ID=TestUser;Password=Test1234!;Connection Timeout=30
         SqlServerPrimaryDatabaseName: IntegrationTests
-        PostgresDatabaseConnectionString: User ID=postgres;Password=postgres!;Host=localhost;Port=5432;Database=TestUtilities;Pooling=true;MinPoolSize=0;MaxPoolSize=100;Connection Lifetime=0;IncludeErrorDetail=true;Timeout=30
+        PostgresDatabaseConnectionString: User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=TestUtilities;Pooling=true;MinPoolSize=0;MaxPoolSize=100;Connection Lifetime=0;IncludeErrorDetail=true;Timeout=30
     - name: Setup .NET
       uses: actions/setup-dotnet@v4 
     - name: Run tests
