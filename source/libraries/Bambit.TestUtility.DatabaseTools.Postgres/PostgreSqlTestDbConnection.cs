@@ -41,6 +41,13 @@ public class PostgreSqlTestDbConnection(IDbConnection connection) : TestDbConnec
                                                           WHERE table_name= @tableName and table_schema = @tableSchema
                                                           """;
 
+    
+    public static readonly IReadOnlyDictionary<Type, Func<string, object>> LocalConverters =
+        new Dictionary<Type, Func<string, object>>
+        {
+           
+        };
+
     /// <summary>
     /// Query string that will be used to map a table to the C# classes
     /// </summary>

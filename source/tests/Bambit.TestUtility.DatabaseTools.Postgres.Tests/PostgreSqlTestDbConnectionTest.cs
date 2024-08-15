@@ -4,6 +4,7 @@ using System.Reflection;
 using Bambit.TestUtility.DatabaseTools.Attributes;
 using Bambit.TestUtility.DataGeneration;
 using FluentAssertions;
+using FluentAssertions.Common;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 
@@ -592,7 +593,53 @@ public class PostgreSqlTestDbConnectionTest
         connection.ExecuteScalar<long>("select count(1) from test.testTableNullable").Should().Be(1);
             
     }
-        
+
+
+    
+    private static List<object[]> GetConverterToTypeData()
+    {
+        DateTime randomDate = RandomDataGenerator.Instance.GenerateDate();
+        int randomInt = RandomDataGenerator.Instance.GenerateInt();
+        DateTimeOffset dateTimeOffset = RandomDataGenerator.Instance.GenerateDateTime().ToDateTimeOffset();
+        string randomString = RandomDataGenerator.Instance.GenerateString(10);
+        Guid testGuid = RandomDataGenerator.Instance.GenerateGuid();
+        return
+        [
+            ["3.1","real", 3.1F],
+            ["true","boolean", true],
+            ["false","boolean", false],
+            ["3","smallint", 3],
+            ["153","integer", 153],
+            ["1535282","bigint", 1535282],
+            ["3.112","double precision", 3.112],
+            ["3.158","numeric", 3.158],
+            ["3.158","money", 3.158],
+            ["153","text", "153"],
+            [randomString ,"character varying", randomString ],
+            [randomString ,"character", randomString ],
+            [randomString ,"json", randomString ],
+            [randomString ,"citext", randomString ],
+            [randomString ,"jsonb", randomString ],
+            [randomString ,"jsonb", randomString ],
+            [randomDate.ToString(),"timestamp without time zone", randomDate ],
+            [dateTimeOffset.ToString(),"timestamp with time zone", dateTimeOffset],
+            [testGuid .ToString(), "uuid", testGuid ]
+            //["my test string","bytea", "my test string"]
+
+        ];
+    } 
+
+    [DataTestMethod]
+    [DynamicData(nameof(GetConverterToTypeData), DynamicDataSourceType.Method)]
+  
+    //[DataRow(new object[]{"my test string","bytea", "my test string" })]
+    //[DataRow(new object[]{"my test string","jsonb", new Guid("84C3B061-2E52-4ED0-B45D-D84AAFB354B5")})]
+    
+
+    public void ConverterToType_ConvertsAsExpected(string input, string typeName, object expected)
+    {
+        PostgreSqlTestDbConnection.ConverterToType(typeName, input).Should().Be(expected);
+    }
 
     #endregion Base members
 }
