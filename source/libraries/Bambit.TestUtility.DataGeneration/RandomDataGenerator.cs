@@ -647,7 +647,7 @@ namespace Bambit.TestUtility.DataGeneration
             PropertyInfo[] propertyInfos =
                 objectType.GetProperties(BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.Public)
                     .Where(p => p is { CanRead: true, CanWrite: true }).ToArray();
-
+            
             foreach (PropertyInfo propertyInfo in propertyInfos)
             {
                 AssignValueToProperty(objectToInitialize, propertyInfo, maxRecursion);

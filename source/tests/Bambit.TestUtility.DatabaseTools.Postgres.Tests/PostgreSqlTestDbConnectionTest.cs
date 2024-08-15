@@ -1,5 +1,9 @@
-﻿using System.Data;
+﻿using System.Collections;
+using System.Data;
 using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using Bambit.TestUtility.DatabaseTools.Attributes;
 using Bambit.TestUtility.DataGeneration;
@@ -7,6 +11,7 @@ using FluentAssertions;
 using FluentAssertions.Common;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using NpgsqlTypes;
 
 namespace Bambit.TestUtility.DatabaseTools.Postgres.Tests;
 
@@ -603,7 +608,48 @@ public class PostgreSqlTestDbConnectionTest
         DateTimeOffset dateTimeOffset = RandomDataGenerator.Instance.GenerateDateTime().ToDateTimeOffset();
         string randomString = RandomDataGenerator.Instance.GenerateString(10);
         Guid testGuid = RandomDataGenerator.Instance.GenerateGuid();
+        IPAddress address = new IPAddress([
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte()
+        ]);
+        PhysicalAddress physicalAddress = new PhysicalAddress([
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte()
+        ]);
+        bool booleanValue = RandomDataGenerator.Instance.GenerateBoolean();
+        bool[] booleans = RandomDataGenerator.Instance
+            .InitializeList<bool>(9, (i) => i.GenerateBoolean()).ToArray();
+        string booleansStrings = string.Join("", booleans.Select(b => b ? "1" : "0"));
+        BitArray bitArray = new BitArray(booleans);
+        NpgsqlPoint point = new NpgsqlPoint(RandomDataGenerator.Instance.GenerateDouble(3,4), 
+            RandomDataGenerator.Instance.GenerateDouble(3, 4));
+        NpgsqlLine line= new NpgsqlLine(RandomDataGenerator.Instance.GenerateDouble(3,4), 
+            RandomDataGenerator.Instance.GenerateDouble(3, 4),
+            RandomDataGenerator.Instance.GenerateDouble(3, 4)
+            );
+        NpgsqlPath path = new NpgsqlPath(RandomDataGenerator.Instance.InitializeList<NpgsqlPoint>(5, (d) =>
+            new NpgsqlPoint(d.GenerateDouble(3, 4),
+                d.GenerateDouble(3, 4))), RandomDataGenerator.Instance.GenerateBoolean());
+        NpgsqlCircle circle = new NpgsqlCircle(RandomDataGenerator.Instance.GenerateDouble(3,4), 
+            RandomDataGenerator.Instance.GenerateDouble(3, 4),
+            RandomDataGenerator.Instance.GenerateDouble(3, 4)
+        );
+        NpgsqlBox box = new NpgsqlBox(RandomDataGenerator.Instance.GenerateDouble(3, 4),
+            RandomDataGenerator.Instance.GenerateDouble(3, 4),
+            RandomDataGenerator.Instance.GenerateDouble(3, 4),
+            RandomDataGenerator.Instance.GenerateDouble(3, 4));
+        uint u = Convert.ToUInt32(RandomDataGenerator.Instance.GenerateInt());
         return
+        
+        
         [
             ["3.1","real", 3.1F],
             ["true","boolean", true],
@@ -622,8 +668,20 @@ public class PostgreSqlTestDbConnectionTest
             [randomString ,"jsonb", randomString ],
             [randomString ,"jsonb", randomString ],
             [randomDate.ToString(),"timestamp without time zone", randomDate ],
-            [dateTimeOffset.ToString(),"timestamp with time zone", dateTimeOffset],
-            [testGuid .ToString(), "uuid", testGuid ]
+            [dateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss.fffffff zz"),"timestamp with time zone", dateTimeOffset],
+            [testGuid .ToString(), "uuid", testGuid ],
+            [address.ToString(), "inet",address],
+            [physicalAddress.ToString(), "macaddr", physicalAddress],
+            [booleanValue.ToString(), "bit",booleanValue],
+            [booleanValue.ToString(), "bit(1)",booleanValue],
+            //[booleansStrings, "bit varying",bitArray],
+            [point.ToString(), "point",point],
+            [path.ToString(),"path", path],
+            [line.ToString(),"line", line],
+            [circle.ToString(), "circle", circle],
+            [box.ToString(), "box", box],
+            [u.ToString(), "oid",u],
+            [u.ToString(), "cid",u]
             //["my test string","bytea", "my test string"]
 
         ];
@@ -639,6 +697,16 @@ public class PostgreSqlTestDbConnectionTest
     public void ConverterToType_ConvertsAsExpected(string input, string typeName, object expected)
     {
         PostgreSqlTestDbConnection.ConverterToType(typeName, input).Should().Be(expected);
+    }
+    
+    [TestMethod]
+    public void ConverterToType_Cidr_ConvertsAsExpected()
+    {  NpgsqlCidr cidr = new NpgsqlCidr(
+            IPAddress.Parse(
+                $"{RandomDataGenerator.Instance.GenerateInt(0, 255)}.{RandomDataGenerator.Instance.GenerateInt(0, 255)}.{RandomDataGenerator.Instance.GenerateInt(0, 255)}.{RandomDataGenerator.Instance.GenerateInt(0, 255)}"),
+            RandomDataGenerator.Instance.GenerateByte()
+        );
+        PostgreSqlTestDbConnection.ConverterToType("cidr", cidr.ToString()).Should().Be(cidr);
     }
 
     #endregion Base members

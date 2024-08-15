@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using Bambit.TestUtility.DatabaseTools.Attributes;
 using Npgsql;
 using NpgsqlTypes;
@@ -42,11 +43,7 @@ public class PostgreSqlTestDbConnection(IDbConnection connection) : TestDbConnec
                                                           """;
 
     
-    public static readonly IReadOnlyDictionary<Type, Func<string, object>> LocalConverters =
-        new Dictionary<Type, Func<string, object>>
-        {
-           
-        };
+    
 
     /// <summary>
     /// Query string that will be used to map a table to the C# classes
@@ -584,6 +581,68 @@ SELECT
 
     }
 
+    public static NpgsqlPoint ParsePoint(string input)
+    {
+        
+            string[] split = input.Trim(['(', ')']).Split(",");
+            double x = double.Parse(split[0]);
+            double y = double.Parse(split[1]);
+            return new NpgsqlPoint(x, y);
+        
+    }
+    public static NpgsqlPath ParsePath(string input)
+    {
+        bool open = input[0] == '[';
+        string trim = input.Trim(['[', ']']);
+        Regex matcher = new Regex(@"\((.*?)\)");
+        MatchCollection matchCollection = matcher.Matches(trim);
+        IEnumerable<NpgsqlPoint> npgsqlPoints = matchCollection.Select(m => ParsePoint(m.Groups[0].Value));
+        return new NpgsqlPath(npgsqlPoints, open);
+    }
+    public static NpgsqlBox ParseBox(string input)
+    {
+        Regex matcher = new Regex(@"\((.*?)\)");
+        MatchCollection matchCollection = matcher.Matches(input);
+        NpgsqlPoint[] npgsqlPoints = matchCollection.Select(m => ParsePoint(m.Groups[0].Value)).ToArray();
+        return new NpgsqlBox(npgsqlPoints[0], npgsqlPoints[1]);
+    }
+    public static NpgsqlLine ParseLine(string input)
+    {
+        string[] split = input.Trim(['{', '}']).Split(",");
+        double a = double.Parse(split[0]);
+        double b = double.Parse(split[1]);
+        double c = double.Parse(split[2]);
+        return new NpgsqlLine(a, b, c);
+    }
+    public static NpgsqlCircle ParseCircle(string input)
+    {
+        string[] split = input.Replace("(","")
+            .Replace(")","")
+            .Replace("<","")
+            .Replace(">","")
+            .Split(",");
+        double a = double.Parse(split[0]);
+        double b = double.Parse(split[1]);
+        double c = double.Parse(split[2]);
+        return new NpgsqlCircle(a, b, c);
+    }
+    public static readonly IReadOnlyDictionary<Type, Func<string, object>> LocalConverters =
+        new Dictionary<Type, Func<string, object>>
+        {
+            {typeof(NpgsqlCidr), input =>
+                {
+                    string[] strings = input.Split("/");
+                    IPAddress address = IPAddress.Parse(strings[0]);
+                    byte mask = byte.Parse(strings[1]);
+                    return new NpgsqlCidr(address, mask);
+                }
+            },
+            {typeof(NpgsqlPoint), i=>ParsePoint(i) },
+            {typeof(NpgsqlPath), i=>ParsePath(i) },
+            {typeof(NpgsqlLine), i=>ParseLine(i)},
+            {typeof(NpgsqlCircle), i=>ParseCircle(i)},
+            {typeof(NpgsqlBox), i=>ParseBox(i)}
+        };
     /// <inheritdoc />
     public override IList<DatabaseMappedClassPropertyDefinition> GetProperties(string schema, string tableName)
     {
@@ -639,8 +698,15 @@ SELECT
     public static object ConverterToType(string typeName, string input)
     {
         Type? converterType = GetPropertyType(typeName, false, -1);
-        if(converterType!=null && AutoAssigner.Converters.TryGetValue(converterType, out var converter))
-            return converter(input);
+        if (converterType != null)
+        {
+            if (LocalConverters.TryGetValue(converterType, out var localConverter))
+                return localConverter(input);
+
+            if (AutoAssigner.Converters.TryGetValue(converterType, out var converter))
+                return converter(input);
+        }
+
         return typeName.ToLower() switch
         {
             "int" or "integer" => AutoAssigner.Converters[typeof(int)](input),
@@ -728,13 +794,13 @@ SELECT
             "cidr" => isNullable ? typeof(NpgsqlCidr?) : typeof(NpgsqlCidr),
             "inet" => typeof(IPAddress),
             "macaddr" => typeof(PhysicalAddress),
-            "tsquery" => typeof(NpgsqlTsQuery),
-            "tsvector" => typeof(NpgsqlTsVector),
+            //"tsquery" => typeof(NpgsqlTsQuery),
+            //"tsvector" => typeof(NpgsqlTsVector),
             "bit"=> maxLength== 1?( isNullable ? typeof(bool?) : typeof(bool)) :   isNullable ? typeof(bool?) : typeof(bool),
             "bit(1)"=> isNullable ? typeof(bool?) : typeof(bool),
             "bit varying" => typeof(BitArray),
             "point" => isNullable ? typeof(NpgsqlPoint?) : typeof(NpgsqlPoint),
-            "lseg" => isNullable ? typeof(NpgsqlLSeg?) : typeof(NpgsqlLSeg),
+            //"lseg" => isNullable ? typeof(NpgsqlLSeg?) : typeof(NpgsqlLSeg),
             "path" => isNullable ? typeof(NpgsqlPath?) : typeof(NpgsqlPath),
             "polygon" => isNullable ? typeof(NpgsqlPolygon?) : typeof(NpgsqlPolygon),
             "line" => isNullable ? typeof(NpgsqlLine?) : typeof(NpgsqlLine),

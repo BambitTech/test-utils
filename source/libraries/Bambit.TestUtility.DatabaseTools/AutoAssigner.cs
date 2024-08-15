@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Security.AccessControl;
 using System.Text.RegularExpressions;
 using Bambit.TestUtility.DatabaseTools.Attributes;
@@ -23,6 +26,7 @@ namespace Bambit.TestUtility.DatabaseTools
             new Dictionary<Type, Func<string, object>>
             {
                 { typeof(int), (s) => int.Parse(s) },
+                { typeof(uint), (s) => uint.Parse(s) },
                 { typeof(long), (s) => long.Parse(s) },
                 { typeof(decimal), (s) => decimal.Parse(s) },
                 { typeof(double), (s) => double.Parse(s) },
@@ -32,6 +36,7 @@ namespace Bambit.TestUtility.DatabaseTools
                 { typeof(string), (s) => s },
                 { typeof(Guid), (s) => Guid.Parse(s) },
                 { typeof(DateTime), (s) => ParseDateExtended(s) },
+                { typeof(DateTimeOffset), (s) => DateTimeOffset.Parse(s) },
                 {
                     typeof(bool),
                     (value) =>
@@ -40,7 +45,21 @@ namespace Bambit.TestUtility.DatabaseTools
                         return lowerValue.Length > 0 &&
                                (lowerValue[0] == 'y' || lowerValue == "true" || lowerValue[0] == '1');
                     }
-                }
+                },
+                {typeof(PhysicalAddress), PhysicalAddress.Parse},
+                {typeof(IPAddress), IPAddress.Parse},
+                {typeof(BitArray), input =>
+                {
+                    bool[] bits = new bool[input.Length];
+                    int i = 0;
+                    foreach (char c in input)
+                    {
+                        bits[i] = c == '1';
+                        i++;
+                    }
+
+                    return new BitArray(bits);
+                }},
             };
 
         /// <summary>
