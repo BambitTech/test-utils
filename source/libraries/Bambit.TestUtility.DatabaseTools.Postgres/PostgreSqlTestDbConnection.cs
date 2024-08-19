@@ -17,6 +17,169 @@ namespace Bambit.TestUtility.DatabaseTools.Postgres;
 /// <param name="connection">The <see cref="IDbConnection"/> that is wrapped</param>
 public class PostgreSqlTestDbConnection(IDbConnection connection) : TestDbConnection(connection)
 {
+    private static readonly Dictionary<string, NpgsqlDbType> DatabasePropertyTypeMap =
+            new(StringComparer.CurrentCultureIgnoreCase)
+            {
+                { "boolean", NpgsqlDbType.Boolean },
+                { "bool", NpgsqlDbType.Boolean },
+                { "smallint", NpgsqlDbType.Smallint },
+                { "integer", NpgsqlDbType.Integer },
+                { "int", NpgsqlDbType.Integer },
+                { "bigint", NpgsqlDbType.Bigint },
+                { "real", NpgsqlDbType.Real },
+                { "double precision", NpgsqlDbType.Double },
+                { "numeric", NpgsqlDbType.Money },
+                { "money", NpgsqlDbType.Money },
+                { "text", NpgsqlDbType.Varchar },
+                { "character varying", NpgsqlDbType.Varchar },
+                { "character", NpgsqlDbType.Varchar },
+                { "citext", NpgsqlDbType.Varchar },
+                { "json", NpgsqlDbType.Varchar },
+                { "jsonb", NpgsqlDbType.Varchar },
+                { "(internal) char", NpgsqlDbType.Varchar },
+                { "name", NpgsqlDbType.Varchar },
+                { "xml", NpgsqlDbType.Xml },
+                { "uuid", NpgsqlDbType.Uuid },
+                { "bytea", NpgsqlDbType.Bytea },
+                { "timestamp without time zone", NpgsqlDbType.Timestamp },
+                { "timestamp with time zone", NpgsqlDbType.TimestampTz },
+                { "date", NpgsqlDbType.Date },
+                { "time without time zone", NpgsqlDbType.Time },
+                { "time with time zone", NpgsqlDbType.TimeTz },
+                { "interval", NpgsqlDbType.Interval },
+                { "cidr", NpgsqlDbType.Cidr },
+                { "inet", NpgsqlDbType.Inet },
+                { "macaddr", NpgsqlDbType.MacAddr },
+                { "tsquery", NpgsqlDbType.TsQuery },
+                { "tsvector", NpgsqlDbType.TsVector },
+                { "bit", NpgsqlDbType.Bit },
+                { "bit varying", NpgsqlDbType.Bit },
+                { "point", NpgsqlDbType.Point },
+                { "lseg", NpgsqlDbType.LSeg },
+                { "path", NpgsqlDbType.Path },
+                { "polygon", NpgsqlDbType.Polygon },
+                { "line", NpgsqlDbType.Line },
+                { "circle", NpgsqlDbType.Circle },
+                { "box", NpgsqlDbType.Box },
+                { "hstore", NpgsqlDbType.Hstore },
+                { "oid", NpgsqlDbType.Oid },
+                { "cid", NpgsqlDbType.Cid },
+                { "oidvector", NpgsqlDbType.Oidvector },
+            };
+    private static 
+        Dictionary<string,Type> PropertyTypes =new(StringComparer.CurrentCultureIgnoreCase)
+        {
+            {"byte",  typeof(byte)},
+            {"boolean" ,   typeof(bool)},
+            {"bool" ,   typeof(bool)},
+            {"smallint" ,   typeof(short)},
+            {"short" ,   typeof(short)},
+            {"integer" ,   typeof(int)},
+            {"int" ,   typeof(int)},
+            {"bigint" ,   typeof(long)},
+            {"long" ,   typeof(long)},
+            {"real" ,   typeof(float)},
+            {"float" ,   typeof(float)},
+            {"double precision" ,   typeof(double)},
+            {"double" ,   typeof(double)},
+            {"numeric" ,   typeof(decimal)},
+            {"money" ,   typeof(decimal)},
+            {"decimal" ,   typeof(decimal)},
+            {"text" , typeof(string)},
+            {"character varying" , typeof(string)},
+            {"character" , typeof(string)},
+            {"citext" , typeof(string)},
+            {"json", typeof(string)},
+            {"jsonb", typeof(string)},
+            {"xml", typeof(string)},
+            {"(internal) char", typeof(string)},
+            {"name", typeof(string)},
+            {"string" , typeof(string)},
+            {"uuid"  ,   typeof(Guid)},
+            {"guid" ,   typeof(Guid)},
+            {"bytea" , typeof(byte[])},
+            {"timestamp without time zone" ,   typeof(DateTime)},
+                {"datetime" ,   typeof(DateTime)},
+            {"timestamp with time zone" ,   typeof(DateTimeOffset)},
+            {"date" ,   typeof(DateOnly)},
+            {"time without time zone",   typeof(TimeSpan)},
+                {"interval"  ,   typeof(TimeSpan)},
+            {"time with time zone" ,   typeof(DateTimeOffset)},
+            {"cidr" ,   typeof(NpgsqlCidr)},
+            {"inet" , typeof(IPAddress)},
+            {"macaddr" , typeof(PhysicalAddress)},
+            {"bit",    typeof(bool)},
+            {"bit(1)",   typeof(bool)},
+            {"bit varying" , typeof(BitArray)},
+            {"point" ,   typeof(NpgsqlPoint)},
+            {"path" ,   typeof(NpgsqlPath)},
+            {"polygon" ,   typeof(NpgsqlPolygon)},
+            {"line" ,   typeof(NpgsqlLine)},
+            {"circle" ,   typeof(NpgsqlCircle)},
+            {"box" ,   typeof(NpgsqlBox)},
+            {"hstore" , typeof(Dictionary<string, string>)},
+            {"oid" ,   typeof(uint)},
+            {"cid" ,   typeof(uint)},
+            {"oidvector" , typeof(uint[])},
+            {"record" , typeof(object[])}
+        };
+    private static Dictionary<string, Type> NullablePropertyTypes =
+            new(StringComparer.CurrentCultureIgnoreCase)
+            {
+                { "byte", typeof(byte?) },
+                { "boolean", typeof(bool?) },
+                { "bool", typeof(bool?) },
+                { "smallint", typeof(short?) },
+                { "short", typeof(short?) },
+                { "integer", typeof(int?) },
+                { "int", typeof(int?) },
+                { "bigint", typeof(long?) },
+                { "long", typeof(long?) },
+                { "real", typeof(float?) },
+                { "float", typeof(float?) },
+                { "double precision", typeof(double?) },
+                { "double", typeof(double?) },
+                { "numeric", typeof(decimal?) },
+                { "money", typeof(decimal?) },
+                { "decimal", typeof(decimal?) },
+                { "text", typeof(string) },
+                { "character varying", typeof(string) },
+                { "character", typeof(string) },
+                { "citext", typeof(string) },
+                { "json", typeof(string) },
+                { "jsonb", typeof(string) },
+                { "xml", typeof(string) },
+                { "(internal?) char", typeof(string) },
+                { "name", typeof(string) },
+                { "string", typeof(string) },
+                { "uuid", typeof(Guid?) },
+                { "guid", typeof(Guid?) },
+                { "bytea", typeof(byte[]) },
+                { "timestamp without time zone", typeof(DateTime?) },
+                { "datetime", typeof(DateTime?) },
+                { "timestamp with time zone", typeof(DateTimeOffset?) },
+                { "date", typeof(DateOnly?) },
+                { "time without time zone", typeof(TimeSpan?) },
+                { "interval", typeof(TimeSpan?) },
+                { "time with time zone", typeof(DateTimeOffset?) },
+                { "cidr", typeof(NpgsqlCidr?) },
+                { "inet", typeof(IPAddress) },
+                { "macaddr", typeof(PhysicalAddress) },
+                { "bit", typeof(bool?) },
+                { "bit(1?)", typeof(bool?) },
+                { "bit varying", typeof(BitArray) },
+                { "point", typeof(NpgsqlPoint?) },
+                { "path", typeof(NpgsqlPath?) },
+                { "polygon", typeof(NpgsqlPolygon?) },
+                { "line", typeof(NpgsqlLine?) },
+                { "circle", typeof(NpgsqlCircle?) },
+                { "box", typeof(NpgsqlBox?) },
+                { "hstore", typeof(Dictionary<string, string>) },
+                { "oid", typeof(uint?) },
+                { "cid", typeof(uint?) },
+                { "oidvector", typeof(uint[]) },
+                { "record", typeof(object[]) }
+            };
 
     private const string PostgreSqlTableDefinitionQuery = """
                                                           select
@@ -44,6 +207,23 @@ public class PostgreSqlTestDbConnection(IDbConnection connection) : TestDbConnec
 
     
     
+    private static readonly IReadOnlyDictionary<Type, Func<string, object>> LocalConverters =
+        new Dictionary<Type, Func<string, object>>
+        {
+            {typeof(NpgsqlCidr), input =>
+                {
+                    string[] strings = input.Split("/");
+                    IPAddress address = IPAddress.Parse(strings[0]);
+                    byte mask = byte.Parse(strings[1]);
+                    return new NpgsqlCidr(address, mask);
+                }
+            },
+            {typeof(NpgsqlPoint), i=>ParsePoint(i) },
+            {typeof(NpgsqlPath), i=>ParsePath(i) },
+            {typeof(NpgsqlLine), i=>ParseLine(i)},
+            {typeof(NpgsqlCircle), i=>ParseCircle(i)},
+            {typeof(NpgsqlBox), i=>ParseBox(i)}
+        };
 
     /// <summary>
     /// Query string that will be used to map a table to the C# classes
@@ -260,12 +440,12 @@ select
                 NpgsqlDbType? dbType=null;
                 string argName=$"@{cleanedColumnList[x]}";
                 if (expectedColumnTypes?[x]!=null)
-                    dbType  =GetDatabasePropertyType(expectedColumnTypes[x]!);
+                    dbType  =GetDatabasePropertyType(expectedColumnTypes[x]);
                 
                 if(dbType.HasValue)
                 {
                     if (value is string s)
-                        value = ConverterToType(expectedColumnTypes![x]!, s);
+                        value = ConverterToType(expectedColumnTypes![x], s);
                     parameter = new NpgsqlParameter(argName, dbType.Value)
                     {
                         Value =  value ?? DBNull.Value
@@ -294,7 +474,7 @@ select
         for (int colIndex = 0; colIndex < dataTable.Columns.Count; colIndex++)
         {
             string columnName = dataTable.Columns[colIndex].ColumnName;
-            if (columnName == " __IndicatorColumn__ ")
+            if (columnName == "__IndicatorColumn__")
             {
                 columnName = "(M)atch / Un(E)xpected /Equals (=)";
             }
@@ -557,7 +737,7 @@ SELECT
         int extra = 0;//reader.GetInt32(2);
         foreach (DataRow dataRow in results.Rows)
         {
-            string v = dataRow[0]!.ToString()!;
+            string v = dataRow[0].ToString()!;
             switch (v)
             {
                 case "M":
@@ -581,6 +761,14 @@ SELECT
 
     }
 
+    /// <summary>
+    /// Parse a string and returns a point
+    /// </summary>
+    /// <param name="input">    The string to parse. </param>
+    /// <returns>
+    /// A NpgsqlPoint.
+    /// </returns>
+    /// <remarks>The point is expected to be in the format of (x,y). </remarks>
     public static NpgsqlPoint ParsePoint(string input)
     {
         
@@ -590,6 +778,17 @@ SELECT
             return new NpgsqlPoint(x, y);
         
     }
+
+    /// <summary>
+    /// Parse a string and returns an NpgsqlPath object
+    /// </summary>
+    /// <param name="input">    The string to parse. </param>
+    /// <returns>
+    /// A NpgsqlPath.
+    /// </returns>
+    /// <remarks>
+    /// The string is expected to be in the format of [(x1,y1), (x2, y2)...(xn,yn)]
+    /// </remarks>
     public static NpgsqlPath ParsePath(string input)
     {
         bool open = input[0] == '[';
@@ -599,6 +798,15 @@ SELECT
         IEnumerable<NpgsqlPoint> npgsqlPoints = matchCollection.Select(m => ParsePoint(m.Groups[0].Value));
         return new NpgsqlPath(npgsqlPoints, open);
     }
+
+    /// <summary>
+    /// Parse a string and returns an NpgsqlBox object
+    /// </summary>
+    /// <param name="input">    The string to parse. </param>
+    /// <returns>
+    /// A NpgsqlBox.
+    /// </returns>
+    /// <remarks>The string is expected to be in the format of [(T,R), (B,L)] where (T,R) is the top right coordinate and (B,L) is the bottom left.</remarks>
     public static NpgsqlBox ParseBox(string input)
     {
         Regex matcher = new Regex(@"\((.*?)\)");
@@ -606,6 +814,15 @@ SELECT
         NpgsqlPoint[] npgsqlPoints = matchCollection.Select(m => ParsePoint(m.Groups[0].Value)).ToArray();
         return new NpgsqlBox(npgsqlPoints[0], npgsqlPoints[1]);
     }
+
+    /// <summary>
+    /// Parse a string and retunrs an NpgsqlLine
+    /// </summary>
+    /// <param name="input">    The string to parse. </param>
+    /// <returns>
+    /// An NpgsqlLine.
+    /// </returns>
+    /// <remarks>The string is expected to be in the format of {A,B,C} where A, B and C are represented  in the formula Ax + By = C = 0 </remarks>
     public static NpgsqlLine ParseLine(string input)
     {
         string[] split = input.Trim(['{', '}']).Split(",");
@@ -614,6 +831,15 @@ SELECT
         double c = double.Parse(split[2]);
         return new NpgsqlLine(a, b, c);
     }
+
+    /// <summary>
+    /// Parse a string to return an NpgsqlCircle
+    /// </summary>
+    /// <param name="input">    The string to parse. </param>
+    /// <returns>
+    /// An NpgsqlCircle.
+    /// </returns>
+    /// <remarks>The string is expected to be in the format of <(Cx,Cy),R> where (Cx,Cy) is the center of the circle and R is the radius.</remarks>
     public static NpgsqlCircle ParseCircle(string input)
     {
         string[] split = input.Replace("(","")
@@ -626,23 +852,6 @@ SELECT
         double c = double.Parse(split[2]);
         return new NpgsqlCircle(a, b, c);
     }
-    public static readonly IReadOnlyDictionary<Type, Func<string, object>> LocalConverters =
-        new Dictionary<Type, Func<string, object>>
-        {
-            {typeof(NpgsqlCidr), input =>
-                {
-                    string[] strings = input.Split("/");
-                    IPAddress address = IPAddress.Parse(strings[0]);
-                    byte mask = byte.Parse(strings[1]);
-                    return new NpgsqlCidr(address, mask);
-                }
-            },
-            {typeof(NpgsqlPoint), i=>ParsePoint(i) },
-            {typeof(NpgsqlPath), i=>ParsePath(i) },
-            {typeof(NpgsqlLine), i=>ParseLine(i)},
-            {typeof(NpgsqlCircle), i=>ParseCircle(i)},
-            {typeof(NpgsqlBox), i=>ParseBox(i)}
-        };
     /// <inheritdoc />
     public override IList<DatabaseMappedClassPropertyDefinition> GetProperties(string schema, string tableName)
     {
@@ -675,7 +884,7 @@ SELECT
                     Scale = reader.GetByte(5),
                     IsComputed = reader.GetInt32(6) > 0
                 };
-                definition.MappedType = GetPropertyType(definition.SourceType, definition.IsNullable, definition.MaxSize);
+                definition.MappedType = GetPropertyType(definition.SourceType, definition.IsNullable/*, definition.MaxSize*/);
                 properties.Add(
                     definition
                 );
@@ -687,132 +896,55 @@ SELECT
         return properties;
 
     }
-    
 
+    /// <inheritdoc/>
     protected override object ConvertForDatabaseValue(string value, string targetType)
     {
         return ConverterToType(targetType, value);
     }
 
-    
+    /// <summary>
+    /// Converter to specified type
+    /// </summary>
+    /// <param name="typeName"> Name of the type. </param>
+    /// <param name="input">    The string to parse/convert. </param>
+    /// <returns>
+    /// An object of the specified type, if a converter is defined; otherwise the input
+    /// </returns>
     public static object ConverterToType(string typeName, string input)
     {
-        Type? converterType = GetPropertyType(typeName, false, -1);
+        Type? converterType = GetPropertyType(typeName, false/*, -1*/);
         if (converterType != null)
         {
             if (LocalConverters.TryGetValue(converterType, out var localConverter))
                 return localConverter(input);
-
             if (AutoAssigner.Converters.TryGetValue(converterType, out var converter))
                 return converter(input);
         }
 
-        return typeName.ToLower() switch
-        {
-            "int" or "integer" => AutoAssigner.Converters[typeof(int)](input),
-            "smallint"  => AutoAssigner.Converters[typeof(short)](input),
-            "bigint"  => AutoAssigner.Converters[typeof(long)](input),
-            "long" => AutoAssigner.Converters[typeof(long)](input),
-            "decimal" => AutoAssigner.Converters[typeof(decimal)](input),
-            "double" => AutoAssigner.Converters[typeof(double)](input),
-            "float" => AutoAssigner.Converters[typeof(float)](input),
-            "byte" => AutoAssigner.Converters[typeof(byte)](input),
-            "short" => AutoAssigner.Converters[typeof(short)](input),
-            "string" => AutoAssigner.Converters[typeof(string)](input),
-            "Guid" => AutoAssigner.Converters[typeof(Guid)](input),
-            "DateTime" => AutoAssigner.Converters[typeof(DateTime)](input),
-            "bool" or  "boolean" => AutoAssigner.Converters[typeof(bool)](input),
-            _ =>  input
-        };
-        
+        return input;
     }
     
 
     private static NpgsqlDbType? GetDatabasePropertyType(string sourceType)
     {
-        return sourceType.ToLower() switch
-        {
-            "boolean"  => NpgsqlDbType.Boolean,
-            "smallint" => NpgsqlDbType.Smallint,
-            "integer" => NpgsqlDbType.Integer,
-            "bigint" => NpgsqlDbType.Bigint,
-            "real" => NpgsqlDbType.Real,
-            "double precision" => NpgsqlDbType.Double,
-            "numeric" or "money" => NpgsqlDbType.Money,
-            "text" or "character varying" or "character" or "citext" or "json" or "jsonb" or "(internal) char"
-                or "name" => NpgsqlDbType.Varchar,
-            "xml"=>NpgsqlDbType.Xml,
-            "uuid" => NpgsqlDbType.Uuid,
-            "bytea" => NpgsqlDbType.Bytea,
-            "timestamp without time zone" => NpgsqlDbType.Timestamp,
-            "timestamp with time zone" => NpgsqlDbType.TimestampTz,
-            "date" => NpgsqlDbType.Date,
-            "time without time zone" => NpgsqlDbType.Time,
-            "time with time zone" => NpgsqlDbType.TimeTz,
-            "interval" => NpgsqlDbType.Interval,
-            "cidr" => NpgsqlDbType.Cidr,
-            "inet" => NpgsqlDbType.Inet,
-            "macaddr" => NpgsqlDbType.MacAddr,
-            "tsquery" =>NpgsqlDbType.TsQuery,
-            "tsvector" => NpgsqlDbType.TsVector,
-            "bit" or "bit varying" => NpgsqlDbType.Bit,
-            "point" => NpgsqlDbType.Point,
-            "lseg" => NpgsqlDbType.LSeg,
-            "path" => NpgsqlDbType.Path,
-            "polygon" => NpgsqlDbType.Polygon,
-            "line" => NpgsqlDbType.Line,
-            "circle" => NpgsqlDbType.Circle,
-            "box" => NpgsqlDbType.Box,
-            "hstore" => NpgsqlDbType.Hstore,
-            "oid" => NpgsqlDbType.Oid,
-            "cid" => NpgsqlDbType.Cid,
-            "oidvector" => NpgsqlDbType.Oidvector,
-//            "record" => NpgsqlDbType.Rec
-            _ => null
-        };
+        
+        if (DatabasePropertyTypeMap.TryGetValue(sourceType, out NpgsqlDbType dbType))
+            return dbType;
+        return null;
     }
-    private static Type? GetPropertyType(string sourceType, bool isNullable, int maxLength)
+    private static Type? GetPropertyType(string sourceType, bool isNullable/*, int maxLength*/)
     {
-        return sourceType switch
-        {
-            "boolean" => isNullable ? typeof(bool?) : typeof(bool),
-            "smallint" => isNullable ? typeof(short?) : typeof(short),
-            "integer" => isNullable ? typeof(int?) : typeof(int),
-            "bigint" => isNullable ? typeof(long?) : typeof(long),
-            "real" => isNullable ? typeof(float?) : typeof(float),
-            "double precision" => isNullable ? typeof(double?) : typeof(double),
-            "numeric" or "money" => isNullable ? typeof(decimal?) : typeof(decimal),
-            "text" or "character varying" or "character" or "citext" or "json" or "jsonb" or "xml" or "(internal) char"
-                or "name" => typeof(string),
-            "uuid" => isNullable ? typeof(Guid?) : typeof(Guid),
-            "bytea" => typeof(byte[]),
-            "timestamp without time zone" => isNullable ? typeof(DateTime?) : typeof(DateTime),
-            "timestamp with time zone" => isNullable ? typeof(DateTimeOffset?) : typeof(DateTimeOffset),
-            "date" => isNullable ? typeof(DateOnly?) : typeof(DateOnly),
-            "time without time zone" or "interval"  => isNullable ? typeof(TimeSpan?) : typeof(TimeSpan),
-            "time with time zone" => isNullable ? typeof(DateTimeOffset?) : typeof(DateTimeOffset),
-            "cidr" => isNullable ? typeof(NpgsqlCidr?) : typeof(NpgsqlCidr),
-            "inet" => typeof(IPAddress),
-            "macaddr" => typeof(PhysicalAddress),
-            //"tsquery" => typeof(NpgsqlTsQuery),
-            //"tsvector" => typeof(NpgsqlTsVector),
-            "bit"=> maxLength== 1?( isNullable ? typeof(bool?) : typeof(bool)) :   isNullable ? typeof(bool?) : typeof(bool),
-            "bit(1)"=> isNullable ? typeof(bool?) : typeof(bool),
-            "bit varying" => typeof(BitArray),
-            "point" => isNullable ? typeof(NpgsqlPoint?) : typeof(NpgsqlPoint),
-            //"lseg" => isNullable ? typeof(NpgsqlLSeg?) : typeof(NpgsqlLSeg),
-            "path" => isNullable ? typeof(NpgsqlPath?) : typeof(NpgsqlPath),
-            "polygon" => isNullable ? typeof(NpgsqlPolygon?) : typeof(NpgsqlPolygon),
-            "line" => isNullable ? typeof(NpgsqlLine?) : typeof(NpgsqlLine),
-            "circle" => isNullable ? typeof(NpgsqlCircle?) : typeof(NpgsqlCircle),
-            "box" => isNullable ? typeof(NpgsqlBox?) : typeof(NpgsqlBox),
-            "hstore" => typeof(Dictionary<string, string>),
-            "oid" => isNullable ? typeof(uint?) : typeof(uint),
-            "cid" => isNullable ? typeof(uint?) : typeof(uint),
-            "oidvector" => typeof(uint[]),
-            "record" => typeof(object[]),
-            _ => null
-        };
+        if(isNullable)
+        {if (NullablePropertyTypes.TryGetValue(sourceType, out Type? pt))
+                return pt;
+
+        }
+        else {if (PropertyTypes.TryGetValue(sourceType, out Type? pt))
+            return pt;
+        }
+
+        return null;
     }
 
 }

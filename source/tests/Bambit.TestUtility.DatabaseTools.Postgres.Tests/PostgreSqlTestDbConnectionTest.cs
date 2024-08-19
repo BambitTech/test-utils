@@ -568,8 +568,48 @@ public class PostgreSqlTestDbConnectionTest
         connection.ExecuteScalar<long>("select count(1) from test.testTableNullable").Should().Be(0);
             
     }
+
+    [TestMethod] 
+    public void TrackInfoMessages_SqlPrints_CatchesMessages()
+    {
+        PostgreSqlTestDbConnection connection = GetConnection();
+        connection.TrackInfoMessages();
+        connection.Open();
+        connection.ExecuteQuery("""
+                                LISTEN channel;
+                                SELECT pg_notify('channel','Hello world');
+                                
+                                """);
+        connection.Close();
+        connection.OutputMessages.Should().Contain("channel|Hello world");
+
+
+    }
+    [TestMethod] 
+    public void UnTrackInfoMessages_SqlPrints_CatchesMessages()
+    {
+        PostgreSqlTestDbConnection connection = GetConnection();
+        connection.TrackInfoMessages();
+        connection.Open();
+        connection.ExecuteQuery("""
+                                LISTEN channel;
+                                SELECT pg_notify('channel','Hello world');
+                                
+                                """);
+        connection.ClearInfoMessages();
+        connection.UntrackInfoMessages();
         
-        
+        connection.ExecuteQuery("""
+                                LISTEN channel;
+                                SELECT pg_notify('channel','Hello world');
+
+                                """);
+        connection.Close();
+        connection.OutputMessages.Should().BeEmpty();
+
+
+    }
+
     [TestMethod]
     public void Transactions_PassIsolationLevel_SetsIsolationLevel()
     {
@@ -627,8 +667,6 @@ public class PostgreSqlTestDbConnectionTest
         bool booleanValue = RandomDataGenerator.Instance.GenerateBoolean();
         bool[] booleans = RandomDataGenerator.Instance
             .InitializeList<bool>(9, (i) => i.GenerateBoolean()).ToArray();
-        string booleansStrings = string.Join("", booleans.Select(b => b ? "1" : "0"));
-        BitArray bitArray = new BitArray(booleans);
         NpgsqlPoint point = new NpgsqlPoint(RandomDataGenerator.Instance.GenerateDouble(3,4), 
             RandomDataGenerator.Instance.GenerateDouble(3, 4));
         NpgsqlLine line= new NpgsqlLine(RandomDataGenerator.Instance.GenerateDouble(3,4), 
@@ -654,8 +692,11 @@ public class PostgreSqlTestDbConnectionTest
             ["3.1","real", 3.1F],
             ["true","boolean", true],
             ["false","boolean", false],
+            ["true","bool", true],
+            ["false","bool", false],
             ["3","smallint", 3],
             ["153","integer", 153],
+            ["153","int", 153],
             ["1535282","bigint", 1535282],
             ["3.112","double precision", 3.112],
             ["3.158","numeric", 3.158],
