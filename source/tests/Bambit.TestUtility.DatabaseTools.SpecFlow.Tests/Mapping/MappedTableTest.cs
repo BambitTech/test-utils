@@ -156,7 +156,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow.Tests.Mapping
         [DataRow(FirstFieldName, FirstFieldName, FirstFieldName, "date", 0)]
         [DataRow(SecondFieldName, SecondFieldName, SecondFieldName, "date", 1)]
         [DataRow(ThirdFieldName, ThirdFieldName, ThirdFieldName, "boolean", 2)]
-        [DataRow(FourthFieldName, FourthFieldName, FourthFieldName, null, 3)]
+        [DataRow(FourthFieldName, FourthFieldName, FourthFieldName, "Invalid", 3)]
         [DataRow(FifthFieldName, FifthFieldName, FifthFieldName, null, 4)]
         [DataRow(LastFieldName, LastFieldName, LastFieldName, "boolean", 5)]
         public void GetColumnDescription_ReturnsExpected(string name, string columnName, string cleanedName, string columnType, int index)

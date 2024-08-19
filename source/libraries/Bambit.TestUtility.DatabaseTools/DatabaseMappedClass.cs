@@ -54,7 +54,6 @@ namespace Bambit.TestUtility.DatabaseTools
         /// <summary>
         /// Retrieves the property on the class with the specified name
         /// </summary>
-        /// <typeparam name="T">The data type of the property</typeparam>
         /// <param name="propertyName">The name of the property to retrieve</param>
         /// <returns>The value of the field</returns>
         /// <exception cref="ArgumentException">The specified property name does not exist on the class</exception>

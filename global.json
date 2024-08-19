@@ -2,5 +2,12 @@
   "sdk": {
     "rollForward": "feature",
     "version": "8.0.204"
+  },
+  "scripts": {
+    "build": "dotnet build --configuration Release",
+    "test": "dotnet test source/TestUtilities.sln --configuration Debug -p:CollectCoverage=true -p:CoverletOutput=../TestResults/ -p:CoverletOutputFormat=lcov -p:MergeWith=../TestResults/coverlet.json --collect:\"XPlat Code Coverage\" -p:CoverletOutputFormat=cobertura  -p:ExcludeByFile=\"*/**/*.g.cs\" -m:1",
+    "report": "reportgenerator -reports:\"source/tests/**/TestResults/**/coverage.cobertura.xml\" -targetdir:coveragereport -reporttypes:\"Html;Clover\" -sourcedirs:source/ -assemblyfilters:\"+*;-*.Tests.dll\" -classfilters:\"+*\" -filefilters:\"-*.g.cs\" -riskhotspotassemblyfilters:\"+*\" -riskhotspotclassfilters:\"+*\"",
+    "nuget": "dotnet pack source/libraries/Bambit.TestUtility.DataGeneration/ --configuration Release --output ./dist/ && dotnet pack source/libraries/Bambit.TestUtility.DatabaseTools/ --configuration Release --output ./dist && dotnet pack source/libraries/Bambit.TestUtility.DatabaseTools.SqlServer/ --configuration Release --output ./dist/ && dotnet pack source/libraries/Bambit.TestUtility.DatabaseTools.SpecFlow/ --configuration Release --output ./dist &&dotnet pack source/libraries/Bambit.TestUtility.DatabaseTools.Postgres/ --configuration Release --output ./dist",
+    "checkNuget": "meziantou.validate-nuget-package \\dist\\.*.nupkg"
   }
 }

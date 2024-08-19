@@ -121,6 +121,7 @@ public abstract class TestDbConnection(IDbConnection connection) : ITestDbConnec
         IEnumerable<object?[]> compareRows,
         bool allowUnexpectedRows = false);
 
+    /// <inheritdoc />
     public object ConvertValue(string value, string targetType)
     {
         switch (targetType)
@@ -148,6 +149,14 @@ public abstract class TestDbConnection(IDbConnection connection) : ITestDbConnec
         return ConvertForDatabaseValue(value, targetType);
     }
 
+    /// <summary>
+    /// Convert a string value to a target database type
+    /// </summary>
+    /// <param name="value">        The value. </param>
+    /// <param name="targetType">   Type of the target. </param>
+    /// <returns>
+    /// The string as a DB type
+    /// </returns>
     protected virtual object ConvertForDatabaseValue(string value, string targetType)
     {
         return value;

@@ -1,11 +1,15 @@
 ﻿using System.Data;
 using System.Diagnostics;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using Bambit.TestUtility.DatabaseTools.Attributes;
 using Bambit.TestUtility.DataGeneration;
 using FluentAssertions;
+using FluentAssertions.Common;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using NpgsqlTypes;
 
 namespace Bambit.TestUtility.DatabaseTools.Postgres.Tests;
 
@@ -471,7 +475,7 @@ public class PostgreSqlTestDbConnectionTest
     [TestMethod]
     public void ConnectionTimeout_Gets_ReturnsExpected()
     {
-        GetConnection().ConnectionTimeout.Should().Be(Configuration.GetValue<int>("Settings:ConnectionTimeout")!);
+        GetConnection().ConnectionTimeout.Should().Be(Configuration.GetValue<int>("Settings:ConnectionTimeout"));
     }
 
     [TestMethod]
@@ -562,8 +566,48 @@ public class PostgreSqlTestDbConnectionTest
         connection.ExecuteScalar<long>("select count(1) from test.testTableNullable").Should().Be(0);
             
     }
+
+    [TestMethod] 
+    public void TrackInfoMessages_SqlPrints_CatchesMessages()
+    {
+        PostgreSqlTestDbConnection connection = GetConnection();
+        connection.TrackInfoMessages();
+        connection.Open();
+        connection.ExecuteQuery("""
+                                LISTEN channel;
+                                SELECT pg_notify('channel','Hello world');
+                                
+                                """);
+        connection.Close();
+        connection.OutputMessages.Should().Contain("channel|Hello world");
+
+
+    }
+    [TestMethod] 
+    public void UnTrackInfoMessages_SqlPrints_CatchesMessages()
+    {
+        PostgreSqlTestDbConnection connection = GetConnection();
+        connection.TrackInfoMessages();
+        connection.Open();
+        connection.ExecuteQuery("""
+                                LISTEN channel;
+                                SELECT pg_notify('channel','Hello world');
+                                
+                                """);
+        connection.ClearInfoMessages();
+        connection.UntrackInfoMessages();
         
-        
+        connection.ExecuteQuery("""
+                                LISTEN channel;
+                                SELECT pg_notify('channel','Hello world');
+
+                                """);
+        connection.Close();
+        connection.OutputMessages.Should().BeEmpty();
+
+
+    }
+
     [TestMethod]
     public void Transactions_PassIsolationLevel_SetsIsolationLevel()
     {
@@ -592,7 +636,114 @@ public class PostgreSqlTestDbConnectionTest
         connection.ExecuteScalar<long>("select count(1) from test.testTableNullable").Should().Be(1);
             
     }
+
+
+    
+    private static List<object[]> GetConverterToTypeData()
+    {
+        DateTime randomDate = RandomDataGenerator.Instance.GenerateDate();
+        DateTimeOffset dateTimeOffset = RandomDataGenerator.Instance.GenerateDateTime().ToDateTimeOffset();
+        string randomString = RandomDataGenerator.Instance.GenerateString(10);
+        Guid testGuid = RandomDataGenerator.Instance.GenerateGuid();
+        IPAddress address = new([
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte()
+        ]);
+        PhysicalAddress physicalAddress = new([
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte(),
+            RandomDataGenerator.Instance.GenerateByte()
+        ]);
+        bool booleanValue = RandomDataGenerator.Instance.GenerateBoolean();
+        NpgsqlPoint point = new(RandomDataGenerator.Instance.GenerateDouble(3,4), 
+            RandomDataGenerator.Instance.GenerateDouble(3, 4));
+        NpgsqlLine line= new(RandomDataGenerator.Instance.GenerateDouble(3,4), 
+            RandomDataGenerator.Instance.GenerateDouble(3, 4),
+            RandomDataGenerator.Instance.GenerateDouble(3, 4)
+            );
+        NpgsqlPath path = new(RandomDataGenerator.Instance.InitializeList(5, (d) =>
+            new NpgsqlPoint(d.GenerateDouble(3, 4),
+                d.GenerateDouble(3, 4))), RandomDataGenerator.Instance.GenerateBoolean());
+        NpgsqlCircle circle = new(RandomDataGenerator.Instance.GenerateDouble(3,4), 
+            RandomDataGenerator.Instance.GenerateDouble(3, 4),
+            RandomDataGenerator.Instance.GenerateDouble(3, 4)
+        );
+        NpgsqlBox box = new(RandomDataGenerator.Instance.GenerateDouble(3, 4),
+            RandomDataGenerator.Instance.GenerateDouble(3, 4),
+            RandomDataGenerator.Instance.GenerateDouble(3, 4),
+            RandomDataGenerator.Instance.GenerateDouble(3, 4));
+        uint u = Convert.ToUInt32(RandomDataGenerator.Instance.GenerateInt());
+        return
         
+        
+        [
+            ["3.1","real", 3.1F],
+            ["true","boolean", true],
+            ["false","boolean", false],
+            ["true","bool", true],
+            ["false","bool", false],
+            ["3","smallint", 3],
+            ["153","integer", 153],
+            ["153","int", 153],
+            ["1535282","bigint", 1535282],
+            ["3.112","double precision", 3.112],
+            ["3.158","numeric", 3.158],
+            ["3.158","money", 3.158],
+            ["153","text", "153"],
+            [randomString ,"character varying", randomString ],
+            [randomString ,"character", randomString ],
+            [randomString ,"json", randomString ],
+            [randomString ,"citext", randomString ],
+            [randomString ,"jsonb", randomString ],
+            [randomString ,"jsonb", randomString ],
+            [randomDate.ToString(),"timestamp without time zone", randomDate ],
+            [dateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss.fffffff zz"),"timestamp with time zone", dateTimeOffset],
+            [testGuid .ToString(), "uuid", testGuid ],
+            [address.ToString(), "inet",address],
+            [physicalAddress.ToString(), "macaddr", physicalAddress],
+            [booleanValue.ToString(), "bit",booleanValue],
+            [booleanValue.ToString(), "bit(1)",booleanValue],
+            //[booleansStrings, "bit varying",bitArray],
+            [point.ToString(), "point",point],
+            [path.ToString(),"path", path],
+            [line.ToString(),"line", line],
+            [circle.ToString(), "circle", circle],
+            [box.ToString(), "box", box],
+            [u.ToString(), "oid",u],
+            [u.ToString(), "cid",u]
+            //["my test string","bytea", "my test string"]
+
+        ];
+    } 
+
+    [DataTestMethod]
+    [DynamicData(nameof(GetConverterToTypeData), DynamicDataSourceType.Method)]
+  
+    //[DataRow(new object[]{"my test string","bytea", "my test string" })]
+    //[DataRow(new object[]{"my test string","jsonb", new Guid("84C3B061-2E52-4ED0-B45D-D84AAFB354B5")})]
+    
+
+    public void ConverterToType_ConvertsAsExpected(string input, string typeName, object expected)
+    {
+        PostgreSqlTestDbConnection.ConverterToType(typeName, input).Should().Be(expected);
+    }
+    
+    [TestMethod]
+    public void ConverterToType_Cidr_ConvertsAsExpected()
+    {  NpgsqlCidr cidr = new(
+            IPAddress.Parse(
+                $"{RandomDataGenerator.Instance.GenerateInt(0, 255)}.{RandomDataGenerator.Instance.GenerateInt(0, 255)}.{RandomDataGenerator.Instance.GenerateInt(0, 255)}.{RandomDataGenerator.Instance.GenerateInt(0, 255)}"),
+            RandomDataGenerator.Instance.GenerateByte()
+        );
+        PostgreSqlTestDbConnection.ConverterToType("cidr", cidr.ToString()).Should().Be(cidr);
+    }
 
     #endregion Base members
 }
