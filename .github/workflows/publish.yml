@@ -71,7 +71,7 @@ jobs:
         run: meziantou.validate-nuget-package (Get-ChildItem "${{ env.NuGetDirectory }}/*.nupkg")
 
   run_test:
-    uses: ./.github/workflows/reuntests.workflow_call.yml
+    uses: ./.github/workflows/runtests.workflow_call.yml
     
   deploy:
     # Publish only when creating a GitHub Release
