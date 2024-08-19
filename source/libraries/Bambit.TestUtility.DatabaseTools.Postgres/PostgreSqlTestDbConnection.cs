@@ -66,7 +66,7 @@ public class PostgreSqlTestDbConnection(IDbConnection connection) : TestDbConnec
                 { "cid", NpgsqlDbType.Cid },
                 { "oidvector", NpgsqlDbType.Oidvector },
             };
-    private static 
+    private static readonly 
         Dictionary<string,Type> PropertyTypes =new(StringComparer.CurrentCultureIgnoreCase)
         {
             {"byte",  typeof(byte)},
@@ -123,7 +123,7 @@ public class PostgreSqlTestDbConnection(IDbConnection connection) : TestDbConnec
             {"oidvector" , typeof(uint[])},
             {"record" , typeof(object[])}
         };
-    private static Dictionary<string, Type> NullablePropertyTypes =
+    private static readonly Dictionary<string, Type> NullablePropertyTypes =
             new(StringComparer.CurrentCultureIgnoreCase)
             {
                 { "byte", typeof(byte?) },
@@ -207,8 +207,8 @@ public class PostgreSqlTestDbConnection(IDbConnection connection) : TestDbConnec
 
     
     
-    private static readonly IReadOnlyDictionary<Type, Func<string, object>> LocalConverters =
-        new Dictionary<Type, Func<string, object>>
+    private static readonly Dictionary<Type, Func<string, object>> LocalConverters =
+        new()
         {
             {typeof(NpgsqlCidr), input =>
                 {
@@ -793,7 +793,7 @@ SELECT
     {
         bool open = input[0] == '[';
         string trim = input.Trim(['[', ']']);
-        Regex matcher = new Regex(@"\((.*?)\)");
+        Regex matcher = new(@"\((.*?)\)");
         MatchCollection matchCollection = matcher.Matches(trim);
         IEnumerable<NpgsqlPoint> npgsqlPoints = matchCollection.Select(m => ParsePoint(m.Groups[0].Value));
         return new NpgsqlPath(npgsqlPoints, open);
@@ -809,7 +809,7 @@ SELECT
     /// <remarks>The string is expected to be in the format of [(T,R), (B,L)] where (T,R) is the top right coordinate and (B,L) is the bottom left.</remarks>
     public static NpgsqlBox ParseBox(string input)
     {
-        Regex matcher = new Regex(@"\((.*?)\)");
+        Regex matcher = new(@"\((.*?)\)");
         MatchCollection matchCollection = matcher.Matches(input);
         NpgsqlPoint[] npgsqlPoints = matchCollection.Select(m => ParsePoint(m.Groups[0].Value)).ToArray();
         return new NpgsqlBox(npgsqlPoints[0], npgsqlPoints[1]);
@@ -839,7 +839,7 @@ SELECT
     /// <returns>
     /// An NpgsqlCircle.
     /// </returns>
-    /// <remarks>The string is expected to be in the format of <(Cx,Cy),R> where (Cx,Cy) is the center of the circle and R is the radius.</remarks>
+    /// <remarks>The string is expected to be in the format of &lt;(Cx,Cy),R&gt; where (Cx,Cy) is the center of the circle and R is the radius.</remarks>
     public static NpgsqlCircle ParseCircle(string input)
     {
         string[] split = input.Replace("(","")

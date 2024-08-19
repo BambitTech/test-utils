@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Data;
+﻿using System.Data;
 using System.Diagnostics;
-using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Reflection;
@@ -477,7 +475,7 @@ public class PostgreSqlTestDbConnectionTest
     [TestMethod]
     public void ConnectionTimeout_Gets_ReturnsExpected()
     {
-        GetConnection().ConnectionTimeout.Should().Be(Configuration.GetValue<int>("Settings:ConnectionTimeout")!);
+        GetConnection().ConnectionTimeout.Should().Be(Configuration.GetValue<int>("Settings:ConnectionTimeout"));
     }
 
     [TestMethod]
@@ -644,17 +642,16 @@ public class PostgreSqlTestDbConnectionTest
     private static List<object[]> GetConverterToTypeData()
     {
         DateTime randomDate = RandomDataGenerator.Instance.GenerateDate();
-        int randomInt = RandomDataGenerator.Instance.GenerateInt();
         DateTimeOffset dateTimeOffset = RandomDataGenerator.Instance.GenerateDateTime().ToDateTimeOffset();
         string randomString = RandomDataGenerator.Instance.GenerateString(10);
         Guid testGuid = RandomDataGenerator.Instance.GenerateGuid();
-        IPAddress address = new IPAddress([
+        IPAddress address = new([
             RandomDataGenerator.Instance.GenerateByte(),
             RandomDataGenerator.Instance.GenerateByte(),
             RandomDataGenerator.Instance.GenerateByte(),
             RandomDataGenerator.Instance.GenerateByte()
         ]);
-        PhysicalAddress physicalAddress = new PhysicalAddress([
+        PhysicalAddress physicalAddress = new([
             RandomDataGenerator.Instance.GenerateByte(),
             RandomDataGenerator.Instance.GenerateByte(),
             RandomDataGenerator.Instance.GenerateByte(),
@@ -665,22 +662,20 @@ public class PostgreSqlTestDbConnectionTest
             RandomDataGenerator.Instance.GenerateByte()
         ]);
         bool booleanValue = RandomDataGenerator.Instance.GenerateBoolean();
-        bool[] booleans = RandomDataGenerator.Instance
-            .InitializeList<bool>(9, (i) => i.GenerateBoolean()).ToArray();
-        NpgsqlPoint point = new NpgsqlPoint(RandomDataGenerator.Instance.GenerateDouble(3,4), 
+        NpgsqlPoint point = new(RandomDataGenerator.Instance.GenerateDouble(3,4), 
             RandomDataGenerator.Instance.GenerateDouble(3, 4));
-        NpgsqlLine line= new NpgsqlLine(RandomDataGenerator.Instance.GenerateDouble(3,4), 
+        NpgsqlLine line= new(RandomDataGenerator.Instance.GenerateDouble(3,4), 
             RandomDataGenerator.Instance.GenerateDouble(3, 4),
             RandomDataGenerator.Instance.GenerateDouble(3, 4)
             );
-        NpgsqlPath path = new NpgsqlPath(RandomDataGenerator.Instance.InitializeList<NpgsqlPoint>(5, (d) =>
+        NpgsqlPath path = new(RandomDataGenerator.Instance.InitializeList(5, (d) =>
             new NpgsqlPoint(d.GenerateDouble(3, 4),
                 d.GenerateDouble(3, 4))), RandomDataGenerator.Instance.GenerateBoolean());
-        NpgsqlCircle circle = new NpgsqlCircle(RandomDataGenerator.Instance.GenerateDouble(3,4), 
+        NpgsqlCircle circle = new(RandomDataGenerator.Instance.GenerateDouble(3,4), 
             RandomDataGenerator.Instance.GenerateDouble(3, 4),
             RandomDataGenerator.Instance.GenerateDouble(3, 4)
         );
-        NpgsqlBox box = new NpgsqlBox(RandomDataGenerator.Instance.GenerateDouble(3, 4),
+        NpgsqlBox box = new(RandomDataGenerator.Instance.GenerateDouble(3, 4),
             RandomDataGenerator.Instance.GenerateDouble(3, 4),
             RandomDataGenerator.Instance.GenerateDouble(3, 4),
             RandomDataGenerator.Instance.GenerateDouble(3, 4));
@@ -742,7 +737,7 @@ public class PostgreSqlTestDbConnectionTest
     
     [TestMethod]
     public void ConverterToType_Cidr_ConvertsAsExpected()
-    {  NpgsqlCidr cidr = new NpgsqlCidr(
+    {  NpgsqlCidr cidr = new(
             IPAddress.Parse(
                 $"{RandomDataGenerator.Instance.GenerateInt(0, 255)}.{RandomDataGenerator.Instance.GenerateInt(0, 255)}.{RandomDataGenerator.Instance.GenerateInt(0, 255)}.{RandomDataGenerator.Instance.GenerateInt(0, 255)}"),
             RandomDataGenerator.Instance.GenerateByte()
