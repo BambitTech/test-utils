@@ -1,7 +1,6 @@
 name: Run Test Suite
 
 on:
-  push:
   workflow_call:
   
 jobs:
