@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="9.0.0" />
+    <PackageReference Include="Npgsql" Version="8.0.5" />
   </ItemGroup>
   <ItemGroup>
     <None Include="../../../docs/Bambit.TestUtility.DatabaseTools.Postgres/Readme.md" Pack="true" PackagePath="\" />

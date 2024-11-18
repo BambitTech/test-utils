@@ -615,6 +615,7 @@ select
         // NOTE: This logic was borrowed from tSqlt (https://github.com/tSQLt-org/tSQLt/blob/main/Source/tSQLt.Private_CompareTables.ssp.sql) which is licensed under apache 2.0
 
         string matchQuery = $@"
+drop table if exists  {ResultsTableName};	
 -- Create the temp table
 select '=' AS __IndicatorColumn__ , {columnList} into   {ResultsTableName}
     from {ExistingTableName}  where 1 = 0;
