@@ -1,5 +1,6 @@
 ﻿
 using System.Data;
+using System.Diagnostics;
 using Bambit.TestUtility.DatabaseTools.SpecFlow.Mapping;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Bambit.TestUtility.DatabaseTools.SpecFlow.Transforms;
