@@ -132,6 +132,23 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow.Tests.Mapping
         }
         #endregion DataReader Ctor
 
+        #region CleanRegex
+
+        [DataTestMethod]
+        [DataRow("Abcd", "Abcd")]
+        [DataRow("Abcd1", "Abcd1")]
+        [DataRow("Abcd@", "Abcd@")]
+        [DataRow("Abcd#", "Abcd")]
+        [DataRow("Abcd#Abcd", "AbcdAbcd")]
+        [DataRow("Abcd+Abcd", "AbcdAbcd")]
+        [DataRow("Abcd-Abcd", "AbcdAbcd")]
+        [DataRow("Abcd&Abcd", "AbcdAbcd")]
+        public void CleanRegex_Replace(string input, string expected)
+        {
+            MappedTable.CleanRegex.Replace(input, "").Should().Be(expected);
+        }
+
+        #endregion
 
         [DataTestMethod]
         [DataRow(FirstFieldName, 0)]

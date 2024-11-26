@@ -219,7 +219,7 @@ public partial class MappedTable
         };
     }
 
-    [GeneratedRegex("[^a-zA-Z@]")]
+    [GeneratedRegex("[^a-zA-Z@0-9]")]
     private static partial Regex AlphaRegEx();
 
     #endregion Private Methods
