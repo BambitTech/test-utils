@@ -18,7 +18,7 @@ public class SqlServerTestDbConnection(IDbConnection connection) : TestDbConnect
                                                                               col.name,
                                                                               typ.name,
                                                                               case
-                                                                                  when col.is_nullable = 1 and typ.name in ('bigint', 'bit', 'date', 'datetime', 'datetime2', 'datetimeoffset', 'decimal', 'float', 'int', 'money', 'numeric', 'real', 'smalldatetime', 'smallint', 'smallmoney', 'time', 'tinyint', 'uniqueidentifier')
+                                                                                  when col.is_nullable = 1 --and typ.name in ('bigint', 'bit', 'date', 'datetime', 'datetime2', 'datetimeoffset', 'decimal', 'float', 'int', 'money', 'numeric', 'real', 'smalldatetime', 'smallint', 'smallmoney', 'time', 'tinyint', 'uniqueidentifier')
                                                                                   then 1
                                                                                   else 0
                                                                               end NullableSign,

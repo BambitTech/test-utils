@@ -23,9 +23,10 @@ Scenario: Verify at least speficed records exist full table matches full table r
 
 	Given only the following records exist in the Test.TestTableAlpha table in the SqlTestDb database:
 | TestTableAlphaId                     | Name          | DateOfBirth | Score | [NullableBit] |
-| F6CC249B-BC42-46B9-A1CF-8D90690E4210 | John Smith    | 11/07/1975    | 100   | 1             |
-| A0926EEA-876A-4C25-9004-2A4724D73F0C | Susan Johnson | 1/1/1980      | 90    | NULL          |
-| 474A6CA3-FBEF-4C38-8C59-6E6AA18E9503 | Bob Obo       | 3/4/1956      | 250   | False         |
+| F6CC249B-BC42-46B9-A1CF-8D90690E4210 | John Smith    | 11/07/1975  | 100   | 1             |
+| A0926EEA-876A-4C25-9004-2A4724D73F0C | Susan Johnson | 1/1/1980    | 90    | NULL          |
+| 474A6CA3-FBEF-4C38-8C59-6E6AA18E9503 | Bob Obo       | 3/4/1956    | 250   | False         |
+| 59CE4CEE-C983-4269-9A84-A3B052DA3537 | null          | 3/4/1956    | 250   | False         |
 
 	Then the following records should exist in the Test.TestTableAlpha table in the SqlTestDb database:
 | TestTableAlphaId                     | Name          | DateOfBirth | Score |

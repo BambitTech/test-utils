@@ -174,8 +174,8 @@ namespace Bambit.TestUtility.DatabaseTools
             else if (propertyInfo.PropertyType == typeof(string))
             {
                 NullabilityInfo nullabilityInfo = NullabilityInfoContext.Create(propertyInfo);
-                nullable = nullabilityInfo.WriteState is NullabilityState.Nullable;
-
+                nullable = nullabilityInfo.WriteState is NullabilityState.Nullable ||
+                           propertyInfo.GetCustomAttributes(typeof(DatabaseNullableAttribute)).Any();
             }
             if (Converters.TryGetValue(propertyType, out var converter))
             {

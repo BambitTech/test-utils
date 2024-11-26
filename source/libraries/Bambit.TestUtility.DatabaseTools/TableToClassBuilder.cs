@@ -79,11 +79,11 @@ public class TableToClassBuilder(ITestDatabaseFactory testDatabaseFactory) : ITa
 
     private static void CreateProperty(TypeBuilder builder, DatabaseMappedClassPropertyDefinition propertyDefinition)
     {
-        if (propertyDefinition.MappedType==null)
+        if (propertyDefinition.MappedType == null)
         {
             return;
         }
-      
+
 
         Type? underlyingType = Nullable.GetUnderlyingType(propertyDefinition.MappedType);
         string safeName = Clean(propertyDefinition.Name);
@@ -124,17 +124,29 @@ public class TableToClassBuilder(ITestDatabaseFactory testDatabaseFactory) : ITa
         propertyBuilder.SetSetMethod(setBuilder);
 
         Type fieldSourceAttributeType = typeof(FieldSourceAttribute);
-        ConstructorInfo ci = fieldSourceAttributeType.GetConstructor([typeof(string),typeof(Type), typeof(string)])!;
+        ConstructorInfo ci = fieldSourceAttributeType.GetConstructor([typeof(string), typeof(Type), typeof(string)])!;
         CustomAttributeBuilder cab = new(ci, [propertyDefinition.Name, propertyDefinition.MappedType, propertyDefinition.SourceType]);
         propertyBuilder.SetCustomAttribute(cab);
 
-        if (propertyDefinition.MappedType == typeof(string) && propertyDefinition.MaxSize > 0)
+        if (propertyDefinition.MappedType == typeof(string))
         {
+            if (propertyDefinition.MaxSize > 0)
+            {
 
-            Type maxLengthType = typeof(MaxLengthAttribute);
-            ci = maxLengthType.GetConstructor([typeof(int)])!;
-            cab = new CustomAttributeBuilder(ci, [propertyDefinition.MaxSize]);
-            propertyBuilder.SetCustomAttribute(cab);
+                Type maxLengthType = typeof(MaxLengthAttribute);
+                ci = maxLengthType.GetConstructor([typeof(int)])!;
+                cab = new CustomAttributeBuilder(ci, [propertyDefinition.MaxSize]);
+                propertyBuilder.SetCustomAttribute(cab);
+            }
+
+            if (propertyDefinition.IsNullable)
+            {
+                Type nullableAttributeType = typeof(DatabaseNullableAttribute);
+                ConstructorInfo nci = nullableAttributeType.GetConstructor([])!;
+                CustomAttributeBuilder nullableAttribute = new(nci,[]);
+                propertyBuilder.SetCustomAttribute(nullableAttribute);
+
+            }
         }
         else if (propertyDefinition.MappedType == typeof(float) || propertyDefinition.MappedType == typeof(decimal)
                                                                 || propertyDefinition.MappedType == typeof(double)
@@ -177,7 +189,7 @@ public class TableToClassBuilder(ITestDatabaseFactory testDatabaseFactory) : ITa
 
     private IList<DatabaseMappedClassPropertyDefinition> GetProperties(string connectionName, string schema, string tableName)
     {
-        using ITestDbConnection connection =TestDatabaseFactory.GetConnection(connectionName);
+        using ITestDbConnection connection = TestDatabaseFactory.GetConnection(connectionName);
         return connection.GetProperties(schema, tableName);
 
     }

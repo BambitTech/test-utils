@@ -1,6 +1,14 @@
 ﻿namespace Bambit.TestUtility.DatabaseTools.Attributes;
 
 /// <summary>
+/// Marks a field from a database as nullable
+/// </summary>
+[AttributeUsage(AttributeTargets.Property)]
+public class DatabaseNullableAttribute() : Attribute
+{
+
+}
+/// <summary>
 /// Describes the source field name and type for a generated class
 /// </summary>
 /// <param name="sourceName">The name of the field in the database</param>
