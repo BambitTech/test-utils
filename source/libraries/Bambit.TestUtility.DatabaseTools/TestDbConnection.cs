@@ -149,6 +149,9 @@ public abstract class TestDbConnection(IDbConnection connection) : ITestDbConnec
         return ConvertForDatabaseValue(value, targetType);
     }
 
+    /// <inheritdoc />
+    public abstract string GenerateRenameTableScript(string schema, string oldName, string newName);
+
     /// <summary>
     /// Convert a string value to a target database type
     /// </summary>
@@ -203,4 +206,7 @@ public abstract class TestDbConnection(IDbConnection connection) : ITestDbConnec
         command.CommandType = CommandType.Text;
         return command.ExecuteReader();
     }
+
+    
+
 }

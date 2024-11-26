@@ -20,13 +20,30 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
 
     public class DatabaseSteps(ScenarioContext context, ISpecFlowOutputHelper outputHelper) : BaseSteps(context)
     {
+
+
+        private Stack<MockedObject> MockedObjects
+        {
+            get
+            {
+                Stack<MockedObject> mocks;
+                if (!Context.TryGetValue(out mocks))
+                {
+                    mocks = new Stack<MockedObject>();
+                    Context.Set(mocks);
+                }
+
+                return mocks;
+            }
+        }
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Current <see cref="ISpecFlowOutputHelper"/> </summary>
         ///
         /// <value> The output helper. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        protected  ISpecFlowOutputHelper OutputHelper { get; }=outputHelper;
+        protected ISpecFlowOutputHelper OutputHelper { get; }=outputHelper;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The last used connection. </summary>
@@ -360,6 +377,28 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
 
             return ExecuteQueryForResults(connection, query);
         }
+
+        /// <summary>
+        /// Adds a mocked object to the stack to later be unmocked after test runs
+        /// </summary>
+        /// <param name="mockObject"></param>
+        protected void AddMockedObject(MockedObject mockObject)
+        {
+            MockedObjects.Push(mockObject);
+        }
+
+        /// <summary>
+        /// Gets a mocked object from the stack if it exists, otherwise <c>null</c>
+        /// </summary>
+        /// <param name="originalSchema">The schema of the mocked object</param>
+        /// <param name="originalName">The name of the object that is mocked</param>
+        /// <returns></returns>
+        protected MockedObject? GetMockedObject(string originalSchema,string originalName)
+        {
+            return MockedObjects.FirstOrDefault(m => m.OriginalName == originalName && m.OriginalSchema==originalSchema);
+
+        }
+
 
     }
 }

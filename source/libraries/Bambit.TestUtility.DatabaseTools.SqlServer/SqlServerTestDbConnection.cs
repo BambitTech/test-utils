@@ -70,6 +70,7 @@ public class SqlServerTestDbConnection(IDbConnection connection) : TestDbConnect
     /// <summary>   (Immutable) name of the results table. </summary>
     protected const string ResultsTableName = "#__TestingUtilities_results";
 
+    
    
     /// <summary>
     /// Handler for <see cref="SqlConnection.InfoMessage"/> events
@@ -373,7 +374,13 @@ select
         }
 
     }
-    
+
+    /// <inheritdoc />
+    public override string GenerateRenameTableScript(string schema, string oldName, string newName)
+    {
+        return $"sp_Rename '{schema}.{oldName}', '{newName}'";
+    }
+
     /// <summary>
     /// Runs a comparison query against the 2 temp tables, <see cref="ExistingTableName"/> and <see cref="ExpectedTableName"/>
     /// </summary>

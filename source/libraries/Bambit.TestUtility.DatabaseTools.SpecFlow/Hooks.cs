@@ -1,5 +1,8 @@
-﻿using Bambit.TestUtility.DatabaseTools.SpecFlow.Configuration;
+﻿using System.Data;
+using Bambit.TestUtility.DatabaseTools.SpecFlow.Configuration;
+using Bambit.TestUtility.DatabaseTools.SpecFlow.Tools;
 using Microsoft.Extensions.Configuration;
+using System.Data.SqlClient;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Infrastructure;
 
@@ -12,7 +15,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     [Binding]
-    public class Hooks
+    public class Hooks(ScenarioContext context, ISpecFlowOutputHelper outputHelper)
     {
         private const string HandlerKey = nameof(HandlerKey);
 
@@ -33,7 +36,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
                 configuration.GetSection("specFlow").Get<SpecFlowUtilitiesConfiguration>();
 
             TestDatabaseFactoryOptions testDatabaseFactoryOptions = configuration.GetSection("databaseFactory").Get<TestDatabaseFactoryOptions>()!;
-            Config.Initialize(testDatabaseFactoryOptions,specFlowConfig??new SpecFlowUtilitiesConfiguration());
+            Config.Initialize(testDatabaseFactoryOptions, specFlowConfig ?? new SpecFlowUtilitiesConfiguration());
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +79,58 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
                 Config.Configuration.TestDatabaseFactory.MessageReceived -= handler;
             }
 
+
+        }
+
+
+        [AfterScenario]
+        public void RestoreMocks()
+        {
+
+            Stack<MockedObject> mocks;
+            if (context.TryGetValue(out mocks))
+            {
+                while (mocks.Count > 0)
+                {
+                    RestoreMockedObject(mocks.Pop());
+                }
+            }
             
+        }
+
+
+        private void RestoreMockedObject(MockedObject mockedObject)
+        {
+            try
+            {
+                SpecFlowDatabaseStateManager stateManager = new SpecFlowDatabaseStateManager(context);
+                ITestDbConnection testDbConnection =
+                    stateManager .OpenConnectionForName(mockedObject.ConnectionName);
+                using IDbCommand command = testDbConnection.CreateCommand();
+
+                foreach (string restoreScript in mockedObject.RestoreScripts)
+                {
+                    command.CommandText = restoreScript;
+                    command.ExecuteNonQuery();
+                }
+
+
+                if (mockedObject.DatabseObjectType == DatabseObjectType.Table)
+                    stateManager.DatabaseClassFactory.PurgeTableDefinition(mockedObject.ConnectionName,
+                        mockedObject.OriginalSchema, mockedObject.OriginalName);
+
+            }
+            catch (Exception ex)
+            {
+                if (mockedObject == null)
+                {
+                    outputHelper.WriteLine("Attempt to restore null object");
+                    throw;
+                }
+                outputHelper.WriteLine($"An error was thrown trying to restore object '{mockedObject.OriginalName}': ");
+                outputHelper.WriteLine($"\t'Connection: {mockedObject.ConnectionName}': ");
+                outputHelper.WriteLine($"\t'Restore scripts: {mockedObject.RestoreScripts?.Count}': ");
+            }
         }
 
     }
