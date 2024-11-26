@@ -65,7 +65,7 @@ namespace Bambit.TestUtility.DatabaseTools
                                                 p.Name ,propertyName, StringComparison.CurrentCultureIgnoreCase)==0
 
                                         ) ??
-                                        throw new ArgumentException("No such property exists", nameof(propertyName));
+                                        throw new ArgumentException($"Property '{propertyName}' does not exist", nameof(propertyName));
             return propertyInfo.GetValue(this);
         }
         /// <summary>

@@ -222,6 +222,13 @@ Given the following records exist in the Test.TestTableAlpha table in the SqlTes
 | tomorrow                   |
 | today                      |
 
+Scenario: Fill table in random order
+Given only the following records exist in the Test.TestTableAlpha table:
+| DateOfBirth @date | Score | Name |
+| 2001-01-01        | 123   | Dave |
+Then only the following records should exist in the Test.TestTableAlpha table:
+| DateOfBirth @date | Score | Name |
+| 2001-01-01        | 123   | Dave |
 
 
 Scenario: Set a variable from the database
@@ -291,6 +298,7 @@ Scenario: Negative numbers are handled as expected
 Then only the following records should exist in the Test.TestTableAlpha table in the SqlTestDb database should fail:
 | [TightDecimal] |
 | -1             |
+
 
 
 

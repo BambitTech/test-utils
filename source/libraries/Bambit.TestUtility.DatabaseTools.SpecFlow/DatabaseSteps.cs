@@ -109,8 +109,8 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
             {
                 DatabaseMappedClass instance = databaseClassFactory.GenerateObjectFromTable(connectionName, schema, tableName);
                 tableRow.ApplyTransformValues(ReplaceVariable).TransformForNull(StateManager.Configuration.NullStringIdentifier);
-                string[] assignedValues = tableRow.AssignValuesIfDefined(instance);
-                object?[] objects = assignedValues.Select(a => instance.GetValue(a)).ToArray();
+                string[] assignedColumns = tableRow.AssignValuesIfDefined(instance);
+                object?[] objects = data.TableColumns.Select(a => instance.GetValue(a.CleanedName)).ToArray();
                 values.Add(objects);
             }
 
