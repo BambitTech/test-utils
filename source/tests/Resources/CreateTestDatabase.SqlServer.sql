@@ -5,11 +5,25 @@ drop table if exists [test].[testTableNotNullable];
 drop table if exists [test].[TestTableAlpha];
 drop table if exists [Test].[TestTableBigInt];
 drop table if exists [Test].[TestTableEpsilon];
+drop table if exists [Test].[TestTableForeignKeyHolder];
+drop table if exists [Test].[TestTableForeignKeyReference];
 drop SCHEMA if exists [test];
 
 go
 create schema [Test];
 go
+create table [Test].[TestTableForeignKeyReference] (
+   id int not null primary key
+)
+go
+create table  [Test].[TestTableForeignKeyHolder] (
+   id int not null,
+   fkid int not null
+)
+alter table  [Test].[TestTableForeignKeyHolder]
+   add constraint FK_TestTableForeignKeyHolder_TestTableForeignKeyReference_fkid foreign key (fkid)
+      references [Test].[TestTableForeignKeyReference]  (id)
+go 
 
 create table [test].[testTableNullable] (
    bigIntField bigint,

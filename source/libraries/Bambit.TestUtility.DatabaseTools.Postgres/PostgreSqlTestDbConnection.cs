@@ -898,6 +898,12 @@ SELECT
 
     }
 
+    /// <inheritdoc />
+    public override string GenerateRenameTableScript(string schema, string oldName, string newName)
+    {
+        return $"alter table {schema}.{oldName} rename to {newName}";
+    }
+
     /// <inheritdoc/>
     protected override object ConvertForDatabaseValue(string value, string targetType)
     {

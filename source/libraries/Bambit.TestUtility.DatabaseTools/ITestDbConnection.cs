@@ -120,5 +120,14 @@ namespace Bambit.TestUtility.DatabaseTools
         /// The value converted.
         /// </returns>
         object ConvertValue( string value, string targetType);
+
+        /// <summary>
+        /// Creates a string that can rename a table
+        /// </summary>
+        /// <param name="schema">Schema the table is in</param>
+        /// <param name="oldName">The current name</param>
+        /// <param name="newName">The new name</param>
+        /// <returns>A script that will rename a table</returns>
+        string GenerateRenameTableScript(string schema, string oldName, string newName);
     }
 }

@@ -404,6 +404,15 @@ public class RandomDataGeneratorTest
         TestNoDupes(() => RandomDataGenerator.Instance.GenerateInt(-100000, 100000), 5);
     }
 
+    [TestMethod]
+    public void GenerateInt_NineDigits_MultipleRuns_hasNineDigits()
+    {
+        for (int x = 0; x < 100; x++)
+        {
+            RandomDataGenerator.Instance.GenerateInt(100000000, 999999999).ToString().Length.Should().Be(9);
+        }
+    }
+    
     #endregion GenerateInt
 
     
