@@ -94,8 +94,14 @@ public class PostgreSqlTestDbConnectionTest
             object? expectedObject = propertyInfo.GetValue(mappedClass);
                 
                 
-
-            testObject.Should().BeEquivalentTo(expectedObject,
+            
+            if (expectedObject is DateOnly)
+            {
+                ((DateTime)testObject).Should().Be(((DateOnly) expectedObject).ToDateTime(TimeOnly.MinValue),
+                    $"Field {name} value of '{testObject}' should be '{expectedObject}");
+            }
+            else 
+                testObject.Should().BeEquivalentTo(expectedObject,
                 $"Field {name} value of '{testObject}' should be '{expectedObject}");
         }
     }
@@ -127,10 +133,14 @@ public class PostgreSqlTestDbConnectionTest
             if (propertyInfo.GetCustomAttributes(typeof(ComputedColumnAttribute)).Any())
                 continue;
             object? expectedObject = propertyInfo.GetValue(mappedClass);
-                
-                
 
-            testObject.Should().BeEquivalentTo(expectedObject,
+            if (expectedObject is DateOnly)
+            {
+                ((DateTime)testObject).Should().Be(((DateOnly) expectedObject).ToDateTime(TimeOnly.MinValue),
+                    $"Field {name} value of '{testObject}' should be '{expectedObject}");
+            }
+            else 
+                testObject.Should().BeEquivalentTo(expectedObject,
                 $"Field {name} value of '{testObject}' should be '{expectedObject}");
         }
     }
