@@ -546,6 +546,7 @@ public class MappedRowTest
     {
         DateTime randomDate =
             DateTime.Parse(RandomDataGenerator.Instance.GenerateDate().ToString(CultureInfo.InvariantCulture));
+        TimeOnly randomTime = TimeOnly.Parse(RandomDataGenerator.Instance.GenerateTimeOnly().ToString(CultureInfo.InvariantCulture));
         string firstName = RandomDataGenerator.Instance.GenerateFirstName();
         float randomFloat =
             (float)(RandomDataGenerator.Instance.GenerateDouble(6, 4) * (float.MaxValue - float.MinValue)) +
@@ -564,6 +565,9 @@ public class MappedRowTest
             ["GuidField", RandomDataGenerator.Instance.GenerateGuid() , (TestClass e)=>(object)e.GuidField],
             ["BoolField", RandomDataGenerator.Instance.GenerateBoolean() , (TestClass e)=>(object)e.BoolField],
             ["ByteField", RandomDataGenerator.Instance.GenerateByte() , (TestClass e)=>(object)e.ByteField],
+
+            ["DateOnlyField", RandomDataGenerator.Instance.GenerateDateOnly() , (TestClass e)=>(object)e.DateOnlyField],
+            ["TimeOnlyField", randomTime , (TestClass e)=>(object)e.TimeOnlyField],
 
 
             ["NullableFirstName", firstName, (TestClass e)=>e.NullableFirstName],

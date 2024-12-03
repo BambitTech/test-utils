@@ -29,8 +29,9 @@ Scenario: Verify at least speficed records exist full table matches full table r
 | 59CE4CEE-C983-4269-9A84-A3B052DA3537 | null          | 3/4/1956    | 250   | False         |
 
 	Then the following records should exist in the Test.TestTableAlpha table in the SqlTestDb database:
-| TestTableAlphaId                     | Name          | DateOfBirth | Score |
-| F6CC249B-BC42-46B9-A1CF-8D90690E4210 | John Smith    | 11/07/1975    | 100   |
+| TestTableAlphaId                     | Name       | DateOfBirth | Score |
+| F6CC249B-BC42-46B9-A1CF-8D90690E4210 | John Smith | 11/07/1975  | 100   |
+| 59CE4CEE-C983-4269-9A84-A3B052DA3537 | null       | 3/4/1956    | 250   | 
 
 
 Scenario: Verify Records exist, matching only a subset of columns

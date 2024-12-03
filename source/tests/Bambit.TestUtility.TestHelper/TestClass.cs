@@ -43,6 +43,8 @@ namespace Bambit.TestUtility.TestHelper
         public TestChildClass ChildClass { get; set; } = null!;
 
         public TestChildClass[] Children { get; set; } = [];
+        public DateOnly DateOnlyField { get; set; }
+        public TimeOnly TimeOnlyField { get; set; }
     }
 
     public interface ITestChildClass

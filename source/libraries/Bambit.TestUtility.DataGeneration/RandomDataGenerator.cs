@@ -168,6 +168,19 @@ namespace Bambit.TestUtility.DataGeneration
         {
             return DateTime.Today.AddDays(GenerateInt(daysAgoMinimum, daysFutureMaximum));
         }
+        
+        public virtual DateOnly GenerateDateOnly(int daysAgoMinimum = -30, int daysFutureMaximum = 30)
+        {
+            return DateOnly.FromDateTime(GenerateDate(daysAgoMinimum, daysFutureMaximum));
+        }
+
+
+        public virtual TimeOnly GenerateTimeOnly()
+        {
+            return new TimeOnly(GenerateInt(0, 23), GenerateInt(0, 60), GenerateInt(0, 60),
+                GenerateInt(0, 99));
+        }
+
 
         
         /// <inheritdoc />
@@ -583,6 +596,14 @@ namespace Bambit.TestUtility.DataGeneration
             else if (propertyType == typeof(DateTime))
             {
                 propertyInfo.SetValue(objectToInitialize, GenerateDate());
+            }
+            else if (propertyType == typeof(DateOnly))
+            {
+                propertyInfo.SetValue(objectToInitialize, GenerateDateOnly());
+            }
+            else if (propertyType == typeof(TimeOnly))
+            {
+                propertyInfo.SetValue(objectToInitialize, GenerateTimeOnly());
             }
             else if (propertyType == typeof(DateTimeOffset))
             {

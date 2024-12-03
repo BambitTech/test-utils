@@ -36,6 +36,8 @@ namespace Bambit.TestUtility.DatabaseTools
                 { typeof(string), (s) => s },
                 { typeof(Guid), (s) => Guid.Parse(s) },
                 { typeof(DateTime), (s) => ParseDateExtended(s) },
+                { typeof(DateOnly), (s) => DateOnly.FromDateTime(ParseDateExtended(s)) },
+                { typeof(TimeOnly), (s) => TimeOnly.FromDateTime( ParseDateExtended(s) )},
                 { typeof(DateTimeOffset), (s) => DateTimeOffset.Parse(s) },
                 {
                     typeof(bool),

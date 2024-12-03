@@ -299,6 +299,18 @@ public class RandomDataGeneratorTest
         TestNoDupes(()=> RandomDataGenerator.Instance.GenerateDateTime(-5, 5),100);
     }
 
+
+    [TestMethod]
+    public void GenerateDateOnly_GeneratedNoDupes()
+    {
+        TestNoDupes(()=> RandomDataGenerator.Instance.GenerateDateOnly(-5000, 5000),10);
+    }
+    [TestMethod]
+    public void GenerateTimeOnly_GeneratedNoDupes()
+    {
+        TestNoDupes(()=> RandomDataGenerator.Instance.GenerateTimeOnly(),20);
+    }
+
     #endregion GenerateDateTime
     #region GenerateEnum
 
