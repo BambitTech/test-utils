@@ -149,7 +149,7 @@ namespace Bambit.TestUtility.DatabaseTools
             List<string> assignedColumns = [];
             // Look for hierarchy objects
             Dictionary<string, Dictionary<string, string?>> hierarchyObjects =
-                new Dictionary<string, Dictionary<string, string?>>();
+                new Dictionary<string, Dictionary<string, string?>>(StringComparer.CurrentCultureIgnoreCase);
             foreach (string key in valueDictionary.Keys)
             {
                 int index = key.IndexOf(".",StringComparison.Ordinal);

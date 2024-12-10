@@ -16,7 +16,7 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
                 r.TestGrandChild =
                     RandomDataGenerator.Instance.InitializeObject<TestGrandChild>());
             properties.Add("ChildClass.ChildName", childClass .ChildName);
-            properties.Add("ChildClass.SubName", childClass.SubName);
+            properties.Add("childClass.SubName", childClass.SubName);
             properties.Add("ChildClass.BoolField", childClass.BoolField.ToString());
             properties.Add("ChildClass.TestGrandChild.GrandChildName", childClass.TestGrandChild.GrandChildName);
             properties.AssignValuesIfDefined(testClass);
