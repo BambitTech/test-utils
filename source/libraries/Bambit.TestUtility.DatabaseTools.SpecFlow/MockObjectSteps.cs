@@ -21,26 +21,32 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
         /// <returns>A <see cref="MockedObject"/> representign the table</returns>
         public MockedObject MockTable(string connectionName, string schema, string name)
         {
+            
+            using ITestDbConnection connection = OpenConnectionForName(connectionName);
+            IDatabaseCatalogRecord databaseCatalogRecord = GetCurrentConnector();
 
             MockedObject mockedObject = new()
             {
-                DatabseObjectType = DatabseObjectType.Table, ConnectionName = connectionName, OriginalName = $"{name}",
+                DatabaseObjectType = DatabseObjectType.Table, ConnectionName = connectionName, OriginalName = $"{name}",
                 OriginalSchema = $"{schema}"
             };
-            using ITestDbConnection connection = OpenConnectionForName(connectionName);
             using IDbCommand command = connection.CreateCommand();
-            mockedObject.NewName= $"{name}_{DateTime.Now.Ticks}";
-            mockedObject.RestoreScripts = new List<string>(new[]
-            {
-                $@"Drop table  if exists {schema}.{name}",
-                connection.GenerateRenameTableScript(schema, mockedObject.NewName, name)// "sp_Rename '[{schema}].{mockedObject.NewName}', '{name}'"
-            });
+            mockedObject.NewName= $"{databaseCatalogRecord.CleanQualifiers(name)}_{DateTime.Now.Ticks}";
+            mockedObject.RestoreScripts =
+            [
+                ..new[]
+                {
+                    $"Drop table  if exists {databaseCatalogRecord.CleanAndEscapeToken(schema)}.{databaseCatalogRecord.CleanAndEscapeToken(name)}",
+                    connection.GenerateRenameTableScript(schema, mockedObject.NewName,
+                        name) // "sp_Rename '[{schema}].{mockedObject.NewName}', '{name}'"
+                }
+            ];
             
-                string query = $@"SELECT count(1) FROM information_schema.columns WHERE table_schema = '{schema}' and table_name = '{name}'";
+                string query = $@"SELECT count(1) FROM information_schema.columns WHERE table_schema = '{databaseCatalogRecord.CleanQualifiers(schema)}' and table_name = '{databaseCatalogRecord.CleanQualifiers(name)}'";
                 command.CommandText = query;
                 int numCols = (int )command.ExecuteScalar()!;
 
-                command.CommandText = connection.GenerateRenameTableScript(schema, name, mockedObject.NewName);// $@"sp_Rename '{schema}.{name}', '{mockedObject.NewName}' ";
+                command.CommandText = connection.GenerateRenameTableScript(databaseCatalogRecord.CleanQualifiers(schema), databaseCatalogRecord.CleanQualifiers(name), mockedObject.NewName);// $@"sp_Rename '{schema}.{name}', '{mockedObject.NewName}' ";
                 command.ExecuteNonQuery();
 
                 command.CommandText = $@"select top 1 *

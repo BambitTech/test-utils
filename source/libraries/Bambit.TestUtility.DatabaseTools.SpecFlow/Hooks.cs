@@ -115,7 +115,7 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
                 }
 
 
-                if (mockedObject.DatabseObjectType == DatabseObjectType.Table)
+                if (mockedObject.DatabaseObjectType == DatabseObjectType.Table)
                     stateManager.DatabaseClassFactory.PurgeTableDefinition(mockedObject.ConnectionName,
                         mockedObject.OriginalSchema, mockedObject.OriginalName);
 

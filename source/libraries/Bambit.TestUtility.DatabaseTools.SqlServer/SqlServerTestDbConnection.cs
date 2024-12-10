@@ -378,7 +378,7 @@ select
     /// <inheritdoc />
     public override string GenerateRenameTableScript(string schema, string oldName, string newName)
     {
-        return $"sp_Rename '{schema}.{oldName}', '{newName}'";
+        return $"sp_Rename '{ schema}.{oldName}', '{newName}'";
     }
 
     /// <summary>

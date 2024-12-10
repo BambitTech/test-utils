@@ -147,12 +147,41 @@ namespace Bambit.TestUtility.DatabaseTools
                                 BindingFlags.Public);
 
             List<string> assignedColumns = [];
+            // Look for hierarchy objects
+            Dictionary<string, Dictionary<string, string?>> hierarchyObjects =
+                new Dictionary<string, Dictionary<string, string?>>();
+            foreach (string key in valueDictionary.Keys)
+            {
+                int index = key.IndexOf(".",StringComparison.Ordinal);
+                if ( index> 0)
+                {
+                    string name=key.Substring(0,index);
+                    string value = key.Substring(index+1);
+                    if(!hierarchyObjects.ContainsKey(name))
+                        hierarchyObjects.Add(name, new Dictionary<string, string?>(StringComparer.CurrentCultureIgnoreCase));
+                    hierarchyObjects[name].Add(value, valueDictionary[key]);
+                }
+            }
             foreach (PropertyInfo propertyInfo in propertyInfos)
             {
 
                 string? propertyName = AssignProperty(propertyInfo, assignee, valueDictionary);
                 if (!string.IsNullOrWhiteSpace(propertyName))
                     assignedColumns.AddRange(propertyName.Split("|".ToCharArray()));
+                else
+                {
+                    // see if we have a matching child element
+                    if (hierarchyObjects.ContainsKey(propertyInfo.Name))
+                    {
+                        // try to initialize the object
+                        object? activatedInstance = Activator.CreateInstance(propertyInfo.PropertyType);
+                        if (activatedInstance != null)
+                        {
+                            propertyInfo.SetValue(assignee, activatedInstance);
+                            hierarchyObjects[propertyInfo.Name].AssignValuesIfDefined(activatedInstance);
+                        }
+                    }
+                }
             }
 
             return [.. assignedColumns];

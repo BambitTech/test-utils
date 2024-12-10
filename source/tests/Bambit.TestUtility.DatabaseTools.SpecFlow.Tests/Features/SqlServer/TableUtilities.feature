@@ -320,7 +320,7 @@ Scenario: Expected is thrown when trying to assign invalid field
 	
 
 Scenario: Mock table, allows insert of data
-	Given the table Test.TestTableForeignKeyHolder is mocked without constraints
+	Given the table [Test].[TestTableForeignKeyHolder] is mocked without constraints
 	Given only the following records exist in the [Test].[TestTableForeignKeyHolder] table:
 	| id | fkid |
 	| 1  | 121  |
