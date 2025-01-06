@@ -39,7 +39,7 @@ jobs:
         PGPASSWORD: postgres
       run: |
         # Give the container a moment to startup
-        sleep 5
+        sleep 25
         # Create a database
         ls /opt
         ls /opt/mssql-tools18
