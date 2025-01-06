@@ -33,7 +33,7 @@ jobs:
         # In this scenario with a fresh container used for testing,
         # it is acceptable to use a plain-text password
         docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Admin123" \
-        -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
+        -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-CU13-ubuntu-22.04
     - name: 🛢️ Create test databases
       env: 
         PGPASSWORD: postgres
@@ -44,10 +44,10 @@ jobs:
         find . -name sqlcmd
         
         
-        /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Admin123 -q "create database IntegrationTests"
-        /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Admin123 -q "CREATE LOGIN [TestUser] WITH PASSWORD=N'Test1234!' "
-        /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Admin123 -d IntegrationTests -q "CREATE USER [TestUser] FOR LOGIN [TestUser];"
-        /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Admin123 -d IntegrationTests -q "ALTER ROLE [db_owner] ADD MEMBER [TestUser]"
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Admin123 -q "create database IntegrationTests"
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Admin123 -q "CREATE LOGIN [TestUser] WITH PASSWORD=N'Test1234!' "
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Admin123 -d IntegrationTests -q "CREATE USER [TestUser] FOR LOGIN [TestUser];"
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Admin123 -d IntegrationTests -q "ALTER ROLE [db_owner] ADD MEMBER [TestUser]"
         # Deploy test database
         /opt/mssql-tools/bin/sqlcmd -S localhost -d IntegrationTests -U sa -P Admin123 -i "./source/tests/Resources/CreateTestDatabase.SqlServer.sql"
         # Add the postgres database
