@@ -41,9 +41,7 @@ jobs:
         # Give the container a moment to startup
         sleep 25
         # Create a database
-        ls /opt
-        ls /opt/mssql-tools18
-        ls /opt/mssql-tools18/bin/
+        find . -name sqlcmd
         
         
         /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Admin123 -q "create database IntegrationTests"
