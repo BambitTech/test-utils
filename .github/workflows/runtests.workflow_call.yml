@@ -41,7 +41,7 @@ jobs:
         # Give the container a moment to startup
         sleep 5
         # Create a database
-        find . -name sqlcmd
+        find / -name sqlcmd
         
         
         /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Admin123 -q "create database IntegrationTests"
