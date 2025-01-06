@@ -128,8 +128,20 @@ namespace Bambit.TestUtility.DatabaseTools.SpecFlow
                     throw;
                 }
                 outputHelper.WriteLine($"An error was thrown trying to restore object '{mockedObject.OriginalName}': ");
-                outputHelper.WriteLine($"\t'Connection: {mockedObject.ConnectionName}': ");
-                outputHelper.WriteLine($"\t'Restore scripts: {mockedObject.RestoreScripts?.Count}': ");
+                outputHelper.WriteLine($"\tConnection: {mockedObject.ConnectionName}': ");
+                outputHelper.WriteLine($"\tRestore scripts: {mockedObject.RestoreScripts?.Count}': ");
+                outputHelper.WriteLine($"\tError: {ex.Message}'");
+                if (ex.InnerException != null)
+                {
+                    outputHelper.WriteLine($"\t\t'Inner error: {ex.InnerException.Message}'");
+                }
+                
+                outputHelper.WriteLine($"\tScripts: ");
+                foreach (string restoreScript in mockedObject.RestoreScripts)
+                {
+                    outputHelper.WriteLine($"\t\t {restoreScript} ");
+                }
+                
             }
         }
 
