@@ -41,6 +41,11 @@ jobs:
         # Give the container a moment to startup
         sleep 5
         # Create a database
+        ls /opt
+        ls /opt/mssql-tools18
+        ls /opt/mssql-tools18/bin/
+        
+        
         /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Admin123 -q "create database IntegrationTests"
         /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Admin123 -q "CREATE LOGIN [TestUser] WITH PASSWORD=N'Test1234!' "
         /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Admin123 -d IntegrationTests -q "CREATE USER [TestUser] FOR LOGIN [TestUser];"
