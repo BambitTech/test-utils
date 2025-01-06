@@ -41,6 +41,9 @@ jobs:
         # Give the container a moment to startup
         sleep 5
         # Create a database
+        ls -l /opt
+
+        echo "Looking for cmd"
         find / -name sqlcmd
         
         
