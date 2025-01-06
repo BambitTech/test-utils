@@ -39,7 +39,7 @@ jobs:
         PGPASSWORD: postgres
       run: |
         # Give the container a moment to startup
-        sleep 25
+        sleep 5
         # Create a database
         find . -name sqlcmd
         
