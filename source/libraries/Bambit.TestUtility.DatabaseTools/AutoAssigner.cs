@@ -208,6 +208,10 @@ namespace Bambit.TestUtility.DatabaseTools
                 nullable = nullabilityInfo.WriteState is NullabilityState.Nullable ||
                            propertyInfo.GetCustomAttributes(typeof(DatabaseNullableAttribute)).Any();
             }
+
+            if (propertyType.BaseType == typeof(Enum))
+                return AssignIfDefined(assignee, name, propertyInfo, nullable,valueDictionary, (string s)=>Enum.Parse(propertyType, s) ) ? name : null;
+            
             if (Converters.TryGetValue(propertyType, out var converter))
             {
 
