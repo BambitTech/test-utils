@@ -22,5 +22,21 @@ namespace Bambit.TestUtility.DatabaseTools.Tests
             properties.AssignValuesIfDefined(testClass);
             testClass.ChildClass.Should().BeEquivalentTo(childClass);
         }
+
+        [TestMethod]
+        public void AssignValuesIfDefined_ClassHasEnum_AssignsEnumValue()
+        {
+            ClassWithEnum enumClass = new ClassWithEnum();
+            Dictionary<string, string?> properties = new Dictionary<string, string?>();
+            properties.Add("EnumValue", "Alpha");
+            properties.AssignValuesIfDefined(enumClass);
+            enumClass.EnumValue.Should().Be(ClassEnumValues.Alpha);
+
+            properties = new Dictionary<string, string?>();
+            properties.Add("EnumValue", "Omega");
+            properties.AssignValuesIfDefined(enumClass);
+            enumClass.EnumValue.Should().Be(ClassEnumValues.Omega);
+
+        }
     }
 }

@@ -3,6 +3,17 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Bambit.TestUtility.TestHelper
 {
+    public enum ClassEnumValues
+    {
+        Alpha,
+        Omega
+    }
+    public class ClassWithEnum
+    {
+        public ClassEnumValues EnumValue { get; set; }
+    }
+
+
     [ExcludeFromCodeCoverage]
     public class TestClass
     {
