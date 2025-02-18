@@ -38,7 +38,7 @@ namespace Bambit.TestUtility.DatabaseTools
                 { typeof(DateTime), (s) => ParseDateExtended(s) },
                 { typeof(DateOnly), (s) => DateOnly.FromDateTime(ParseDateExtended(s)) },
                 { typeof(TimeOnly), (s) => TimeOnly.FromDateTime( ParseDateExtended(s) )},
-                { typeof(DateTimeOffset), (s) => DateTimeOffset.Parse(s) },
+                { typeof(DateTimeOffset), (s) => ParseDateOffsetExtended(s) },
                 {
                     typeof(bool),
                     (value) =>
@@ -73,6 +73,72 @@ namespace Bambit.TestUtility.DatabaseTools
         public static DateTime ParseDateExtended(string stringValue)
         {
             if (DateTime.TryParse(stringValue, out DateTime parsedDate))
+                return parsedDate;
+            string dateValue = stringValue.Replace(" ", "").ToLower();
+
+            switch (dateValue)
+            {
+                case "today":
+                    return DateTime.Today;
+                case "yesterday":
+                    return DateTime.Today.AddDays(-1);
+                case "tomorrow":
+                    return DateTime.Today.AddDays(1);
+                case "now":
+                    return DateTime.Now;
+                case "firstdayofthismonth":
+                case "firstdayofcurrentmonth":
+                case "firstdayofmonth":
+                    return new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+                case "lastdayofthismonth":
+                case "lastdayofcurrentmonth":
+                case "lastdayofmonth":
+                    return new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddMonths(1).AddDays(-1);
+                case "endoflastmonth":
+                case "lastdayoflastmonth":
+                case "lastdayofpreviousmonth":
+                    return new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddDays(-1);
+            }
+
+            Regex patternMatch = DatePatternMatch();
+            Match match = patternMatch.Match(dateValue);
+            if (!match.Success)
+                throw new ArgumentException($"unable to parse date value '{stringValue}'", nameof(stringValue));
+            string[] values =
+            [
+                match.Groups[1].Value,
+                match.Groups[2].Value,
+                match.Groups[3].Value,
+                match.Groups[4].Value
+            ];
+            DateTime firstDate = ParseDateExtended(values[0]);
+            if (!int.TryParse(values[2], out int addition))
+                throw new ArgumentException($"unable to parse date value '{stringValue}'", nameof(stringValue));
+            if (values[1] == "-")
+                addition *= -1;
+            if (values[3].StartsWith("month"))
+                return firstDate.AddMonths(addition);
+            if (values[3].StartsWith("hour"))
+                return firstDate.AddHours(addition);
+            if (values[3].StartsWith("second"))
+                return firstDate.AddSeconds(addition);
+            if (values[3].StartsWith("minute"))
+                return firstDate.AddMinutes(addition);
+            if (values[3].StartsWith("year"))
+                return firstDate.AddYears(addition);
+            return firstDate.AddDays(addition);
+
+        }
+        
+        /// <summary>
+        /// Parses our a string, allowing custom day types (e.g., today, yesterday) along with adding time spans (hours, days, etc.)
+        /// </summary>
+        /// <param name="stringValue">The value to parse.</param>
+        /// <returns>A DateTime object</returns>
+        /// <exception cref="ArgumentException">The supplied string could not be parsed</exception>
+        public static DateTimeOffset ParseDateOffsetExtended(string stringValue)
+        {
+            if (DateTimeOffset.TryParse(stringValue, out DateTimeOffset parsedDate))
                 return parsedDate;
             string dateValue = stringValue.Replace(" ", "").ToLower();
 
