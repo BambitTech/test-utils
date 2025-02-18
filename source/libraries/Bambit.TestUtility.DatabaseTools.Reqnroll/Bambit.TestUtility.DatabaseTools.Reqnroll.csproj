@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+   <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+     <PackageId>Bambit.TestUtility.DatabaseTools.Reqnroll</PackageId>
+	  <Authors>Law Metler</Authors>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <Company>Bambit Technologies, Inc.</Company>
+	  <Copyright>2024 Bambit Technologies, Inc</Copyright>
+	  <Description>Step library for testing against databases.</Description>
+	  <PackageProjectUrl>https://github.com/BambitTech/test-utils/</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/BambitTech/test-utils/</RepositoryUrl>
+     <PackageReadmeFile>Readme.md</PackageReadmeFile>
+     <PackageTags>Testing;Database;library;Reqnroll</PackageTags>
+     <PackageIcon>icon.png</PackageIcon>
+     <IncludeSymbols>true</IncludeSymbols>
+     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+     <EnablePackageValidation>true</EnablePackageValidation>
+     <Version>1.0.1</Version>
+
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../../docs/Bambit.TestUtility.DatabaseTools.Reqnroll/Readme.md" Pack="true" PackagePath="\" />
+    <None Include="../../../docs/icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.6.3" />
+    <PackageReference Include="Reqnroll" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bambit.TestUtility.DatabaseTools.SqlServer\Bambit.TestUtility.DatabaseTools.SqlServer.csproj" />
+    <ProjectReference Include="..\Bambit.TestUtility.DatabaseTools\Bambit.TestUtility.DatabaseTools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MinVer" Version="6.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

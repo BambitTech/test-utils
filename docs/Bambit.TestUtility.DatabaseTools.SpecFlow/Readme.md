@@ -1,4 +1,4 @@
-# Bambit.TestUtility.DatabaseTools.SpecFlow Basic Concepts
+# Bambit.TestUtility.DatabaseTools.Reqnroll Basic Concepts
 
 ## sage
 Provides a set of step definitions ane hooks for manipulating and testing agasint a Database with SpecFlo syntax.
@@ -7,12 +7,12 @@ Provides a set of step definitions ane hooks for manipulating and testing agasin
 
 Install:
 ```shell
-PM> Install-Package Bambit.TestUtility.DatabaseTools.SpecFlow
+PM> Install-Package Bambit.TestUtility.DatabaseTools.Reqnroll
 
 ```
 
 To use the defined steps in a StepFlow project, you will need to do the following:
- 1. Add the assembly in the `stepAssemblies` section of your ***specflow.json*** file (see https://docs.specflow.org/projects/specflow/en/latest/Bindings/Use-Bindings-from-External-Assemblies.html)
+ 1. Add the assembly in the `stepAssemblies` section of your ***Reqnroll.json*** file (see https://docs.Reqnroll.org/projects/Reqnroll/en/latest/Bindings/Use-Bindings-from-External-Assemblies.html)
  2. Create a ***bambit.utilities.json*** config file.  It should look like the following:
 ```json
 {
@@ -30,7 +30,7 @@ To use the defined steps in a StepFlow project, you will need to do the followin
     },
       
   },
-  "specFlow": {
+  "Reqnroll": {
     "nullStringIdentifier": "null",
     "timeoutSeconds": 30
   }
@@ -81,4 +81,4 @@ Then only the following records should exist in the [dbo].[TestTable] table:
    
 	
 ```
-For a full list of available steps and usage, see [Documentation](https://bambittech.github.io/test-utils/Bambit.TestUtility.DatabaseTools.SpecFlow/Overview.html) and [Steps](https://bambittech.github.io/test-utils/Bambit.TestUtility.DatabaseTools.SpecFlow/StepDefinitions.html)
+For a full list of available steps and usage, see [Documentation](https://bambittech.github.io/test-utils/Bambit.TestUtility.DatabaseTools.Reqnroll/Overview.html) and [Steps](https://bambittech.github.io/test-utils/Bambit.TestUtility.DatabaseTools.Reqnroll/StepDefinitions.html)

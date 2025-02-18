@@ -38,6 +38,7 @@ jobs:
     - run: dotnet pack source/libraries/Bambit.TestUtility.DatabaseTools/ --configuration Release --output ${{ env.NuGetDirectory }}
     - run: dotnet pack source/libraries/Bambit.TestUtility.DatabaseTools.SqlServer/ --configuration Release --output ${{ env.NuGetDirectory }}
     - run: dotnet pack source/libraries/Bambit.TestUtility.DatabaseTools.SpecFlow/ --configuration Release --output ${{ env.NuGetDirectory }}
+    - run: dotnet pack source/libraries/Bambit.TestUtility.DatabaseTools.Reqnroll/ --configuration Release --output ${{ env.NuGetDirectory }}
     - run: dotnet pack source/libraries/Bambit.TestUtility.DatabaseTools.Postgres/ --configuration Release --output ${{ env.NuGetDirectory }}
     # Publish the NuGet package as an artifact, so they can be used in the following jobs
     - uses: actions/upload-artifact@v4
@@ -72,7 +73,7 @@ jobs:
         run: meziantou.validate-nuget-package (Get-ChildItem "${{ env.NuGetDirectory }}/*.nupkg")
 
 #  run_test:
-    uses: ./.github/workflows/runtests.workflow_call.yml
+#    uses: ./.github/workflows/runtests.workflow_call.yml
     
   deploy:
     # Publish only when creating a GitHub Release
@@ -80,7 +81,7 @@ jobs:
     # You can update this logic if you want to manage releases differently
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
-    needs: [ validate_nuget, run_test ]
+    needs: [ validate_nuget] #, run_test ]
     steps:
       # Download the NuGet package created in the previous job
       - uses: actions/download-artifact@v4
