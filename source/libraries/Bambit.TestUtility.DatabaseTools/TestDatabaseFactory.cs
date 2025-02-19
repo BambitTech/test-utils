@@ -36,6 +36,16 @@ public class TestDatabaseFactory : ITestDatabaseFactory
             }
         }
     }
+
+    /// <summary>
+    /// Adds or updates a mapped database
+    /// </summary>
+    /// <param name="name">the name of the database connection</param>
+    /// <param name="database">The <see cref="MappedDatabase"/> information</param>
+    public void AddOrUpdateMappedDatabase(string name, MappedDatabase database)
+    {
+        ConnectionMap[name] = database;
+    }
     /// <inheritdoc />
     public ITestDbConnection GetConnection(string name)
     {

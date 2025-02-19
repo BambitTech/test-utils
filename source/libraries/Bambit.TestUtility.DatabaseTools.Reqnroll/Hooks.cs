@@ -28,11 +28,11 @@ namespace Bambit.TestUtility.DatabaseTools.Reqnroll
         public static void BeforeTestRun()
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
-                .AddJsonFile("bambit.utilities.json")
+                .AddJsonFile("bambit.utilities.json", true)
                 .AddJsonFile("bambit.utilities.local.json", true)
                 .Build();
             ReqnrollUtilitiesConfiguration? reqnrollConfig =
-                configuration.GetSection("Reqnroll").Get<ReqnrollUtilitiesConfiguration>();
+                configuration.GetSection("reqnroll").Get<ReqnrollUtilitiesConfiguration>();
 
             TestDatabaseFactoryOptions testDatabaseFactoryOptions = configuration.GetSection("databaseFactory")
                 .Get<TestDatabaseFactoryOptions>()!;

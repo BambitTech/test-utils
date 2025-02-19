@@ -1,4 +1,5 @@
-﻿using Bambit.TestUtility.DatabaseTools.Reqnroll.Configuration;
+﻿using System.Diagnostics;
+using Bambit.TestUtility.DatabaseTools.Reqnroll.Configuration;
 using Reqnroll;
 
 namespace Bambit.TestUtility.DatabaseTools.Reqnroll;
@@ -115,17 +116,17 @@ namespace Bambit.TestUtility.DatabaseTools.Reqnroll;
         ///
         /// <param name="testDatabaseFactoryOptions">       Options for controlling the test database
         ///                                                 factory. </param>
-        /// <param name="ReqnrollUtilitiesConfiguration">   The specifier flow utilities configuration. </param>
+        /// <param name="reqnrollUtilitiesConfiguration">   The specifier flow utilities configuration. </param>
         ///
         /// <returns>   An InstanceConfiguration. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         internal static InstanceConfiguration Initialize(TestDatabaseFactoryOptions testDatabaseFactoryOptions, 
-            ReqnrollUtilitiesConfiguration ReqnrollUtilitiesConfiguration)
+            ReqnrollUtilitiesConfiguration reqnrollUtilitiesConfiguration)
         {
             lock (InstanceLock)
             {
-                ConfigurationBacker ??= new InstanceConfiguration(testDatabaseFactoryOptions, ReqnrollUtilitiesConfiguration);
+                ConfigurationBacker ??= new InstanceConfiguration(testDatabaseFactoryOptions, reqnrollUtilitiesConfiguration);
             }
 
             return Configuration;
@@ -172,5 +173,17 @@ namespace Bambit.TestUtility.DatabaseTools.Reqnroll;
             context.Set(ConfigurationBacker.DatabaseClassFactory);
             context.Set(ConfigurationBacker.DatabaseRandomizer);
             context.Set(ConfigurationBacker.ReqnrollUtilitiesConfiguration.Clone() );
+        }
+
+        /// <summary>
+        /// Adds or updates a mapped database
+        /// </summary>
+        /// <param name="name">the name of the database connection</param>
+        /// <param name="mappedDatabase">The <see cref="MappedDatabase"/> information</param>
+
+        public static void AddMappedDatabase(string name, MappedDatabase mappedDatabase)
+        {
+            VerifyConfigIsNotNull();
+            Configuration.TestDatabaseFactory.AddOrUpdateMappedDatabase(name, mappedDatabase);
         }
     }
